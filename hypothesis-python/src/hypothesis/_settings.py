@@ -90,11 +90,7 @@ class settingsProperty:
     @property
     def __doc__(self):
         description = all_settings[self.name].description
-        default = (
-            repr(getattr(settings.default, self.name))
-            if self.show_default
-            else "(dynamically calculated)"
-        )
+        default = repr(getattr(settings.default, self.name)) if self.show_default else "(dynamically calculated)"
         return f"{description}\n\ndefault value: ``{default}``"
 
 
@@ -122,8 +118,7 @@ class settingsMeta(type):
     def __setattr__(cls, name: str, value: object) -> None:
         if name == "default":
             raise AttributeError(
-                "Cannot assign to the property settings.default - "
-                "consider using settings.load_profile instead."
+                "Cannot assign to the property settings.default - consider using settings.load_profile instead."
             )
         elif not (isinstance(value, settingsProperty) or name.startswith("_")):
             raise AttributeError(
@@ -178,10 +173,7 @@ class settings(metaclass=settingsMeta):
             check_type(settings, parent, "parent")
         if derandomize not in (not_set, False):
             if database not in (not_set, None):  # type: ignore
-                raise InvalidArgument(
-                    "derandomize=True implies database=None, so passing "
-                    f"{database=} too is invalid."
-                )
+                raise InvalidArgument(f"derandomize=True implies database=None, so passing {database=} too is invalid.")
             database = None
 
         defaults = parent or settings.default
@@ -189,9 +181,7 @@ class settings(metaclass=settingsMeta):
             for setting in all_settings.values():
                 value = locals()[setting.name]
                 if value is not_set:
-                    object.__setattr__(
-                        self, setting.name, getattr(defaults, setting.name)
-                    )
+                    object.__setattr__(self, setting.name, getattr(defaults, setting.name))
                 else:
                     object.__setattr__(self, setting.name, setting.validator(value))
 
@@ -208,8 +198,7 @@ class settings(metaclass=settingsMeta):
         # ``test`` is returned, because this check results in type refinement.
         if not callable(_test):
             raise InvalidArgument(
-                "settings objects can be called as a decorator with @given, "
-                f"but decorated {test=} is not callable."
+                f"settings objects can be called as a decorator with @given, but decorated {test=} is not callable."
             )
         if inspect.isclass(test):
             from hypothesis.stateful import RuleBasedStateMachine
@@ -227,8 +216,7 @@ class settings(metaclass=settingsMeta):
                 return test  # type: ignore
             else:
                 raise InvalidArgument(
-                    "@settings(...) can only be used as a decorator on "
-                    "functions, or on subclasses of RuleBasedStateMachine."
+                    "@settings(...) can only be used as a decorator on functions, or on subclasses of RuleBasedStateMachine."
                 )
         if hasattr(_test, "_hypothesis_internal_settings_applied"):
             # Can't use _hypothesis_internal_use_settings as an indicator that
@@ -265,9 +253,7 @@ class settings(metaclass=settingsMeta):
           the first time it is accessed on any given settings object.
         """
         if settings.__definitions_are_locked:
-            raise InvalidState(
-                "settings have been locked and may no longer be defined."
-            )
+            raise InvalidState("settings have been locked and may no longer be defined.")
         if options is not None:
             options = tuple(options)
             assert default in options
@@ -592,10 +578,7 @@ def _validate_phases(phases: Sequence[Phase]) -> Sequence[Phase]:
 settings._define_setting(
     "phases",
     default=tuple(Phase),
-    description=(
-        "Control which phases should be run. "
-        "See :ref:`the full documentation for more details <phases>`"
-    ),
+    description=("Control which phases should be run. See :ref:`the full documentation for more details <phases>`"),
     validator=_validate_phases,
 )
 
@@ -634,8 +617,7 @@ def validate_health_check_suppressions(suppressions):
     for s in suppressions:
         if not isinstance(s, HealthCheck):
             raise InvalidArgument(
-                f"Non-HealthCheck value {s!r} of type {type(s).__name__} "
-                "is invalid in suppress_health_check."
+                f"Non-HealthCheck value {s!r} of type {type(s).__name__} is invalid in suppress_health_check."
             )
         if s in (HealthCheck.return_value, HealthCheck.not_a_test_method):
             note_deprecation(
@@ -756,16 +738,13 @@ types.  We aim to support heuristic-random, solver-based, and fuzzing-based back
 settings.lock_further_definitions()
 
 
-def note_deprecation(
-    message: str, *, since: str, has_codemod: bool, stacklevel: int = 0
-) -> None:
+def note_deprecation(message: str, *, since: str, has_codemod: bool, stacklevel: int = 0) -> None:
     if since != "RELEASEDAY":
         date = datetime.date.fromisoformat(since)
         assert datetime.date(2021, 1, 1) <= date
     if has_codemod:
         message += (
-            "\n    The `hypothesis codemod` command-line tool can automatically "
-            "refactor your code to fix this warning."
+            "\n    The `hypothesis codemod` command-line tool can automatically refactor your code to fix this warning."
         )
     warnings.warn(HypothesisDeprecationWarning(message), stacklevel=2 + stacklevel)
 
@@ -796,7 +775,5 @@ assert settings.default is not None
 # defined settings - in case we've added or remove something from one but
 # not the other.
 assert set(all_settings) == {
-    p.name
-    for p in inspect.signature(settings.__init__).parameters.values()
-    if p.kind == inspect.Parameter.KEYWORD_ONLY
+    p.name for p in inspect.signature(settings.__init__).parameters.values() if p.kind == inspect.Parameter.KEYWORD_ONLY
 }

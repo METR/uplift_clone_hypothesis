@@ -146,11 +146,7 @@ else:
         return bool(any(config.getoption(opt) for opt in _ALL_OPTIONS))
 
     def pytest_report_header(config):
-        if not (
-            config.option.verbose >= 1
-            or "hypothesis" in sys.modules
-            or _any_hypothesis_option(config)
-        ):
+        if not (config.option.verbose >= 1 or "hypothesis" in sys.modules or _any_hypothesis_option(config)):
             return None
 
         from hypothesis import Verbosity, settings
@@ -179,10 +175,7 @@ else:
             # with the extra values given (in this case 'verbosity')
             settings.register_profile(name, verbosity=verbosity_value)
             settings.load_profile(name)
-        if (
-            config.getoption(EXPLAIN_OPTION)
-            and Phase.explain not in settings.default.phases
-        ):
+        if config.getoption(EXPLAIN_OPTION) and Phase.explain not in settings.default.phases:
             name = f"{settings._current_profile}-with-explain-phase"
             phases = (*settings.default.phases, Phase.explain)
             settings.register_profile(name, phases=phases)
@@ -208,8 +201,7 @@ else:
 
         # See https://github.com/pytest-dev/pytest/issues/9159
         core.pytest_shows_exceptiongroups = (
-            getattr(pytest, "version_tuple", ())[:2] >= (7, 2)
-            or item.config.getoption("tbstyle", "auto") == "native"
+            getattr(pytest, "version_tuple", ())[:2] >= (7, 2) or item.config.getoption("tbstyle", "auto") == "native"
         )
         core.running_under_pytest = True
 
@@ -253,9 +245,7 @@ else:
             # work, the test object is probably something weird
             # (e.g a stateful test wrapper), so we skip the function-scoped
             # fixture check.
-            settings = getattr(
-                item.obj, "_hypothesis_internal_use_settings", Settings.default
-            )
+            settings = getattr(item.obj, "_hypothesis_internal_use_settings", Settings.default)
 
             # Check for suspicious use of function-scoped fixtures, but only
             # if the corresponding health check is not suppressed.
@@ -291,8 +281,7 @@ else:
                 fn = getattr(item.obj, "__func__", item.obj)
                 fn._hypothesis_internal_use_settings = Settings(
                     parent=settings,
-                    suppress_health_check={HealthCheck.differing_executors}
-                    | set(settings.suppress_health_check),
+                    suppress_health_check={HealthCheck.differing_executors} | set(settings.suppress_health_check),
                 )
 
                 # Give every parametrized test invocation a unique database key
@@ -407,9 +396,7 @@ else:
                 return
             if not _WROTE_TO:
                 terminalreporter.section("Hypothesis")
-            terminalreporter.write_line(
-                f"`git apply {fname}` to add failing examples to your code."
-            )
+            terminalreporter.write_line(f"`git apply {fname}` to add failing examples to your code.")
 
     def pytest_collection_modifyitems(items):
         if "hypothesis" not in sys.modules:

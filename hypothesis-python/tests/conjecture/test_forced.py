@@ -182,11 +182,7 @@ def test_forced_with_large_magnitude_integers(data):
 
     half_range = 2**127 + 1
     cd = fresh_data()
-    cd.draw_integer(
-        min_value=half_range + bound_offset, forced=half_range + forced_offset
-    )
+    cd.draw_integer(min_value=half_range + bound_offset, forced=half_range + forced_offset)
 
     cd = fresh_data()
-    cd.draw_integer(
-        max_value=-(half_range + bound_offset), forced=-(half_range + forced_offset)
-    )
+    cd.draw_integer(max_value=-(half_range + bound_offset), forced=-(half_range + forced_offset))

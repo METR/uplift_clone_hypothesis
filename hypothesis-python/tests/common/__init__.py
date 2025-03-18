@@ -41,11 +41,7 @@ __all__ = ["TIME_INCREMENT", "OrderedPair", "standard_types"]
 
 OrderedPair = namedtuple("OrderedPair", ("left", "right"))
 
-ordered_pair = integers().flatmap(
-    lambda right: integers(min_value=0).map(
-        lambda length: OrderedPair(right - length, right)
-    )
-)
+ordered_pair = integers().flatmap(lambda right: integers(min_value=0).map(lambda length: OrderedPair(right - length, right)))
 
 
 def constant_list(strat):

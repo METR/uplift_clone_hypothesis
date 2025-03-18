@@ -30,9 +30,7 @@ ARRAY_CODES = ["B", "H", "I", "L", "Q", "O"]
 T = TypeVar("T")
 
 
-def array_or_list(
-    code: str, contents: Iterable[int]
-) -> Union[list[int], "ArrayType[int]"]:
+def array_or_list(code: str, contents: Iterable[int]) -> Union[list[int], "ArrayType[int]"]:
     if code == "O":
         return list(contents)
     return array.array(code, contents)
@@ -107,13 +105,9 @@ class IntList(Sequence[int]):
     def __getitem__(self, i: int) -> int: ...  # pragma: no cover
 
     @overload
-    def __getitem__(
-        self, i: slice
-    ) -> Union[list[int], "ArrayType[int]"]: ...  # pragma: no cover
+    def __getitem__(self, i: slice) -> Union[list[int], "ArrayType[int]"]: ...  # pragma: no cover
 
-    def __getitem__(
-        self, i: Union[int, slice]
-    ) -> Union[int, list[int], "ArrayType[int]"]:
+    def __getitem__(self, i: Union[int, slice]) -> Union[int, list[int], "ArrayType[int]"]:
         return self.__underlying[i]
 
     def __delitem__(self, i: Union[int, slice]) -> None:
@@ -414,9 +408,7 @@ def gc_cumulative_time() -> float:
     if not _gc_initialized:
         if hasattr(gc, "callbacks"):
             # CPython
-            def gc_callback(
-                phase: Literal["start", "stop"], info: dict[str, int]
-            ) -> None:
+            def gc_callback(phase: Literal["start", "stop"], info: dict[str, int]) -> None:
                 global _gc_start, _gc_cumulative_time
                 try:
                     now = _perf_counter()

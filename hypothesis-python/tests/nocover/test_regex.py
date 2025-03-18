@@ -58,9 +58,9 @@ def conservative_regex(draw):
 
 
 CONSERVATIVE_REGEX = conservative_regex()
-FLAGS = st.sets(
-    st.sampled_from([re.ASCII, re.IGNORECASE, re.MULTILINE, re.DOTALL])
-).map(lambda flag_set: reduce(int.__or__, flag_set, 0))
+FLAGS = st.sets(st.sampled_from([re.ASCII, re.IGNORECASE, re.MULTILINE, re.DOTALL])).map(
+    lambda flag_set: reduce(int.__or__, flag_set, 0)
+)
 
 
 @given(st.data())
@@ -76,9 +76,7 @@ def test_conservative_regex_are_correct_by_construction(data):
 @given(st.data())
 def test_fuzz_stuff(data):
     pattern = data.draw(
-        st.text(min_size=1, max_size=5)
-        | st.binary(min_size=1, max_size=5)
-        | CONSERVATIVE_REGEX.filter(bool)
+        st.text(min_size=1, max_size=5) | st.binary(min_size=1, max_size=5) | CONSERVATIVE_REGEX.filter(bool)
     )
     flags = data.draw(FLAGS)
 

@@ -53,9 +53,7 @@ def _process_benchmark_data(data):
     assert set(data) == {"old", "new"}
     old_calls = data["old"]["calls"]
     new_calls = data["new"]["calls"]
-    assert set(old_calls) == set(new_calls), set(old_calls).symmetric_difference(
-        set(new_calls)
-    )
+    assert set(old_calls) == set(new_calls), set(old_calls).symmetric_difference(set(new_calls))
 
     graph_data = []
 
@@ -82,9 +80,7 @@ def _process_benchmark_data(data):
         sums["new"] += statistics.mean(new)
         diffs = [n_old - n_new for n_old, n_new in zip(old, new)]
         diffs_times = [_diff_times(n_old, n_new) for n_old, n_new in zip(old, new)]
-        ci_shrink = (
-            _mean_difference_ci(old, new, confidence=0.95) if len(old) > 1 else 0
-        )
+        ci_shrink = _mean_difference_ci(old, new, confidence=0.95) if len(old) > 1 else 0
 
         graph_data.append(
             {

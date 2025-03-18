@@ -23,9 +23,7 @@ def test_can_find_positive_delta():
 
 
 def test_can_find_negative_delta():
-    assert minimal(
-        timedeltas(max_value=dt.timedelta(10**6)), lambda x: x.days < 0
-    ) == dt.timedelta(-1)
+    assert minimal(timedeltas(max_value=dt.timedelta(10**6)), lambda x: x.days < 0) == dt.timedelta(-1)
 
 
 def test_can_find_on_the_second():
@@ -69,9 +67,7 @@ def test_default_datetimes_are_naive(dt):
 
 def test_bordering_on_a_leap_year():
     x = minimal(
-        datetimes(
-            dt.datetime.min.replace(year=2003), dt.datetime.max.replace(year=2005)
-        ),
+        datetimes(dt.datetime.min.replace(year=2003), dt.datetime.max.replace(year=2005)),
         lambda x: x.month == 2 and x.day == 29,
         settings=settings(max_examples=1200),
     )

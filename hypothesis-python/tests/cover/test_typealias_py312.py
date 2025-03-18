@@ -23,9 +23,7 @@ def test_resolves_simple_typealias():
 
     assert_simple_property(st.from_type(MyInt), lambda x: isinstance(x, int))
     assert_simple_property(st.from_type(AliasedInt), lambda x: isinstance(x, int))
-    assert_simple_property(
-        st.from_type(MaybeInt), lambda x: isinstance(x, int) or x is None
-    )
+    assert_simple_property(st.from_type(MaybeInt), lambda x: isinstance(x, int) or x is None)
 
     find_any(st.from_type(MaybeInt), lambda x: isinstance(x, int))
     find_any(st.from_type(MaybeInt), lambda x: x is None)

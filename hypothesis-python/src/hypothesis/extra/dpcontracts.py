@@ -39,9 +39,7 @@ def fulfill(contract_func):
     test e.g. ``assert fulfill(func)(*args)``.
     """
     if not hasattr(contract_func, "__contract_wrapped_func__"):
-        raise InvalidArgument(
-            f"{contract_func.__name__} has no dpcontracts preconditions"
-        )
+        raise InvalidArgument(f"{contract_func.__name__} has no dpcontracts preconditions")
 
     @proxies(contract_func)
     def inner(*args, **kwargs):

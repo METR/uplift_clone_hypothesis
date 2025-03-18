@@ -59,24 +59,16 @@ def _recase_randomly(draw: DrawFn, tld: str) -> str:
 
 class DomainNameStrategy(st.SearchStrategy):
     @staticmethod
-    def clean_inputs(
-        minimum: int, maximum: int, value: Optional[int], variable_name: str
-    ) -> int:
+    def clean_inputs(minimum: int, maximum: int, value: Optional[int], variable_name: str) -> int:
         if value is None:
             value = maximum
         elif not isinstance(value, int):
-            raise InvalidArgument(
-                f"Expected integer but {variable_name} is a {type(value).__name__}"
-            )
+            raise InvalidArgument(f"Expected integer but {variable_name} is a {type(value).__name__}")
         elif not minimum <= value <= maximum:
-            raise InvalidArgument(
-                f"Invalid value {minimum!r} < {variable_name}={value!r} < {maximum!r}"
-            )
+            raise InvalidArgument(f"Invalid value {minimum!r} < {variable_name}={value!r} < {maximum!r}")
         return value
 
-    def __init__(
-        self, max_length: Optional[int] = None, max_element_length: Optional[int] = None
-    ) -> None:
+    def __init__(self, max_length: Optional[int] = None, max_element_length: Optional[int] = None) -> None:
         """
         A strategy for :rfc:`1035` fully qualified domain names.
 
@@ -89,9 +81,7 @@ class DomainNameStrategy(st.SearchStrategy):
         # https://tools.ietf.org/html/rfc1035#section-2.3.4
 
         max_length = self.clean_inputs(4, 255, max_length, "max_length")
-        max_element_length = self.clean_inputs(
-            1, 63, max_element_length, "max_element_length"
-        )
+        max_element_length = self.clean_inputs(1, 63, max_element_length, "max_element_length")
 
         super().__init__()
         self.max_length = max_length
@@ -106,9 +96,7 @@ class DomainNameStrategy(st.SearchStrategy):
             label_regex = r"[a-zA-Z][a-zA-Z0-9]?"
         else:
             maximum_center_character_pattern_repetitions = self.max_element_length - 2
-            label_regex = r"[a-zA-Z]([a-zA-Z0-9\-]{0,%d}[a-zA-Z0-9])?" % (
-                maximum_center_character_pattern_repetitions,
-            )
+            label_regex = r"[a-zA-Z]([a-zA-Z0-9\-]{0,%d}[a-zA-Z0-9])?" % (maximum_center_character_pattern_repetitions,)
 
         # Construct reusable strategies here to avoid a performance hit by doing
         # so repeatedly in do_draw.
@@ -149,13 +137,9 @@ class DomainNameStrategy(st.SearchStrategy):
 
 
 @defines_strategy(force_reusable_values=True)
-def domains(
-    *, max_length: int = 255, max_element_length: int = 63
-) -> st.SearchStrategy[str]:
+def domains(*, max_length: int = 255, max_element_length: int = 63) -> st.SearchStrategy[str]:
     """Generate :rfc:`1035` compliant fully qualified domain names."""
-    return DomainNameStrategy(
-        max_length=max_length, max_element_length=max_element_length
-    )
+    return DomainNameStrategy(max_length=max_length, max_element_length=max_element_length)
 
 
 # The `urls()` strategy uses this to generate URL fragments (e.g. "#foo").
@@ -164,11 +148,7 @@ def domains(
 _url_fragments_strategy = (
     st.lists(
         st.builds(
-            lambda char, encode: (
-                f"%{ord(char):02X}"
-                if (encode or char not in FRAGMENT_SAFE_CHARACTERS)
-                else char
-            ),
+            lambda char, encode: (f"%{ord(char):02X}" if (encode or char not in FRAGMENT_SAFE_CHARACTERS) else char),
             st.characters(min_codepoint=0, max_codepoint=255),
             st.booleans(),
         ),

@@ -147,9 +147,7 @@ def get_type_hints(thing: object) -> dict[str, Any]:
     if isinstance(thing, partial):
         from hypothesis.internal.reflection import get_signature
 
-        bound = set(get_signature(thing.func).parameters).difference(
-            get_signature(thing).parameters
-        )
+        bound = set(get_signature(thing.func).parameters).difference(get_signature(thing).parameters)
         return {k: v for k, v in get_type_hints(thing.func).items() if k not in bound}
 
     try:
@@ -172,18 +170,13 @@ def get_type_hints(thing: object) -> dict[str, Any]:
 
             vkinds = (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
             for p in get_signature(thing).parameters.values():
-                if (
-                    p.kind not in vkinds
-                    and is_a_type(p.annotation)
-                    and p.annotation is not p.empty
-                ):
+                if p.kind not in vkinds and is_a_type(p.annotation) and p.annotation is not p.empty:
                     p_hint = p.annotation
 
                     # Defer to `get_type_hints` if signature annotation is, or
                     # contains, a forward reference that is otherwise resolved.
                     if any(
-                        isinstance(sig_hint, ForwardRef)
-                        and not isinstance(hint, ForwardRef)
+                        isinstance(sig_hint, ForwardRef) and not isinstance(hint, ForwardRef)
                         for sig_hint, hint in zip(
                             _hint_and_args(p.annotation),
                             _hint_and_args(hints.get(p.name, Any)),
@@ -272,10 +265,7 @@ else:  # pragma: no cover
 
 def _asdict_inner(obj, dict_factory):
     if dataclasses._is_dataclass_instance(obj):
-        return dict_factory(
-            (f.name, _asdict_inner(getattr(obj, f.name), dict_factory))
-            for f in dataclasses.fields(obj)
-        )
+        return dict_factory((f.name, _asdict_inner(getattr(obj, f.name), dict_factory)) for f in dataclasses.fields(obj))
     elif isinstance(obj, tuple) and hasattr(obj, "_fields"):
         return type(obj)(*[_asdict_inner(v, dict_factory) for v in obj])
     elif isinstance(obj, (list, tuple)):
@@ -286,9 +276,6 @@ def _asdict_inner(obj, dict_factory):
             for k, v in obj.items():
                 result[_asdict_inner(k, dict_factory)] = _asdict_inner(v, dict_factory)
             return result
-        return type(obj)(
-            (_asdict_inner(k, dict_factory), _asdict_inner(v, dict_factory))
-            for k, v in obj.items()
-        )
+        return type(obj)((_asdict_inner(k, dict_factory), _asdict_inner(v, dict_factory)) for k, v in obj.items())
     else:
         return copy.deepcopy(obj)

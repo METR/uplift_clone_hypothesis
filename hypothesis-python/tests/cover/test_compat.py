@@ -49,9 +49,7 @@ def test_our_ceil_agrees_with_math_ceil(value):
 
 
 class WeirdSig:
-    __signature__ = Signature(
-        parameters=[Parameter(name="args", kind=Parameter.VAR_POSITIONAL)]
-    )
+    __signature__ = Signature(parameters=[Parameter(name="args", kind=Parameter.VAR_POSITIONAL)])
 
 
 def test_no_type_hints():
@@ -91,9 +89,7 @@ Bar.__signature__ = signature(Bar).replace(  # type: ignore
 )
 
 
-@pytest.mark.parametrize(
-    "obj,expected", [(Foo, Optional[Foo]), (Bar, Optional[Union[int, Bar]])]
-)
+@pytest.mark.parametrize("obj,expected", [(Foo, Optional[Foo]), (Bar, Optional[Union[int, Bar]])])
 def test_resolve_fwd_refs(obj, expected):
     # See: https://github.com/HypothesisWorks/hypothesis/issues/3519
     assert get_type_hints(obj)["x"] == expected

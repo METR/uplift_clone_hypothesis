@@ -14,10 +14,7 @@ from hypothesis.extra import codemods
 
 
 def test_refactor_function_is_idempotent():
-    before = (
-        "from hypothesis.strategies import complex_numbers\n\n"
-        "complex_numbers(None)\n"
-    )
+    before = "from hypothesis.strategies import complex_numbers\n\ncomplex_numbers(None)\n"
     after = codemods.refactor(before)
     assert before.replace("None", "min_magnitude=0") == after
     assert codemods.refactor(after) == after

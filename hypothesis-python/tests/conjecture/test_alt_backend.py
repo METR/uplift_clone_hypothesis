@@ -80,9 +80,7 @@ class PrngProvider(PrimitiveProvider):
             assert min_value is not None
             assert max_value is not None
             # use .choices so we can use the weights= param.
-            choices = self.prng.choices(
-                range(min_value, max_value + 1), weights=weights, k=1
-            )
+            choices = self.prng.choices(range(min_value, max_value + 1), weights=weights, k=1)
             return choices[0]
 
         if min_value is None and max_value is None:
@@ -134,9 +132,7 @@ class PrngProvider(PrimitiveProvider):
         min_size: int = 0,
         max_size: int = COLLECTION_DEFAULT_MAX_SIZE,
     ) -> str:
-        size = self.prng.randint(
-            min_size, max(min_size, min(100 if max_size is None else max_size, 100))
-        )
+        size = self.prng.randint(min_size, max(min_size, min(100 if max_size is None else max_size, 100)))
         return "".join(map(chr, self.prng.choices(intervals, k=size)))
 
     def draw_bytes(
@@ -232,9 +228,7 @@ def test_backend_can_shrink_strings():
 
 def test_backend_can_shrink_booleans():
     with temp_register_backend("prng", PrngProvider):
-        b = minimal(
-            st.booleans(), lambda b: b, settings=settings(backend="prng", database=None)
-        )
+        b = minimal(st.booleans(), lambda b: b, settings=settings(backend="prng", database=None))
 
     assert b
 
@@ -281,16 +275,13 @@ class TrivialProvider(PrimitiveProvider):
 
 
 class InvalidLifetime(TrivialProvider):
-
     lifetime = "forever and a day!"
 
 
 def test_invalid_lifetime():
     with temp_register_backend("invalid_lifetime", InvalidLifetime):
         with pytest.raises(InvalidArgument):
-            ConjectureRunner(
-                lambda: True, settings=settings(backend="invalid_lifetime")
-            )
+            ConjectureRunner(lambda: True, settings=settings(backend="invalid_lifetime"))
 
 
 function_lifetime_init_count = 0
@@ -353,16 +344,11 @@ def test_case_lifetime():
         # such as the zero buffer, which does not entail creating providers.
         # These two facts combined mean that the number of inits could be
         # anywhere reasonably close to the number of function calls.
-        assert (
-            test_function_count - 10
-            <= test_case_lifetime_init_count
-            <= test_function_count + 10
-        )
+        assert test_function_count - 10 <= test_case_lifetime_init_count <= test_function_count + 10
 
 
 def test_flaky_with_backend():
     with temp_register_backend("trivial", TrivialProvider), capture_observations():
-
         calls = 0
 
         @given(st.integers())
@@ -407,7 +393,6 @@ class RealizeProvider(TrivialProvider):
 
 def test_realize():
     with temp_register_backend("realize", RealizeProvider):
-
         values = []
 
         @given(st.integers())
@@ -495,11 +480,7 @@ def test_custom_observations_from_backend():
 
     assert "<backend failed to realize symbolic arguments>" in repr(ls)
 
-    infos = [
-        {k: v for k, v in t.items() if k in ("title", "content")}
-        for t in ls
-        if t["type"] != "test_case"
-    ]
+    infos = [{k: v for k, v in t.items() if k in ("title", "content")} for t in ls if t["type"] != "test_case"]
     assert {"title": "Trivial alert", "content": "message here"} in infos
     assert {"title": "trivial-data", "content": {"k2": "v2"}} in infos
 
@@ -600,17 +581,13 @@ def test_available_providers_deprecation():
 
 
 @pytest.mark.parametrize("backend", AVAILABLE_PROVIDERS.keys())
-@pytest.mark.parametrize(
-    "strategy", [st.integers(), st.text(), st.floats(), st.booleans(), st.binary()]
-)
+@pytest.mark.parametrize("strategy", [st.integers(), st.text(), st.floats(), st.booleans(), st.binary()])
 def test_can_generate_from_all_available_providers(backend, strategy):
     if backend == "crosshair":
         # TODO running into a 'not in statespace' issue which is fixed in
         # https://github.com/HypothesisWorks/hypothesis/pull/4034. Remove
         # this skip when that is merged
-        pytest.skip(
-            "temp, fixed in https://github.com/HypothesisWorks/hypothesis/pull/4034"
-        )
+        pytest.skip("temp, fixed in https://github.com/HypothesisWorks/hypothesis/pull/4034")
 
     @given(strategy)
     @settings(backend=backend, database=None)
@@ -620,9 +597,7 @@ def test_can_generate_from_all_available_providers(backend, strategy):
     with (
         pytest.raises(ValueError),
         (
-            pytest.warns(
-                HypothesisWarning, match="/dev/urandom is not available on windows"
-            )
+            pytest.warns(HypothesisWarning, match="/dev/urandom is not available on windows")
             if backend == "hypothesis-urandom" and WINDOWS
             else nullcontext()
         ),

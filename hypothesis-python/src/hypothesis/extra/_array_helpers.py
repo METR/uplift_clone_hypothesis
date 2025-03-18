@@ -71,10 +71,7 @@ NDIM_MAX = 32
 @check_function
 def check_valid_dims(dims, name):
     if dims > NDIM_MAX:
-        raise InvalidArgument(
-            f"{name}={dims}, but Hypothesis does not support arrays with "
-            f"more than {NDIM_MAX} dimensions"
-        )
+        raise InvalidArgument(f"{name}={dims}, but Hypothesis does not support arrays with more than {NDIM_MAX} dimensions")
 
 
 @defines_strategy()
@@ -110,9 +107,7 @@ def array_shapes(
     order_check("dims", 0, min_dims, max_dims)
     order_check("side", 0, min_side, max_side)
 
-    return st.lists(
-        st.integers(min_side, max_side), min_size=min_dims, max_size=max_dims
-    ).map(tuple)
+    return st.lists(st.integers(min_side, max_side), min_size=min_dims, max_size=max_dims).map(tuple)
 
 
 @defines_strategy()
@@ -151,13 +146,9 @@ def valid_tuple_axes(
     order_check("size", 0, min_size, max_size)
     check_valid_interval(max_size, ndim, "max_size", "ndim")
 
-    axes = st.integers(0, max(0, 2 * ndim - 1)).map(
-        lambda x: x if x < ndim else x - 2 * ndim
-    )
+    axes = st.integers(0, max(0, 2 * ndim - 1)).map(lambda x: x if x < ndim else x - 2 * ndim)
 
-    return st.lists(
-        axes, min_size=min_size, max_size=max_size, unique_by=lambda x: x % ndim
-    ).map(tuple)
+    return st.lists(axes, min_size=min_size, max_size=max_size, unique_by=lambda x: x % ndim).map(tuple)
 
 
 @defines_strategy()
@@ -226,9 +217,7 @@ def broadcastable_shapes(
         )
 
     # check for unsatisfiable [min_side, max_side]
-    if not (
-        min_side <= 1 <= max_side or all(s <= max_side for s in shape[::-1][:dims])
-    ):
+    if not (min_side <= 1 <= max_side or all(s <= max_side for s in shape[::-1][:dims])):
         raise InvalidArgument(
             f"Given base_shape={shape}, there are no broadcast-compatible "
             f"shapes that satisfy all of {bound_name}={dims}, "
@@ -310,8 +299,7 @@ def _hypothesis_parse_gufunc_signature(signature):
             )
         raise InvalidArgument(f"{signature!r} is not a valid gufunc signature")
     input_shapes, output_shapes = (
-        tuple(tuple(re.findall(_DIMENSION, a)) for a in re.findall(_SHAPE, arg_list))
-        for arg_list in signature.split("->")
+        tuple(tuple(re.findall(_DIMENSION, a)) for a in re.findall(_SHAPE, arg_list)) for arg_list in signature.split("->")
     )
     assert len(output_shapes) == 1
     result_shape = output_shapes[0]
@@ -398,8 +386,7 @@ def mutually_broadcastable_shapes(
         check_argument(signature is not not_set, arg_msg)
         if signature is None:
             raise InvalidArgument(
-                "Expected a string, but got invalid signature=None.  "
-                "(maybe .signature attribute of an element-wise ufunc?)"
+                "Expected a string, but got invalid signature=None.  (maybe .signature attribute of an element-wise ufunc?)"
             )
         check_type(str, signature, "signature")
         parsed_signature = _hypothesis_parse_gufunc_signature(signature)
@@ -451,9 +438,7 @@ def mutually_broadcastable_shapes(
         )
 
     # check for unsatisfiable [min_side, max_side]
-    if not (
-        min_side <= 1 <= max_side or all(s <= max_side for s in base_shape[::-1][:dims])
-    ):
+    if not (min_side <= 1 <= max_side or all(s <= max_side for s in base_shape[::-1][:dims])):
         raise InvalidArgument(
             f"Given base_shape={base_shape}, there are no broadcast-compatible "
             f"shapes that satisfy all of {bound_name}={dims}, "
@@ -655,9 +640,7 @@ class BasicIndexStrategy(st.SearchStrategy):
         # Insert some number of new size-one dimensions if allowed
         result_dims = sum(isinstance(idx, slice) for idx in result)
         while (
-            self.allow_newaxis
-            and result_dims < self.max_dims
-            and (result_dims < self.min_dims or data.draw(st.booleans()))
+            self.allow_newaxis and result_dims < self.max_dims and (result_dims < self.min_dims or data.draw(st.booleans()))
         ):
             i = data.draw(st.integers(0, len(result)))
             result.insert(i, None)  # Note that `np.newaxis is None`

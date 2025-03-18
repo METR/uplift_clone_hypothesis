@@ -25,13 +25,9 @@ def test_debug_output():
 
 def test_includes_name_in_repr_if_set():
     assert (
-        repr(Integer(10, lambda x: True, name="hi there", random=Random(0)))
-        == "Integer('hi there', initial=10, current=10)"
+        repr(Integer(10, lambda x: True, name="hi there", random=Random(0))) == "Integer('hi there', initial=10, current=10)"
     )
 
 
 def test_normally_contains_no_space_for_name():
-    assert (
-        repr(Integer(10, lambda x: True, random=Random(0)))
-        == "Integer(initial=10, current=10)"
-    )
+    assert repr(Integer(10, lambda x: True, random=Random(0))) == "Integer(initial=10, current=10)"

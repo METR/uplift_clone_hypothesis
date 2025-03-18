@@ -42,10 +42,7 @@ def test_runs_repeatably_when_seed_is_set(seed, testdir):
     script = testdir.makepyfile(TEST_SUITE)
 
     results = [
-        testdir.runpytest(
-            script, "--verbose", "--strict-markers", f"--hypothesis-seed={seed}", "-rN"
-        )
-        for _ in range(2)
+        testdir.runpytest(script, "--verbose", "--strict-markers", f"--hypothesis-seed={seed}", "-rN") for _ in range(2)
     ]
 
     for r in results:
@@ -82,13 +79,9 @@ def test_failure(i):
 """
 
 
-def test_repeats_healthcheck_when_following_seed_instruction(
-    testdir, tmp_path, monkeypatch
-):
+def test_repeats_healthcheck_when_following_seed_instruction(testdir, tmp_path, monkeypatch):
     monkeypatch.delenv("CI", raising=False)
-    health_check_test = HEALTH_CHECK_FAILURE.replace(
-        "<file>", repr(str(tmp_path / "seen"))
-    )
+    health_check_test = HEALTH_CHECK_FAILURE.replace("<file>", repr(str(tmp_path / "seen")))
 
     script = testdir.makepyfile(health_check_test)
 
@@ -106,8 +99,6 @@ def test_repeats_healthcheck_when_following_seed_instruction(
     assert "FailedHealthCheck" in rerun_output
     assert "--hypothesis-seed" not in rerun_output
 
-    rerun2 = testdir.runpytest(
-        script, "--verbose", "--strict-markers", "--hypothesis-seed=10"
-    )
+    rerun2 = testdir.runpytest(script, "--verbose", "--strict-markers", "--hypothesis-seed=10")
     rerun2_output = "\n".join(rerun2.stdout.lines)
     assert "FailedHealthCheck" not in rerun2_output

@@ -57,9 +57,7 @@ def test_pyright_passes_on_basic_test(tmp_path: Path, python_version: str):
         ),
         encoding="utf-8",
     )
-    _write_config(
-        tmp_path, {"typeCheckingMode": "strict", "pythonVersion": python_version}
-    )
+    _write_config(tmp_path, {"typeCheckingMode": "strict", "pythonVersion": python_version})
     assert _get_pyright_errors(file) == []
 
 
@@ -85,9 +83,7 @@ def test_given_only_allows_strategies(tmp_path: Path, python_version: str):
         ),
         encoding="utf-8",
     )
-    _write_config(
-        tmp_path, {"typeCheckingMode": "strict", "pythonVersion": python_version}
-    )
+    _write_config(tmp_path, {"typeCheckingMode": "strict", "pythonVersion": python_version})
     errors = _get_pyright_errors(file)
     msg = 'Argument of type "Literal[1]" cannot be assigned to parameter "_given_arguments"'
     assert sum(e["message"].startswith(msg) for e in errors) == 1, errors
@@ -127,9 +123,7 @@ def test_pyright_raises_for_mixed_pos_kwargs_in_given(tmp_path: Path):
     _write_config(tmp_path, {"typeCheckingMode": "strict"})
     assert (
         sum(
-            e["message"].startswith(
-                'No overloads for "given" match the provided arguments'
-            )
+            e["message"].startswith('No overloads for "given" match the provided arguments')
             for e in _get_pyright_errors(file)
         )
         == 1
@@ -279,9 +273,7 @@ def test_pyright_tuples_pos_args_only(tmp_path: Path):
     _write_config(tmp_path, {"typeCheckingMode": "strict"})
     assert (
         sum(
-            e["message"].startswith(
-                'No overloads for "tuples" match the provided arguments'
-            )
+            e["message"].startswith('No overloads for "tuples" match the provided arguments')
             for e in _get_pyright_errors(file)
         )
         == 2
@@ -304,9 +296,7 @@ def test_pyright_one_of_pos_args_only(tmp_path: Path):
     _write_config(tmp_path, {"typeCheckingMode": "strict"})
     assert (
         sum(
-            e["message"].startswith(
-                'No overloads for "one_of" match the provided arguments'
-            )
+            e["message"].startswith('No overloads for "one_of" match the provided arguments')
             for e in _get_pyright_errors(file)
         )
         == 2

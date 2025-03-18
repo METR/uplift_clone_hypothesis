@@ -69,13 +69,9 @@ MappedTo = TypeVar("MappedTo")
 RecurT: "TypeAlias" = Callable[["SearchStrategy"], Any]
 calculating = UniqueIdentifier("calculating")
 
-MAPPED_SEARCH_STRATEGY_DO_DRAW_LABEL = calc_label_from_name(
-    "another attempted draw in MappedStrategy"
-)
+MAPPED_SEARCH_STRATEGY_DO_DRAW_LABEL = calc_label_from_name("another attempted draw in MappedStrategy")
 
-FILTERED_SEARCH_STRATEGY_DO_DRAW_LABEL = calc_label_from_name(
-    "single loop iteration in FilteredStrategy"
-)
+FILTERED_SEARCH_STRATEGY_DO_DRAW_LABEL = calc_label_from_name("single loop iteration in FilteredStrategy")
 
 
 def recursive_property(strategy: "SearchStrategy", name: str, default: object) -> Any:
@@ -367,9 +363,7 @@ class SearchStrategy(Generic[Ex]):
             return self  # type: ignore  # Mypy has no way to know that `Ex == T`
         return MappedStrategy(self, pack=pack)
 
-    def flatmap(
-        self, expand: Callable[[Ex], "SearchStrategy[T]"]
-    ) -> "SearchStrategy[T]":
+    def flatmap(self, expand: Callable[[Ex], "SearchStrategy[T]"]) -> "SearchStrategy[T]":
         """Returns a new strategy that generates values by generating a value
         from this strategy, say x, then generating a value from
         strategy(expand(x))
@@ -398,9 +392,7 @@ class SearchStrategy(Generic[Ex]):
         """
         return FilteredStrategy(conditions=(condition,), strategy=self)
 
-    def _filter_for_filtered_draw(
-        self, condition: Callable[[Ex], Any]
-    ) -> "SearchStrategy[Ex]":
+    def _filter_for_filtered_draw(self, condition: Callable[[Ex], Any]) -> "SearchStrategy[Ex]":
         # Hook for parent strategies that want to perform fallible filtering
         # on one of their internal strategies (e.g. UniqueListStrategy).
         # The returned object must have a `.do_filtered_draw(data)` method
@@ -438,12 +430,8 @@ class SearchStrategy(Generic[Ex]):
         # we use .branches / .element_strategies to get the list of possible
         # strategies, so this unwrapping is *not* necessary for correctness.
         strategies: list[SearchStrategy] = []
-        strategies.extend(
-            self.original_strategies if isinstance(self, OneOfStrategy) else [self]
-        )
-        strategies.extend(
-            other.original_strategies if isinstance(other, OneOfStrategy) else [other]
-        )
+        strategies.extend(self.original_strategies if isinstance(self, OneOfStrategy) else [self])
+        strategies.extend(other.original_strategies if isinstance(other, OneOfStrategy) else [other])
         return OneOfStrategy(strategies)
 
     def __bool__(self) -> bool:
@@ -551,23 +539,13 @@ class SampledFromStrategy(SearchStrategy[Ex]):
 
     def __repr__(self) -> str:
         return (
-            self.repr_
-            or "sampled_from(["
-            + ", ".join(map(get_pretty_function_description, self.elements))
-            + "])"
-        ) + "".join(
-            f".{name}({get_pretty_function_description(f)})"
-            for name, f in self._transformations
-        )
+            self.repr_ or "sampled_from([" + ", ".join(map(get_pretty_function_description, self.elements)) + "])"
+        ) + "".join(f".{name}({get_pretty_function_description(f)})" for name, f in self._transformations)
 
     def calc_label(self):
         return combine_labels(
             self.class_label,
-            *(
-                (calc_label_from_hash(self.elements),)
-                if is_hashable(self.elements)
-                else ()
-            ),
+            *((calc_label_from_hash(self.elements),) if is_hashable(self.elements) else ()),
         )
 
     def calc_has_reusable_values(self, recur: RecurT) -> Any:
@@ -602,12 +580,9 @@ class SampledFromStrategy(SearchStrategy[Ex]):
 
     def do_draw(self, data: ConjectureData) -> Ex:
         result = self.do_filtered_draw(data)
-        if isinstance(result, SearchStrategy) and all(
-            isinstance(x, SearchStrategy) for x in self.elements
-        ):
+        if isinstance(result, SearchStrategy) and all(isinstance(x, SearchStrategy) for x in self.elements):
             data._sampled_from_all_strategies_elements_message = (
-                "sample_from was given a collection of strategies: "
-                "{!r}. Was one_of intended?",
+                "sample_from was given a collection of strategies: {!r}. Was one_of intended?",
                 self.elements,
             )
         if result is filter_not_satisfied:
@@ -731,16 +706,10 @@ class OneOfStrategy(SearchStrategy[Ex]):
         return self.__element_strategies
 
     def calc_label(self) -> int:
-        return combine_labels(
-            self.class_label, *(p.label for p in self.original_strategies)
-        )
+        return combine_labels(self.class_label, *(p.label for p in self.original_strategies))
 
     def do_draw(self, data: ConjectureData) -> Ex:
-        strategy = data.draw(
-            SampledFromStrategy(self.element_strategies).filter(
-                lambda s: s.available(data)
-            )
-        )
+        strategy = data.draw(SampledFromStrategy(self.element_strategies).filter(lambda s: s.available(data)))
         return data.draw(strategy)
 
     def __repr__(self) -> str:
@@ -781,9 +750,7 @@ def one_of(__a1: SearchStrategy[Ex]) -> SearchStrategy[Ex]:  # pragma: no cover
 
 
 @overload
-def one_of(
-    __a1: SearchStrategy[Ex], __a2: SearchStrategy[T]
-) -> SearchStrategy[Union[Ex, T]]:  # pragma: no cover
+def one_of(__a1: SearchStrategy[Ex], __a2: SearchStrategy[T]) -> SearchStrategy[Union[Ex, T]]:  # pragma: no cover
     ...
 
 
@@ -821,9 +788,7 @@ def one_of(*args: SearchStrategy[Any]) -> SearchStrategy[Any]:  # pragma: no cov
 
 
 @defines_strategy(never_lazy=True)
-def one_of(
-    *args: Union[Sequence[SearchStrategy[Any]], SearchStrategy[Any]]
-) -> SearchStrategy[Any]:
+def one_of(*args: Union[Sequence[SearchStrategy[Any]], SearchStrategy[Any]]) -> SearchStrategy[Any]:
     # Mypy workaround alert:  Any is too loose above; the return parameter
     # should be the union of the input parameters.  Unfortunately, Mypy <=0.600
     # raises errors due to incompatible inputs instead.  See #1270 for links.
@@ -902,9 +867,7 @@ class MappedStrategy(SearchStrategy[MappedTo], Generic[MappedFrom, MappedTo]):
 
     def do_draw(self, data: ConjectureData) -> MappedTo:
         with warnings.catch_warnings():
-            if isinstance(self.pack, type) and issubclass(
-                self.pack, (abc.Mapping, abc.Set)
-            ):
+            if isinstance(self.pack, type) and issubclass(self.pack, (abc.Mapping, abc.Set)):
                 warnings.simplefilter("ignore", BytesWarning)
             for _ in range(3):
                 try:
@@ -920,14 +883,9 @@ class MappedStrategy(SearchStrategy[MappedTo], Generic[MappedFrom, MappedTo]):
 
     @property
     def branches(self) -> Sequence[SearchStrategy[MappedTo]]:
-        return [
-            MappedStrategy(strategy, pack=self.pack)
-            for strategy in self.mapped_strategy.branches
-        ]
+        return [MappedStrategy(strategy, pack=self.pack) for strategy in self.mapped_strategy.branches]
 
-    def filter(
-        self, condition: Callable[[MappedTo], Any]
-    ) -> "SearchStrategy[MappedTo]":
+    def filter(self, condition: Callable[[MappedTo], Any]) -> "SearchStrategy[MappedTo]":
         # Includes a special case so that we can rewrite filters on collection
         # lengths, when most collections are `st.lists(...).map(the_type)`.
         ListStrategy = _list_strategy_type()
@@ -989,15 +947,11 @@ filter_not_satisfied = UniqueIdentifier("filter not satisfied")
 
 
 class FilteredStrategy(SearchStrategy[Ex]):
-    def __init__(
-        self, strategy: SearchStrategy[Ex], conditions: tuple[Callable[[Ex], Any], ...]
-    ):
+    def __init__(self, strategy: SearchStrategy[Ex], conditions: tuple[Callable[[Ex], Any], ...]):
         super().__init__()
         if isinstance(strategy, FilteredStrategy):
             # Flatten chained filters into a single filter with multiple conditions.
-            self.flat_conditions: tuple[Callable[[Ex], Any], ...] = (
-                strategy.flat_conditions + conditions
-            )
+            self.flat_conditions: tuple[Callable[[Ex], Any], ...] = strategy.flat_conditions + conditions
             self.filtered_strategy: SearchStrategy[Ex] = strategy.filtered_strategy
         else:
             self.flat_conditions = conditions
@@ -1018,10 +972,7 @@ class FilteredStrategy(SearchStrategy[Ex]):
         if not hasattr(self, "_cached_repr"):
             self._cached_repr = "{!r}{}".format(
                 self.filtered_strategy,
-                "".join(
-                    f".filter({get_pretty_function_description(cond)})"
-                    for cond in self.flat_conditions
-                ),
+                "".join(f".filter({get_pretty_function_description(cond)})" for cond in self.flat_conditions),
             )
         return self._cached_repr
 
@@ -1039,9 +990,7 @@ class FilteredStrategy(SearchStrategy[Ex]):
         if isinstance(fresh, FilteredStrategy):
             # In this case we have at least some non-rewritten filter predicates,
             # so we just re-initialize the strategy.
-            FilteredStrategy.__init__(
-                self, fresh.filtered_strategy, fresh.flat_conditions
-            )
+            FilteredStrategy.__init__(self, fresh.filtered_strategy, fresh.flat_conditions)
         else:
             # But if *all* the predicates were rewritten... well, do_validate() is
             # an in-place method so we still just re-initialize the strategy!
@@ -1056,9 +1005,7 @@ class FilteredStrategy(SearchStrategy[Ex]):
         # If it couldn't be rewritten, we'll get a new FilteredStrategy - and then
         # combine the conditions of each in our expected newest=last order.
         if isinstance(out, FilteredStrategy):
-            return FilteredStrategy(
-                out.filtered_strategy, self.flat_conditions + out.flat_conditions
-            )
+            return FilteredStrategy(out.filtered_strategy, self.flat_conditions + out.flat_conditions)
         # But if it *could* be rewritten, we can return the more efficient form!
         return FilteredStrategy(out, self.flat_conditions)
 
@@ -1115,7 +1062,4 @@ def check_strategy(arg: object, name: str = "") -> None:
             hint = ", such as st.sampled_from({}),".format(name or "...")
         if name:
             name += "="
-        raise InvalidArgument(
-            "Expected a SearchStrategy%s but got %s%r (type=%s)"
-            % (hint, name, arg, type(arg).__name__)
-        )
+        raise InvalidArgument("Expected a SearchStrategy%s but got %s%r (type=%s)" % (hint, name, arg, type(arg).__name__))

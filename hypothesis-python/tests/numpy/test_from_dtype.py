@@ -86,12 +86,8 @@ def test_can_cast_for_scalars(data):
     # Note: this only passes with castable datatypes, certain dtype
     # combinations will result in an error if numpy is not able to cast them.
     dt_elements = np.dtype(data.draw(st.sampled_from(["bool", "<i2", ">i2"])))
-    dt_desired = np.dtype(
-        data.draw(st.sampled_from(["<i2", ">i2", "float32", "float64"]))
-    )
-    result = data.draw(
-        nps.arrays(dtype=dt_desired, elements=nps.from_dtype(dt_elements), shape=())
-    )
+    dt_desired = np.dtype(data.draw(st.sampled_from(["<i2", ">i2", "float32", "float64"])))
+    result = data.draw(nps.arrays(dtype=dt_desired, elements=nps.from_dtype(dt_elements), shape=()))
     assert isinstance(result, np.ndarray)
     assert result.dtype == dt_desired
 
@@ -198,9 +194,7 @@ def test_from_dtype_can_include_or_exclude_nat(dtype):
 
 def test_arrays_gives_useful_error_on_inconsistent_time_unit():
     with pytest.raises(InvalidArgument, match="mismatch of time units in dtypes"):
-        check_can_generate_examples(
-            nps.arrays("m8[Y]", 10, elements=nps.from_dtype(np.dtype("m8[D]")))
-        )
+        check_can_generate_examples(nps.arrays("m8[Y]", 10, elements=nps.from_dtype(np.dtype("m8[D]"))))
 
 
 @pytest.mark.parametrize(
@@ -236,11 +230,7 @@ def test_arrays_gives_useful_error_on_inconsistent_time_unit():
         (
             complex,
             {"min_magnitude": 1, "max_magnitude": 1e6},
-            lambda x: (
-                (1 - sys.float_info.epsilon)
-                <= abs(x)
-                <= 1e6 * (1 + sys.float_info.epsilon)
-            ),
+            lambda x: ((1 - sys.float_info.epsilon) <= abs(x) <= 1e6 * (1 + sys.float_info.epsilon)),
         ),
         # Integer bounds, limited to the representable range
         ("int8", {"min_value": -1, "max_value": 1}, lambda x: -1 <= x <= 1),
@@ -271,9 +261,7 @@ def test_customize_structured_dtypes(x):
 @pytest.mark.parametrize("width", [32, 64])
 def test_float_subnormal_generation(allow_subnormal, width):
     dtype = np.dtype(f"float{width}")
-    strat = nps.from_dtype(dtype, allow_subnormal=allow_subnormal).filter(
-        lambda n: n != 0
-    )
+    strat = nps.from_dtype(dtype, allow_subnormal=allow_subnormal).filter(lambda n: n != 0)
     smallest_normal = width_smallest_normals[width]
     if allow_subnormal:
         find_any(strat, lambda n: -smallest_normal < n < smallest_normal)
@@ -285,16 +273,11 @@ def test_float_subnormal_generation(allow_subnormal, width):
 @pytest.mark.parametrize("width", [64, 128])
 def test_complex_subnormal_generation(allow_subnormal, width):
     dtype = np.dtype(f"complex{width}")
-    strat = nps.from_dtype(dtype, allow_subnormal=allow_subnormal).filter(
-        lambda n: n.real != 0 and n.imag != 0
-    )
+    strat = nps.from_dtype(dtype, allow_subnormal=allow_subnormal).filter(lambda n: n.real != 0 and n.imag != 0)
     smallest_normal = width_smallest_normals[width / 2]
 
     def condition(n):
-        return (
-            -smallest_normal < n.real < smallest_normal
-            or -smallest_normal < n.imag < smallest_normal
-        )
+        return -smallest_normal < n.real < smallest_normal or -smallest_normal < n.imag < smallest_normal
 
     if allow_subnormal:
         find_any(strat, condition)

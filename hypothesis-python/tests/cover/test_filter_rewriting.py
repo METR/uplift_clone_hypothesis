@@ -348,9 +348,7 @@ def test_sequence_filter_rewriting(strategy, predicate):
 @pytest.mark.parametrize("method", [str.lower, str.title, str.upper])
 def test_warns_on_suspicious_string_methods(method):
     s = unwrap_strategies(st.text())
-    with pytest.warns(
-        HypothesisWarning, match="this allows all nonempty strings!  Did you mean"
-    ):
+    with pytest.warns(HypothesisWarning, match="this allows all nonempty strings!  Did you mean"):
         fs = s.filter(method)
     assert fs.min_size == 1
 
@@ -431,11 +429,7 @@ def test_filter_rewriting_text_partial_len(data, strategy, predicate, start, end
 def test_can_rewrite_multiple_length_filters_if_not_lambdas(data):
     # This is a key capability for efficient rewriting using the `annotated-types`
     # package, although unfortunately we can't do it for lambdas.
-    s = (
-        st.text(min_size=1, max_size=5)
-        .filter(partial(min_len, 2))
-        .filter(partial(max_len, 4))
-    )
+    s = st.text(min_size=1, max_size=5).filter(partial(min_len, 2)).filter(partial(max_len, 4))
     assert isinstance(s, LazyStrategy)
     inner = unwrap_strategies(s)
     assert isinstance(inner, TextStrategy)
@@ -556,9 +550,7 @@ two = 2
 )
 @settings(max_examples=A_FEW)
 @given(data=st.data())
-def test_filter_rewriting_lambda_len_unique_elements(
-    data, strategy, predicate, start, end
-):
+def test_filter_rewriting_lambda_len_unique_elements(data, strategy, predicate, start, end):
     s = strategy.filter(predicate)
     unwrapped = unwrap_strategies(s)
     assert isinstance(unwrapped, FilteredStrategy)
@@ -589,9 +581,7 @@ def test_does_not_rewrite_unsatisfiable_len_filter(predicate):
     assert not strategy.is_empty
 
 
-@pytest.mark.parametrize(
-    "method", ["match", "search", "findall", "fullmatch", "finditer", "split"]
-)
+@pytest.mark.parametrize("method", ["match", "search", "findall", "fullmatch", "finditer", "split"])
 @pytest.mark.parametrize(
     "strategy, pattern",
     [

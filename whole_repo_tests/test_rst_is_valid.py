@@ -23,10 +23,7 @@ def is_sphinx(f):
 
 
 ALL_RST = [
-    f
-    for f in tools.all_files()
-    if os.path.basename(f) not in ["RELEASE.rst", "RELEASE-sample.rst"]
-    and f.endswith(".rst")
+    f for f in tools.all_files() if os.path.basename(f) not in ["RELEASE.rst", "RELEASE-sample.rst"] and f.endswith(".rst")
 ]
 
 
@@ -39,10 +36,7 @@ def test_rst_code_blocks():
     pattern = re.compile(r"^\.\.\s+code-block:\s+", re.MULTILINE)
     for f in ALL_RST:
         matches = pattern.search(Path(f).read_text())
-        assert not matches, (
-            f"incorrect code block syntax in {f}. Use `.. code-block::` "
-            "instead of `.. code-block:`"
-        )
+        assert not matches, f"incorrect code block syntax in {f}. Use `.. code-block::` instead of `.. code-block:`"
 
 
 def disabled_test_passes_flake8():

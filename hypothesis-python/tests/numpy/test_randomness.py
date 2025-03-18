@@ -27,6 +27,4 @@ def test_numpy_prng_is_seeded():
 
     inner()
 
-    np.testing.assert_array_equal(
-        np.random.get_state()[1], prng_state[1], "State was not restored."
-    )
+    np.testing.assert_array_equal(np.random.get_state()[1], prng_state[1], "State was not restored.")

@@ -83,11 +83,7 @@ def test_lookup_knows_about_all_core_strategies():
     }
     assert set(_strategies).issuperset(blocklist), blocklist.difference(_strategies)
     found = set()
-    for thing in (
-        getattr(st, name)
-        for name in sorted(_strategies)
-        if name in dir(st) and name not in blocklist
-    ):
+    for thing in (getattr(st, name) for name in sorted(_strategies) if name in dir(st) and name not in blocklist):
         for n in range(3):
             try:
                 ex = find_any(thing(*([st.nothing()] * n)))
@@ -256,9 +252,7 @@ def _check_instances(t):
     )
 
 
-@pytest.mark.parametrize(
-    "typ", sorted((x for x in _global_type_lookup if _check_instances(x)), key=str)
-)
+@pytest.mark.parametrize("typ", sorted((x for x in _global_type_lookup if _check_instances(x)), key=str))
 @given(data=st.data())
 def test_can_generate_from_all_registered_types(data, typ):
     value = data.draw(st.from_type(typ), label="value")
@@ -376,9 +370,7 @@ def test_generic_origin_from_type(strat, type_):
 
 def test_generic_origin_concrete_builds():
     with temp_registered(MyGeneric, st.builds(MyGeneric, st.integers())):
-        assert_all_examples(
-            st.builds(using_generic), lambda example: isinstance(example, int)
-        )
+        assert_all_examples(st.builds(using_generic), lambda example: isinstance(example, int))
 
 
 class AbstractFoo(abc.ABC):
@@ -437,9 +429,7 @@ def test_abstract_resolver_fallback():
         check_can_generate_examples(gen_abstractbar)
     with temp_registered(ConcreteBar, gen_concretebar):
         # which in turn means we resolve to the concrete subtype.
-        assert_simple_property(
-            gen_abstractbar, lambda gen: isinstance(gen, ConcreteBar)
-        )
+        assert_simple_property(gen_abstractbar, lambda gen: isinstance(gen, ConcreteBar))
     with pytest.raises(ResolutionFailed):
         check_can_generate_examples(gen_abstractbar)
 

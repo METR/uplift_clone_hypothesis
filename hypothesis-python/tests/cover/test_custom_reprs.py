@@ -30,10 +30,7 @@ def hi(there, stuff):
 
 
 def test_supports_positional_and_keyword_args_in_builds():
-    assert (
-        repr(st.builds(hi, st.integers(), there=st.booleans()))
-        == "builds(hi, integers(), there=booleans())"
-    )
+    assert repr(st.builds(hi, st.integers(), there=st.booleans())) == "builds(hi, integers(), there=booleans())"
 
 
 def test_preserves_sequence_type_of_argument():

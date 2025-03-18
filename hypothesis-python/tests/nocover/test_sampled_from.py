@@ -124,10 +124,7 @@ def test_flags_minimize_to_first_named_flag():
 
 
 def test_flags_minimizes_bit_count():
-    assert (
-        minimal(st.sampled_from(LargeFlag), lambda f: bit_count(f.value) > 1)
-        == LargeFlag.bit0 | LargeFlag.bit1
-    )
+    assert minimal(st.sampled_from(LargeFlag), lambda f: bit_count(f.value) > 1) == LargeFlag.bit0 | LargeFlag.bit1
 
 
 def test_flags_finds_all_bits_set():

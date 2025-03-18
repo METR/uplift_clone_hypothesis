@@ -33,10 +33,7 @@ ordered_pair = (
 
 
 def test_can_get_descriptions_of_nested_lambdas_with_different_names():
-    assert (
-        get_pretty_function_description(ordered_pair)
-        == "lambda right: [].map(lambda length: ())"
-    )
+    assert get_pretty_function_description(ordered_pair) == "lambda right: [].map(lambda length: ())"
 
 
 def test_does_not_error_on_unparsable_source():
@@ -172,6 +169,4 @@ def decorator_with_wrapper():
 
 
 def test_can_handle_nested_lambda_in_decorator_argument():
-    assert (
-        get_pretty_function_description(decorator_with_wrapper[0]) == "lambda x: x + 1"
-    )
+    assert get_pretty_function_description(decorator_with_wrapper[0]) == "lambda x: x + 1"

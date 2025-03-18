@@ -70,7 +70,6 @@ def test_fails_differently_is_flaky():
 
 @pytest.mark.skipif(sys.version_info < (3, 11), reason="except* syntax")
 def test_exceptiongroup_wrapped_naked_exception_is_flaky():
-
     # Defer parsing until runtime, as "except*" is syntax error pre 3.11
     rude_def = """
 first_call = True
@@ -122,9 +121,7 @@ def test_flaky_with_context_when_fails_only_under_tracing(monkeypatch):
     def test(x):
         pass
 
-    with pytest.raises(
-        FlakyFailure, match="failed on the first run but now succeeds"
-    ) as e:
+    with pytest.raises(FlakyFailure, match="failed on the first run but now succeeds") as e:
         test()
     exceptions = e.value.exceptions
     assert len(exceptions) == 1

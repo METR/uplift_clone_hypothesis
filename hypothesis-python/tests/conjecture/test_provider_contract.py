@@ -65,9 +65,7 @@ def test_provider_contract_bytestring(bytestring, choice_type_and_kwargs):
 
         assert choice_permitted(value, kwargs)
         kwargs["forced"] = choice_from_index(0, choice_type, kwargs)
-        assert choice_equal(
-            kwargs["forced"], getattr(data, f"draw_{choice_type}")(**kwargs)
-        )
+        assert choice_equal(kwargs["forced"], getattr(data, f"draw_{choice_type}")(**kwargs))
 
 
 @pytest.mark.parametrize(
@@ -75,9 +73,7 @@ def test_provider_contract_bytestring(bytestring, choice_type_and_kwargs):
     [
         pytest.param(
             URandomProvider,
-            marks=pytest.mark.skipif(
-                WINDOWS, reason="/dev/urandom not available on windows"
-            ),
+            marks=pytest.mark.skipif(WINDOWS, reason="/dev/urandom not available on windows"),
         ),
         HypothesisProvider,
     ],

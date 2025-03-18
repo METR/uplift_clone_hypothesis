@@ -15,6 +15,7 @@ a single value.
 Notably, the set of steps available at any point may depend on the
 execution to date.
 """
+
 import collections
 import inspect
 from collections.abc import Iterable, Sequence
@@ -120,9 +121,7 @@ def get_state_machine_test(state_machine_factory, *, settings=None, _min_steps=0
         cd.hypothesis_runner = machine
         machine._observability_predicates = cd._observability_predicates  # alias
 
-        print_steps = (
-            current_build_context().is_final or current_verbosity() >= Verbosity.debug
-        )
+        print_steps = current_build_context().is_final or current_verbosity() >= Verbosity.debug
         cd._stateful_repr_parts = []
 
         def output(s):
@@ -182,9 +181,7 @@ def get_state_machine_test(state_machine_factory, *, settings=None, _min_steps=0
                 # a return value using the variable name they are assigned to.
                 # See https://github.com/HypothesisWorks/hypothesis/issues/2341
                 if print_steps or TESTCASE_CALLBACKS:
-                    data_to_print = {
-                        k: machine._pretty_print(v) for k, v in data.items()
-                    }
+                    data_to_print = {k: machine._pretty_print(v) for k, v in data.items()}
 
                 # Assign 'result' here in case executing the rule fails below
                 result = multiple()
@@ -193,9 +190,7 @@ def get_state_machine_test(state_machine_factory, *, settings=None, _min_steps=0
                     for k, v in list(data.items()):
                         if isinstance(v, VarReference):
                             data[k] = machine.names_to_values[v.name]
-                        elif isinstance(v, list) and all(
-                            isinstance(item, VarReference) for item in v
-                        ):
+                        elif isinstance(v, list) and all(isinstance(item, VarReference) for item in v):
                             data[k] = [machine.names_to_values[item.name] for item in v]
 
                     label = f"execute:rule:{rule.function.__name__}"
@@ -208,9 +203,7 @@ def get_state_machine_test(state_machine_factory, *, settings=None, _min_steps=0
                     if rule.targets:
                         if isinstance(result, MultipleResults):
                             for single_result in result.values:
-                                machine._add_result_to_targets(
-                                    rule.targets, single_result
-                                )
+                                machine._add_result_to_targets(rule.targets, single_result)
                         else:
                             machine._add_result_to_targets(rule.targets, result)
                     elif result is not None:
@@ -233,13 +226,9 @@ def get_state_machine_test(state_machine_factory, *, settings=None, _min_steps=0
             machine.teardown()
 
     # Use a machine digest to identify stateful tests in the example database
-    run_state_machine.hypothesis.inner_test._hypothesis_internal_add_digest = (
-        function_digest(state_machine_factory)
-    )
+    run_state_machine.hypothesis.inner_test._hypothesis_internal_add_digest = function_digest(state_machine_factory)
     # Copy some attributes so @seed and @reproduce_failure "just work"
-    run_state_machine._hypothesis_internal_use_seed = getattr(
-        state_machine_factory, "_hypothesis_internal_use_seed", None
-    )
+    run_state_machine._hypothesis_internal_use_seed = getattr(state_machine_factory, "_hypothesis_internal_use_seed", None)
     run_state_machine._hypothesis_internal_use_reproduce_failure = getattr(
         state_machine_factory, "_hypothesis_internal_use_reproduce_failure", None
     )
@@ -255,9 +244,7 @@ def run_state_machine_as_test(state_machine_factory, *, settings=None, _min_step
     RuleBasedStateMachine when called with no arguments - it can be a class or a
     function. settings will be used to control the execution of the test.
     """
-    state_machine_test = get_state_machine_test(
-        state_machine_factory, settings=settings, _min_steps=_min_steps
-    )
+    state_machine_test = get_state_machine_test(state_machine_factory, settings=settings, _min_steps=_min_steps)
     state_machine_test(state_machine_factory)
 
 
@@ -296,9 +283,7 @@ class RuleBasedStateMachine(metaclass=StateMachineMeta):
         self.names_list: list[str] = []
         self.names_to_values: dict[str, Any] = {}
         self.__stream = StringIO()
-        self.__printer = RepresentationPrinter(
-            self.__stream, context=_current_build_context.value
-        )
+        self.__printer = RepresentationPrinter(self.__stream, context=_current_build_context.value)
         self._initialize_rules_to_run = copy(self.initialize_rules())
         self._rules_strategy = RuleStrategy(self)
 
@@ -314,9 +299,7 @@ class RuleBasedStateMachine(metaclass=StateMachineMeta):
     def _pretty_print(self, value):
         if isinstance(value, VarReference):
             return value.name
-        elif isinstance(value, list) and all(
-            isinstance(item, VarReference) for item in value
-        ):
+        elif isinstance(value, list) and all(isinstance(item, VarReference) for item in value):
             return "[" + ", ".join([item.name for item in value]) + "]"
         self.__stream.seek(0)
         self.__stream.truncate(0)
@@ -423,11 +406,7 @@ class RuleBasedStateMachine(metaclass=StateMachineMeta):
             if not all(precond(self) for precond in invar.preconditions):
                 continue
             name = invar.function.__name__
-            if (
-                current_build_context().is_final
-                or settings.verbosity >= Verbosity.debug
-                or TESTCASE_CALLBACKS
-            ):
+            if current_build_context().is_final or settings.verbosity >= Verbosity.debug or TESTCASE_CALLBACKS:
                 output(f"state.{name}()")
             start = perf_counter()
             result = invar.function(self)
@@ -538,9 +517,7 @@ class Bundle(SearchStrategy[Ex]):
     drawn from this bundle will be consumed (as above) when requested.
     """
 
-    def __init__(
-        self, name: str, *, consume: bool = False, draw_references: bool = True
-    ) -> None:
+    def __init__(self, name: str, *, consume: bool = False, draw_references: bool = True) -> None:
         self.name = name
         self.__reference_strategy = BundleReferenceStrategy(name, consume=consume)
         self.draw_references = draw_references
@@ -755,9 +732,7 @@ def rule(
         existing_rule = getattr(f, RULE_MARKER, None)
         existing_initialize_rule = getattr(f, INITIALIZE_RULE_MARKER, None)
         if existing_rule is not None or existing_initialize_rule is not None:
-            raise InvalidDefinition(
-                "A function cannot be used for two distinct rules. ", Settings.default
-            )
+            raise InvalidDefinition("A function cannot be used for two distinct rules. ", Settings.default)
         preconditions = getattr(f, PRECONDITIONS_MARKER, ())
         rule = Rule(
             targets=converted_targets,
@@ -831,14 +806,10 @@ def initialize(
         existing_rule = getattr(f, RULE_MARKER, None)
         existing_initialize_rule = getattr(f, INITIALIZE_RULE_MARKER, None)
         if existing_rule is not None or existing_initialize_rule is not None:
-            raise InvalidDefinition(
-                "A function cannot be used for two distinct rules. ", Settings.default
-            )
+            raise InvalidDefinition("A function cannot be used for two distinct rules. ", Settings.default)
         preconditions = getattr(f, PRECONDITIONS_MARKER, ())
         if preconditions:
-            raise InvalidDefinition(
-                "An initialization rule cannot have a precondition. ", Settings.default
-            )
+            raise InvalidDefinition("An initialization rule cannot have a precondition. ", Settings.default)
         rule = Rule(
             targets=converted_targets,
             arguments=kwargs,
@@ -893,9 +864,7 @@ def precondition(precond: Callable[[Any], bool]) -> Callable[[TestFunc], TestFun
 
         existing_initialize_rule = getattr(f, INITIALIZE_RULE_MARKER, None)
         if existing_initialize_rule is not None:
-            raise InvalidDefinition(
-                "An initialization rule cannot have a precondition. ", Settings.default
-            )
+            raise InvalidDefinition("An initialization rule cannot have a precondition. ", Settings.default)
 
         rule = getattr(f, RULE_MARKER, None)
         invariant = getattr(f, INVARIANT_MARKER, None)
@@ -905,9 +874,7 @@ def precondition(precond: Callable[[Any], bool]) -> Callable[[TestFunc], TestFun
             setattr(precondition_wrapper, RULE_MARKER, new_rule)
         elif invariant is not None:
             assert rule is None
-            new_invariant = attr.evolve(
-                invariant, preconditions=(*invariant.preconditions, precond)
-            )
+            new_invariant = attr.evolve(invariant, preconditions=(*invariant.preconditions, precond))
             setattr(precondition_wrapper, INVARIANT_MARKER, new_invariant)
         else:
             setattr(

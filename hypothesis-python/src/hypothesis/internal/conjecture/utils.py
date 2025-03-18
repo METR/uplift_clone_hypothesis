@@ -61,9 +61,7 @@ def identity(v: T) -> T:
     return v
 
 
-def check_sample(
-    values: Union[type[enum.Enum], Sequence[T]], strategy_name: str
-) -> Sequence[T]:
+def check_sample(values: Union[type[enum.Enum], Sequence[T]], strategy_name: str) -> Sequence[T]:
     if "numpy" in sys.modules and isinstance(values, sys.modules["numpy"].ndarray):
         if values.ndim != 1:
             raise InvalidArgument(
@@ -128,9 +126,7 @@ def compute_sampler_table(weights: tuple[float, ...]) -> list[tuple[int, int, fl
         assert table[lo][1] is None
         table[lo][1] = hi
         table[lo][2] = one - scaled_probabilities[lo]
-        scaled_probabilities[hi] = (
-            scaled_probabilities[hi] + scaled_probabilities[lo]
-        ) - one
+        scaled_probabilities[hi] = (scaled_probabilities[hi] + scaled_probabilities[lo]) - one
 
         if scaled_probabilities[hi] < 1:
             heapq.heappush(small, hi)

@@ -195,10 +195,7 @@ def test_pandas_column(tmp_path, val, expect):
 def test_data_object_type_tracing(tmp_path):
     f = tmp_path / "check_mypy_on_st_data.py"
     f.write_text(
-        "from hypothesis.strategies import data, integers\n"
-        "d = data().example()\n"
-        "s = d.draw(integers())\n"
-        "reveal_type(s)\n",
+        "from hypothesis.strategies import data, integers\nd = data().example()\ns = d.draw(integers())\nreveal_type(s)\n",
         encoding="utf-8",
     )
     got = get_mypy_analysed_type(f)
@@ -258,11 +255,7 @@ def test_functions_type_tracing(tmp_path, source, expected):
 def test_settings_preserves_type(tmp_path):
     f = tmp_path / "check_mypy_on_settings.py"
     f.write_text(
-        "from hypothesis import settings\n"
-        "@settings(max_examples=10)\n"
-        "def f(x: int) -> int:\n"
-        "    return x\n"
-        "reveal_type(f)\n",
+        "from hypothesis import settings\n@settings(max_examples=10)\ndef f(x: int) -> int:\n    return x\nreveal_type(f)\n",
         encoding="utf-8",
     )
     got = get_mypy_analysed_type(f)
@@ -272,10 +265,7 @@ def test_settings_preserves_type(tmp_path):
 def test_stateful_bundle_generic_type(tmp_path):
     f = tmp_path / "check_mypy_on_stateful_bundle.py"
     f.write_text(
-        "from hypothesis.stateful import Bundle\n"
-        "b: Bundle[int] = Bundle('test')\n"
-        "x = b.example()\n"
-        "reveal_type(x)\n",
+        "from hypothesis.stateful import Bundle\nb: Bundle[int] = Bundle('test')\nx = b.example()\nreveal_type(x)\n",
         encoding="utf-8",
     )
     got = get_mypy_analysed_type(f)
@@ -310,10 +300,7 @@ def test_stateful_rule_targets(tmp_path, decorator, target_args, returns):
 def test_stateful_rule_no_targets(tmp_path, decorator):
     f = tmp_path / "check_mypy_on_stateful_rule.py"
     f.write_text(
-        "from hypothesis.stateful import *\n"
-        f"@{decorator}()\n"
-        "def my_rule() -> None:\n"
-        "    ...\n",
+        f"from hypothesis.stateful import *\n@{decorator}()\ndef my_rule() -> None:\n    ...\n",
         encoding="utf-8",
     )
     assert_mypy_errors(f, [])
@@ -337,9 +324,7 @@ def test_stateful_target_params_mutually_exclusive(tmp_path, decorator):
 
 
 @pytest.mark.parametrize("decorator", ["rule", "initialize"])
-@pytest.mark.parametrize(
-    "target_args", ["", "target=b1", "targets=(b1,)", "targets=(b1, b2)"]
-)
+@pytest.mark.parametrize("target_args", ["", "target=b1", "targets=(b1,)", "targets=(b1, b2)"])
 @pytest.mark.parametrize("returns", ["int", "MultipleResults[int]"])
 def test_stateful_target_params_return_type(tmp_path, decorator, target_args, returns):
     f = tmp_path / "check_mypy_on_stateful_rule.py"
@@ -359,10 +344,7 @@ def test_stateful_target_params_return_type(tmp_path, decorator, target_args, re
 def test_stateful_no_target_params_return_type(tmp_path, decorator):
     f = tmp_path / "check_mypy_on_stateful_rule.py"
     f.write_text(
-        "from hypothesis.stateful import *\n"
-        f"@{decorator}()\n"
-        "def my_rule() -> int:\n"
-        "    ...\n",
+        f"from hypothesis.stateful import *\n@{decorator}()\ndef my_rule() -> int:\n    ...\n",
         encoding="utf-8",
     )
     assert_mypy_errors(f, [(2, "arg-type")])
@@ -446,9 +428,7 @@ def test_stateful_consumes_type_tracing(tmp_path, wrapper, expected):
 def test_stateful_consumed_bundle_cannot_be_target(tmp_path):
     f = tmp_path / "check_mypy_on_stateful_rule.py"
     f.write_text(
-        "from hypothesis.stateful import *\n"
-        "b: Bundle[int] = Bundle('b')\n"
-        "rule(target=consumes(b))\n",
+        "from hypothesis.stateful import *\nb: Bundle[int] = Bundle('b')\nrule(target=consumes(b))\n",
         encoding="utf-8",
     )
     assert_mypy_errors(f, [(3, "call-overload")])
@@ -464,9 +444,7 @@ def test_stateful_consumed_bundle_cannot_be_target(tmp_path):
 def test_stateful_precondition_requires_predicate(tmp_path, return_val, errors):
     f = tmp_path / "check_mypy_on_stateful_precondition.py"
     f.write_text(
-        "from hypothesis.stateful import *\n"
-        f"@precondition(lambda self: {return_val})\n"
-        "def my_rule() -> None: ...\n",
+        f"from hypothesis.stateful import *\n@precondition(lambda self: {return_val})\ndef my_rule() -> None: ...\n",
         encoding="utf-8",
     )
     assert_mypy_errors(f, errors)
@@ -507,9 +485,7 @@ def test_stateful_precondition_instance_method(tmp_path):
 def test_stateful_precondition_precond_requires_one_arg(tmp_path):
     f = tmp_path / "check_mypy_on_stateful_precondition.py"
     f.write_text(
-        "from hypothesis.stateful import *\n"
-        "precondition(lambda: True)\n"
-        "precondition(lambda a, b: True)\n",
+        "from hypothesis.stateful import *\nprecondition(lambda: True)\nprecondition(lambda a, b: True)\n",
         encoding="utf-8",
     )
     # Additional "Cannot infer type of lambda" errors

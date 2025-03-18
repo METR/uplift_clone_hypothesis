@@ -20,10 +20,6 @@ def kwonlyargs_composites(draw, *, kwarg1=None):
     return draw(st.fixed_dictionaries({"kwarg1": st.just(kwarg1), "i": st.integers()}))
 
 
-@given(
-    st.lists(
-        st.one_of(kwonlyargs_composites(kwarg1="test")), unique_by=lambda x: x["i"]
-    )
-)
+@given(st.lists(st.one_of(kwonlyargs_composites(kwarg1="test")), unique_by=lambda x: x["i"]))
 def test_composite_with_keyword_only_args(a):
     pass

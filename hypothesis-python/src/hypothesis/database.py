@@ -60,9 +60,7 @@ if TYPE_CHECKING:
 StrPathT: "TypeAlias" = Union[str, PathLike[str]]
 SaveDataT: "TypeAlias" = tuple[bytes, bytes]  # key, value
 DeleteDataT: "TypeAlias" = tuple[bytes, Optional[bytes]]  # key, value
-ListenerEventT: "TypeAlias" = Union[
-    tuple[Literal["save"], SaveDataT], tuple[Literal["delete"], DeleteDataT]
-]
+ListenerEventT: "TypeAlias" = Union[tuple[Literal["save"], SaveDataT], tuple[Literal["delete"], DeleteDataT]]
 ListenerT: "TypeAlias" = Callable[[ListenerEventT], Any]
 
 
@@ -437,9 +435,7 @@ class DirectoryBasedExampleDatabase(ExampleDatabase):
         _broadcast_change = self._broadcast_change
 
         class Handler(FileSystemEventHandler):
-            def on_created(
-                _self, event: Union[FileCreatedEvent, DirCreatedEvent]
-            ) -> None:
+            def on_created(_self, event: Union[FileCreatedEvent, DirCreatedEvent]) -> None:
                 # we only registered for the file creation event
                 assert not isinstance(event, DirCreatedEvent)
                 # watchdog events are only bytes if we passed a byte path to
@@ -467,9 +463,7 @@ class DirectoryBasedExampleDatabase(ExampleDatabase):
 
                 _broadcast_change(("save", (key, value)))
 
-            def on_deleted(
-                self, event: Union[FileDeletedEvent, DirDeletedEvent]
-            ) -> None:
+            def on_deleted(self, event: Union[FileDeletedEvent, DirDeletedEvent]) -> None:
                 assert not isinstance(event, DirDeletedEvent)
                 assert isinstance(event.src_path, str)
 
@@ -707,9 +701,7 @@ class GitHubArtifactDatabase(ExampleDatabase):
         self.token: Optional[str] = getenv("GITHUB_TOKEN")
 
         if path is None:
-            self.path: Path = Path(
-                storage_directory(f"github-artifacts/{self.artifact_name}/")
-            )
+            self.path: Path = Path(storage_directory(f"github-artifacts/{self.artifact_name}/"))
         else:
             self.path = Path(path)
 
@@ -731,10 +723,7 @@ class GitHubArtifactDatabase(ExampleDatabase):
         )
 
     def __repr__(self) -> str:
-        return (
-            f"GitHubArtifactDatabase(owner={self.owner!r}, "
-            f"repo={self.repo!r}, artifact_name={self.artifact_name!r})"
-        )
+        return f"GitHubArtifactDatabase(owner={self.owner!r}, repo={self.repo!r}, artifact_name={self.artifact_name!r})"
 
     def _prepare_for_io(self) -> None:
         assert self._artifact is not None, "Artifact not loaded."
@@ -801,9 +790,7 @@ class GitHubArtifactDatabase(ExampleDatabase):
 
         # Check if the latest artifact is a cache hit
         if found_artifact is not None and (
-            datetime.now(timezone.utc)
-            - datetime.fromisoformat(found_artifact.stem.replace("_", ":"))
-            < self.cache_timeout
+            datetime.now(timezone.utc) - datetime.fromisoformat(found_artifact.stem.replace("_", ":")) < self.cache_timeout
         ):
             self._artifact = found_artifact
         else:
@@ -816,8 +803,7 @@ class GitHubArtifactDatabase(ExampleDatabase):
                 self._artifact = new_artifact
             elif found_artifact is not None:
                 warnings.warn(
-                    "Using an expired artifact as a fallback for the database: "
-                    f"{found_artifact}",
+                    f"Using an expired artifact as a fallback for the database: {found_artifact}",
                     HypothesisWarning,
                     stacklevel=2,
                 )
@@ -862,10 +848,7 @@ class GitHubArtifactDatabase(ExampleDatabase):
         except URLError:
             warning_message = "Could not connect to GitHub to get the latest artifact. "
         except TimeoutError:
-            warning_message = (
-                "Could not connect to GitHub to get the latest artifact "
-                "(connection timed out)."
-            )
+            warning_message = "Could not connect to GitHub to get the latest artifact (connection timed out)."
 
         if warning_message is not None:
             warnings.warn(warning_message, HypothesisWarning, stacklevel=4)

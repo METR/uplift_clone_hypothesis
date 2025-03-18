@@ -61,9 +61,7 @@ LOTS = 10**6
 TRIAL_SETTINGS = settings(max_examples=LOTS, database=None)
 
 
-@pytest.mark.parametrize(
-    "seed", [2282791295271755424, 1284235381287210546, 14202812238092722246, 26097]
-)
+@pytest.mark.parametrize("seed", [2282791295271755424, 1284235381287210546, 14202812238092722246, 26097])
 @pytest.mark.parametrize("size", [5, 10, 20])
 @pytest.mark.parametrize("p", [0.01, 0.1])
 @pytest.mark.parametrize("strategy_class", [LinearLists, Matrices])
@@ -77,9 +75,7 @@ def test_minimal_poisoned_containers(seed, size, p, strategy_class):
         if POISON in v:
             data.mark_interesting()
 
-    runner = ConjectureRunner(
-        test_function, random=Random(seed), settings=TRIAL_SETTINGS
-    )
+    runner = ConjectureRunner(test_function, random=Random(seed), settings=TRIAL_SETTINGS)
     runner.run()
     (v,) = runner.interesting_examples.values()
     result = ConjectureData.for_choices(v.choices).draw(strategy)

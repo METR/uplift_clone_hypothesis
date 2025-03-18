@@ -39,9 +39,7 @@ class IntervalSet:
         return x.union(x)
 
     def __init__(self, intervals: Iterable[Sequence[int]] = ()) -> None:
-        self.intervals: IntervalsT = cast(
-            IntervalsT, tuple(tuple(v) for v in intervals)
-        )
+        self.intervals: IntervalsT = cast(IntervalsT, tuple(tuple(v) for v in intervals))
         # cast above is validated by this length assertion. check here instead of
         # before to not exhaust generators before we create intervals from it
         assert all(len(v) == 2 for v in self.intervals)

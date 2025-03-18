@@ -60,12 +60,10 @@ def pytest_configure(config):
         # be enough: https://github.com/pytest-dev/pytest-xdist/issues/271.
         # Need a lockfile or equivalent.
 
-        assert not hasattr(
-            config, "workerinput"
-        ), "--hypothesis-benchmark-shrinks does not currently support xdist. Run without -n"
-        assert config.getoption(
-            "--hypothesis-benchmark-output"
-        ), "must specify shrinking output file"
+        assert not hasattr(config, "workerinput"), (
+            "--hypothesis-benchmark-shrinks does not currently support xdist. Run without -n"
+        )
+        assert config.getoption("--hypothesis-benchmark-output"), "must specify shrinking output file"
 
         global in_shrinking_benchmark
         in_shrinking_benchmark = True
@@ -210,8 +208,7 @@ def pytest_runtest_call(item):
     if isinstance(getattr(outcome, "exception", None), NonInteractiveExampleWarning):
         add_note(
             outcome.exception,
-            "For hypothesis' own test suite, consider using one of the helper "
-            "methods in tests.common.debug instead.",
+            "For hypothesis' own test suite, consider using one of the helper methods in tests.common.debug instead.",
         )
 
 

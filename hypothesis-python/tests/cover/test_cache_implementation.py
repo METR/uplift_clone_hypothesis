@@ -57,9 +57,7 @@ class LFUCache(GenericCache):
 
 @st.composite
 def write_pattern(draw, min_distinct_keys=0):
-    keys = draw(
-        st.lists(st.integers(0, 1000), unique=True, min_size=max(min_distinct_keys, 1))
-    )
+    keys = draw(st.lists(st.integers(0, 1000), unique=True, min_size=max(min_distinct_keys, 1)))
     values = draw(st.lists(st.integers(), unique=True, min_size=1))
     s = st.lists(
         st.tuples(st.sampled_from(keys), st.sampled_from(values)),

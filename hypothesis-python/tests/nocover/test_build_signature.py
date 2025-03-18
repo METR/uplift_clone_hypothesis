@@ -56,15 +56,11 @@ def test_from_type_can_be_default_or_annotation():
     find_any(st.from_type(ModelForFromType), lambda m: isinstance(m.b, list))
 
 
-def use_annotations(
-    self, test_a: int, test_b: Optional[str] = None, *, test_x: float, test_y: str
-):
+def use_annotations(self, test_a: int, test_b: Optional[str] = None, *, test_x: float, test_y: str):
     pass
 
 
-def use_signature(
-    self, testA: int, testB: Optional[str] = None, *, testX: float, testY: list[str]
-):
+def use_signature(self, testA: int, testB: Optional[str] = None, *, testX: float, testY: list[str]):
     pass
 
 

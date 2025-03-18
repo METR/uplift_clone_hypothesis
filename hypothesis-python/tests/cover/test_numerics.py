@@ -88,18 +88,14 @@ def test_fuzz_fractions_bounds(data):
 @given(data())
 def test_fuzz_decimals_bounds(data):
     places = data.draw(none() | integers(0, 20), label="places")
-    finite_decs = (
-        decimals(allow_nan=False, allow_infinity=False, places=places) | none()
-    )
+    finite_decs = decimals(allow_nan=False, allow_infinity=False, places=places) | none()
     low, high = data.draw(tuples(finite_decs, finite_decs), label="low, high")
     if low is not None and high is not None and low > high:
         low, high = high, low
     ctx = decimal.Context(prec=data.draw(integers(1, 100), label="precision"))
     try:
         with decimal.localcontext(ctx):
-            strat = decimals(
-                low, high, allow_nan=False, allow_infinity=False, places=places
-            )
+            strat = decimals(low, high, allow_nan=False, allow_infinity=False, places=places)
             val = data.draw(strat, label="value")
     except InvalidArgument:
         reject()  # decimals too close for given places
@@ -112,9 +108,7 @@ def test_fuzz_decimals_bounds(data):
 
 
 def test_all_decimals_can_be_exact_floats():
-    find_any(
-        decimals(), lambda x: assume(x.is_finite()) and decimal.Decimal(float(x)) == x
-    )
+    find_any(decimals(), lambda x: assume(x.is_finite()) and decimal.Decimal(float(x)) == x)
 
 
 @given(fractions(), fractions(), fractions())

@@ -41,9 +41,7 @@ def test_can_generate_non_naive_time():
 
 
 def test_can_generate_non_naive_datetime():
-    assert (
-        minimal(datetimes(timezones=timezones()), lambda d: d.tzinfo).tzinfo == pytz.UTC
-    )
+    assert minimal(datetimes(timezones=timezones()), lambda d: d.tzinfo).tzinfo == pytz.UTC
 
 
 @given(datetimes(timezones=timezones()))
@@ -60,9 +58,7 @@ def test_datetime_bounds_must_be_naive(name, val):
 def test_underflow_in_simplify():
     # we shouldn't trigger a pytz bug when we're simplifying
     minimal(
-        datetimes(
-            max_value=dt.datetime.min + dt.timedelta(days=3), timezones=timezones()
-        ),
+        datetimes(max_value=dt.datetime.min + dt.timedelta(days=3), timezones=timezones()),
         lambda x: x.tzinfo != pytz.UTC,
     )
 
@@ -70,9 +66,7 @@ def test_underflow_in_simplify():
 def test_overflow_in_simplify():
     # we shouldn't trigger a pytz bug when we're simplifying
     minimal(
-        datetimes(
-            min_value=dt.datetime.max - dt.timedelta(days=3), timezones=timezones()
-        ),
+        datetimes(min_value=dt.datetime.max - dt.timedelta(days=3), timezones=timezones()),
         lambda x: x.tzinfo != pytz.UTC,
     )
 
@@ -92,9 +86,7 @@ def test_timezone_aware_times_are_timezone_aware(dt):
 
 
 def test_can_generate_non_utc():
-    times(timezones=timezones()).filter(
-        lambda d: assume(d.tzinfo) and d.tzinfo.zone != "UTC"
-    ).validate()
+    times(timezones=timezones()).filter(lambda d: assume(d.tzinfo) and d.tzinfo.zone != "UTC").validate()
 
 
 @given(sampled_from(["min_value", "max_value"]), times(timezones=timezones()))
@@ -122,9 +114,7 @@ def test_can_trigger_error_in_draw_near_boundary(bound):
             data.draw(datetimes(**bound, timezones=timezones()))
         except StopTest:
             pass
-        if "Failed to draw a datetime" in data.conjecture_data.events.get(
-            "invalid because", ""
-        ):
+        if "Failed to draw a datetime" in data.conjecture_data.events.get("invalid because", ""):
             nonlocal found
             found = True
 

@@ -65,13 +65,9 @@ class BooleanKWargs(TypedDict):
 
 
 ChoiceT: "TypeAlias" = Union[int, str, bool, float, bytes]
-ChoiceKwargsT: "TypeAlias" = Union[
-    IntegerKWargs, FloatKWargs, StringKWargs, BytesKWargs, BooleanKWargs
-]
+ChoiceKwargsT: "TypeAlias" = Union[IntegerKWargs, FloatKWargs, StringKWargs, BytesKWargs, BooleanKWargs]
 ChoiceTypeT: "TypeAlias" = Literal["integer", "string", "boolean", "float", "bytes"]
-ChoiceKeyT: "TypeAlias" = Union[
-    int, str, bytes, tuple[Literal["bool"], bool], tuple[Literal["float"], int]
-]
+ChoiceKeyT: "TypeAlias" = Union[int, str, bytes, tuple[Literal["bool"], bool], tuple[Literal["float"], int]]
 
 
 @attr.s(slots=True)
@@ -135,11 +131,7 @@ class ChoiceNode:
             if min_value == -math.inf and max_value == math.inf:
                 return choice_equal(self.value, shrink_towards)
 
-            if (
-                not math.isinf(min_value)
-                and not math.isinf(max_value)
-                and math.ceil(min_value) <= math.floor(max_value)
-            ):
+            if not math.isinf(min_value) and not math.isinf(max_value) and math.ceil(min_value) <= math.floor(max_value):
                 # the interval contains an integer. the simplest integer is the
                 # one closest to shrink_towards
                 shrink_towards = max(math.ceil(min_value), shrink_towards)
@@ -233,9 +225,7 @@ def collection_index(
     # are for a single element. to_order orders an element by returning an n ≥ 0.
 
     # we start by adding the size to the index, relative to min_size.
-    index = _size_to_index(len(choice), alphabet_size=alphabet_size) - _size_to_index(
-        min_size, alphabet_size=alphabet_size
-    )
+    index = _size_to_index(len(choice), alphabet_size=alphabet_size) - _size_to_index(min_size, alphabet_size=alphabet_size)
     # We then add each element c to the index, starting from the end (so "ab" is
     # simpler than "ba"). Each loop takes c at position i in the sequence and
     # computes the number of sequences of size i which come before it in the ordering.
@@ -374,9 +364,9 @@ def choice_to_index(choice: ChoiceT, kwargs: ChoiceKwargsT) -> int:
 
             assert min_value is not None
             assert max_value is not None
-            assert kwargs["weights"] is None or all(
-                w > 0 for w in kwargs["weights"].values()
-            ), "technically possible but really annoying to support zero weights"
+            assert kwargs["weights"] is None or all(w > 0 for w in kwargs["weights"].values()), (
+                "technically possible but really annoying to support zero weights"
+            )
 
             # check which side gets exhausted first
             if (shrink_towards - min_value) < (max_value - shrink_towards):
@@ -423,9 +413,7 @@ def choice_to_index(choice: ChoiceT, kwargs: ChoiceKwargsT) -> int:
         raise NotImplementedError
 
 
-def choice_from_index(
-    index: int, choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT
-) -> ChoiceT:
+def choice_from_index(index: int, choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT) -> ChoiceT:
     assert index >= 0
     if choice_type == "integer":
         kwargs = cast(IntegerKWargs, kwargs)
@@ -455,9 +443,9 @@ def choice_from_index(
             # case: bounded
             assert min_value is not None
             assert max_value is not None
-            assert kwargs["weights"] is None or all(
-                w > 0 for w in kwargs["weights"].values()
-            ), "possible but really annoying to support zero weights"
+            assert kwargs["weights"] is None or all(w > 0 for w in kwargs["weights"].values()), (
+                "possible but really annoying to support zero weights"
+            )
 
             if (shrink_towards - min_value) < (max_value - shrink_towards):
                 # equivalent to semibounded below case
@@ -487,9 +475,7 @@ def choice_from_index(
         return bool(index)
     elif choice_type == "bytes":
         kwargs = cast(BytesKWargs, kwargs)
-        value_b = collection_value(
-            index, min_size=kwargs["min_size"], alphabet_size=2**8, from_order=identity
-        )
+        value_b = collection_value(index, min_size=kwargs["min_size"], alphabet_size=2**8, from_order=identity)
         return bytes(value_b)
     elif choice_type == "string":
         kwargs = cast(StringKWargs, kwargs)
@@ -531,10 +517,9 @@ def choice_permitted(choice: ChoiceT, kwargs: ChoiceKwargsT) -> bool:
         kwargs = cast(FloatKWargs, kwargs)
         if math.isnan(choice):
             return kwargs["allow_nan"]
-        return (
-            sign_aware_lte(kwargs["min_value"], choice)
-            and sign_aware_lte(choice, kwargs["max_value"])
-        ) and not (0 < abs(choice) < kwargs["smallest_nonzero_magnitude"])
+        return (sign_aware_lte(kwargs["min_value"], choice) and sign_aware_lte(choice, kwargs["max_value"])) and not (
+            0 < abs(choice) < kwargs["smallest_nonzero_magnitude"]
+        )
     elif isinstance(choice, str):
         kwargs = cast(StringKWargs, kwargs)
         if len(choice) < kwargs["min_size"]:
@@ -578,12 +563,8 @@ def choice_equal(choice1: ChoiceT, choice2: ChoiceT) -> bool:
     return choice_key(choice1) == choice_key(choice2)
 
 
-def choice_kwargs_equal(
-    choice_type: ChoiceTypeT, kwargs1: ChoiceKwargsT, kwargs2: ChoiceKwargsT
-) -> bool:
-    return choice_kwargs_key(choice_type, kwargs1) == choice_kwargs_key(
-        choice_type, kwargs2
-    )
+def choice_kwargs_equal(choice_type: ChoiceTypeT, kwargs1: ChoiceKwargsT, kwargs2: ChoiceKwargsT) -> bool:
+    return choice_kwargs_key(choice_type, kwargs1) == choice_kwargs_key(choice_type, kwargs2)
 
 
 def choice_kwargs_key(choice_type, kwargs):

@@ -48,16 +48,11 @@ def is_space(s):
 
 
 def is_unicode_space(s):
-    return all(
-        unicodedata.category(c) in UNICODE_SPACE_CATEGORIES or c in UNICODE_SPACE_CHARS
-        for c in s
-    )
+    return all(unicodedata.category(c) in UNICODE_SPACE_CATEGORIES or c in UNICODE_SPACE_CHARS for c in s)
 
 
 def is_word(s):
-    return all(
-        c == "_" or unicodedata.category(c) in UNICODE_WORD_CATEGORIES for c in s
-    )
+    return all(c == "_" or unicodedata.category(c) in UNICODE_WORD_CATEGORIES for c in s)
 
 
 def ascii_regex(pattern):
@@ -77,15 +72,15 @@ def _test_matching_pattern(pattern, *, isvalidchar, is_unicode=False):
             msg = "%r supposed to match %r (%r, category %r), but it doesn't"
             assert r.search(c), msg % (pattern, c, c, unicodedata.category(c))
         else:
-            assert not r.search(c), (
-                '"%s" supposed not to match "%s" (%r, category "%s"), '
-                "but it does" % (pattern, c, c, unicodedata.category(c))
+            assert not r.search(c), '"%s" supposed not to match "%s" (%r, category "%s"), but it does' % (
+                pattern,
+                c,
+                c,
+                unicodedata.category(c),
             )
 
 
-@pytest.mark.parametrize(
-    "category,predicate", [(r"\w", is_word), (r"\d", is_digit), (r"\s", None)]
-)
+@pytest.mark.parametrize("category,predicate", [(r"\w", is_word), (r"\d", is_digit), (r"\s", None)])
 @pytest.mark.parametrize("invert", [False, True])
 @pytest.mark.parametrize("is_unicode", [False, True])
 def test_matching(category, predicate, invert, is_unicode):
@@ -166,9 +161,7 @@ def test_literals_with_ignorecase(pattern):
     find_any(strategy, lambda s: s == "A")
 
 
-@pytest.mark.parametrize(
-    "pattern", [re.compile("\\A[^a][^b]\\Z", re.IGNORECASE), "(?i)\\A[^a][^b]\\Z"]
-)
+@pytest.mark.parametrize("pattern", [re.compile("\\A[^a][^b]\\Z", re.IGNORECASE), "(?i)\\A[^a][^b]\\Z"])
 def test_not_literal_with_ignorecase(pattern):
     assert_all_examples(
         st.from_regex(pattern),
@@ -242,12 +235,8 @@ def test_end():
 
 
 def test_groupref_exists():
-    assert_all_examples(
-        st.from_regex("^(<)?a(?(1)>)$"), lambda s: s in ("a", "a\n", "<a>", "<a>\n")
-    )
-    assert_all_examples(
-        st.from_regex("^(a)?(?(1)b|c)$"), lambda s: s in ("ab", "ab\n", "c", "c\n")
-    )
+    assert_all_examples(st.from_regex("^(<)?a(?(1)>)$"), lambda s: s in ("a", "a\n", "<a>", "<a>\n"))
+    assert_all_examples(st.from_regex("^(a)?(?(1)b|c)$"), lambda s: s in ("ab", "ab\n", "c", "c\n"))
 
 
 def test_impossible_negative_lookahead():
@@ -262,9 +251,7 @@ def test_can_handle_boundaries_nested(s):
 def test_groupref_not_shared_between_regex():
     # If group references are (incorrectly!) shared between regex, this would
     # fail as the would only be one reference.
-    check_can_generate_examples(
-        st.tuples(st.from_regex("(a)\\1"), st.from_regex("(b)\\1"))
-    )
+    check_can_generate_examples(st.tuples(st.from_regex("(a)\\1"), st.from_regex("(b)\\1")))
 
 
 @pytest.mark.skipif(
@@ -285,9 +272,7 @@ def test_group_ref_is_not_shared_between_identical_regex(data):
 def test_does_not_leak_groups(data):
     a = data.draw(base_regex_strategy(re.compile("^(a)\\Z"), alphabet=st.characters()))
     assert a == "a"
-    b = data.draw(
-        base_regex_strategy(re.compile("^(?(1)a|b)(.)\\Z"), alphabet=st.characters())
-    )
+    b = data.draw(base_regex_strategy(re.compile("^(?(1)a|b)(.)\\Z"), alphabet=st.characters()))
     assert b[0] == "b"
 
 
@@ -449,9 +434,7 @@ def test_fullmatch_generates_example(pattern, matching_str):
     ],
 )
 def test_fullmatch_matches(pattern, eqiv_pattern):
-    assert_all_examples(
-        st.from_regex(pattern, fullmatch=True), lambda s: re.match(eqiv_pattern, s)
-    )
+    assert_all_examples(st.from_regex(pattern, fullmatch=True), lambda s: re.match(eqiv_pattern, s))
 
 
 def test_fullmatch_must_be_bool():

@@ -65,12 +65,8 @@ def test_name_passed_on(s):
     assert s.name == "test_name"
 
 
-@pytest.mark.skipif(
-    not IntegerDtype, reason="Nullable types not available in this version of Pandas"
-)
-@pytest.mark.parametrize(
-    "dtype", ["Int8", pd.core.arrays.integer.Int8Dtype() if IntegerDtype else None]
-)
+@pytest.mark.skipif(not IntegerDtype, reason="Nullable types not available in this version of Pandas")
+@pytest.mark.parametrize("dtype", ["Int8", pd.core.arrays.integer.Int8Dtype() if IntegerDtype else None])
 def test_pandas_nullable_types(dtype):
     assert_no_examples(
         pdst.series(dtype=dtype, elements=st.just(0)),

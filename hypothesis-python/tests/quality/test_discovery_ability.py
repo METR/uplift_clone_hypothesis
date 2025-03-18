@@ -69,9 +69,7 @@ def define_test(specifier, predicate, condition=None, p=0.5, suppress_health_che
             condition_string = ""
         else:
             _condition = condition
-            condition_string = strip_lambda(
-                reflection.get_pretty_function_description(condition)
-            )
+            condition_string = strip_lambda(reflection.get_pretty_function_description(condition))
 
         def test_function(data):
             with BuildContext(data):
@@ -125,9 +123,7 @@ def define_test(specifier, predicate, condition=None, p=0.5, suppress_health_che
 
 
 test_can_produce_zero = define_test(integers(), lambda x: x == 0)
-test_can_produce_large_magnitude_integers = define_test(
-    integers(), lambda x: abs(x) > 1000
-)
+test_can_produce_large_magnitude_integers = define_test(integers(), lambda x: abs(x) > 1000)
 test_can_produce_large_positive_integers = define_test(integers(), lambda x: x > 1000)
 test_can_produce_large_negative_integers = define_test(integers(), lambda x: x < -1000)
 
@@ -146,21 +142,15 @@ test_can_produce_stripped_strings = define_test(text(), lambda x: x == x.strip()
 # probability back up.
 test_can_produce_multi_line_strings = define_test(text(), lambda x: "\n" in x, p=0.35)
 
-test_can_produce_ascii_strings = define_test(
-    text(), lambda x: all(ord(c) <= 127 for c in x)
-)
+test_can_produce_ascii_strings = define_test(text(), lambda x: all(ord(c) <= 127 for c in x))
 
-test_can_produce_long_strings_with_no_ascii = define_test(
-    text(min_size=5), lambda x: all(ord(c) > 127 for c in x), p=0.1
-)
+test_can_produce_long_strings_with_no_ascii = define_test(text(min_size=5), lambda x: all(ord(c) > 127 for c in x), p=0.1)
 
 test_can_produce_short_strings_with_some_non_ascii = define_test(
     text(), lambda x: any(ord(c) > 127 for c in x), condition=lambda x: len(x) <= 3
 )
 
-test_can_produce_large_binary_strings = define_test(
-    binary(), lambda x: len(x) > 10, p=0.3
-)
+test_can_produce_large_binary_strings = define_test(binary(), lambda x: len(x) > 10, p=0.3)
 
 test_can_produce_positive_infinity = define_test(floats(), lambda x: x == math.inf)
 
@@ -178,9 +168,7 @@ test_can_produce_long_lists = define_test(lists(integers()), long_list, p=0.3)
 
 test_can_produce_short_lists = define_test(lists(integers()), lambda x: len(x) <= 10)
 
-test_can_produce_the_same_int_twice = define_test(
-    lists(integers()), lambda t: len(set(t)) < len(t)
-)
+test_can_produce_the_same_int_twice = define_test(lists(integers()), lambda t: len(set(t)) < len(t))
 
 
 def distorted_value(x):
@@ -202,23 +190,15 @@ test_sampled_from_often_distorted = define_test(
 )
 
 
-test_non_empty_subset_of_two_is_usually_large = define_test(
-    sets(sampled_from((1, 2))), lambda t: len(t) == 2
-)
+test_non_empty_subset_of_two_is_usually_large = define_test(sets(sampled_from((1, 2))), lambda t: len(t) == 2)
 
-test_subset_of_ten_is_sometimes_empty = define_test(
-    sets(integers(1, 10)), lambda t: len(t) == 0
-)
+test_subset_of_ten_is_sometimes_empty = define_test(sets(integers(1, 10)), lambda t: len(t) == 0)
 
 test_mostly_sensible_floats = define_test(floats(), lambda t: t + 1 > t)
 
-test_mostly_largish_floats = define_test(
-    floats(), lambda t: t + 1 > 1, condition=lambda x: x > 0
-)
+test_mostly_largish_floats = define_test(floats(), lambda t: t + 1 > 1, condition=lambda x: x > 0)
 
-test_ints_can_occasionally_be_really_large = define_test(
-    integers(), lambda t: t >= 2**63
-)
+test_ints_can_occasionally_be_really_large = define_test(integers(), lambda t: t >= 2**63)
 
 test_mixing_is_sometimes_distorted = define_test(
     lists(booleans() | tuples()),
@@ -237,9 +217,7 @@ test_partial_mixes_3_reasonably_often = define_test(
     condition=bool,
 )
 
-test_mixes_not_too_often = define_test(
-    lists(booleans() | tuples()), lambda x: len(set(map(type, x))) == 1, condition=bool
-)
+test_mixes_not_too_often = define_test(lists(booleans() | tuples()), lambda x: len(set(map(type, x))) == 1, condition=bool)
 
 test_integers_are_usually_non_zero = define_test(integers(), lambda x: x != 0)
 
@@ -248,9 +226,7 @@ test_integers_are_sometimes_zero = define_test(integers(), lambda x: x == 0)
 test_integers_are_often_small = define_test(integers(), lambda x: abs(x) <= 100)
 
 
-test_integers_are_often_small_but_not_that_small = define_test(
-    integers(), lambda x: 50 <= abs(x) <= 255
-)
+test_integers_are_often_small_but_not_that_small = define_test(integers(), lambda x: 50 <= abs(x) <= 255)
 
 
 # This series of tests checks that the one_of() strategy flattens branches
@@ -261,9 +237,7 @@ test_integers_are_often_small_but_not_that_small = define_test(
 # This first strategy chooses an integer between 0 and 7 (inclusive).
 one_of_nested_strategy = one_of(
     just(0),
-    one_of(
-        just(1), just(2), one_of(just(3), just(4), one_of(just(5), just(6), just(7)))
-    ),
+    one_of(just(1), just(2), one_of(just(3), just(4), one_of(just(5), just(6), just(7)))),
 )
 
 for i in range(8):
@@ -274,9 +248,7 @@ for i in range(8):
     )
 
 
-xor_nested_strategy = just(0) | (
-    just(1) | just(2) | (just(3) | just(4) | (just(5) | just(6) | just(7)))
-)
+xor_nested_strategy = just(0) | (just(1) | just(2) | (just(3) | just(4) | (just(5) | just(6) | just(7))))
 
 for i in range(8):
     exec(
@@ -337,11 +309,7 @@ xor_nested_strategy_with_flatmap = just(None).flatmap(
     lambda x: (
         just([x] * 0)
         | just([x] * 1)
-        | (
-            just([x] * 2)
-            | just([x] * 3)
-            | (just([x] * 4) | just([x] * 5) | (just([x] * 6) | just([x] * 7)))
-        )
+        | (just([x] * 2) | just([x] * 3) | (just([x] * 4) | just([x] * 5) | (just([x] * 6) | just([x] * 7))))
     )
 )
 
@@ -369,10 +337,6 @@ for i in range(4):
     )
 
 
-test_long_duplicates_strings = define_test(
-    tuples(text(), text()), lambda s: len(s[0]) >= 5 and s[0] == s[1]
-)
+test_long_duplicates_strings = define_test(tuples(text(), text()), lambda s: len(s[0]) >= 5 and s[0] == s[1])
 
-test_can_produce_nasty_strings = define_test(
-    text(), lambda s: s in {"NaN", "Inf", "undefined"}, p=0.01
-)
+test_can_produce_nasty_strings = define_test(text(), lambda s: s in {"NaN", "Inf", "undefined"}, p=0.01)

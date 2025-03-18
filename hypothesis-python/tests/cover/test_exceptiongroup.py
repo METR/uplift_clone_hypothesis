@@ -58,9 +58,7 @@ def test_user_error_and_stoptest() -> None:
     # TODO: which I suppose is an argument in favor of stripping it??
     @given(st.data())
     def user_error_and_stoptest(data: DataObject) -> None:
-        raise BaseExceptionGroup(
-            "", [errors.StopTest(data.conjecture_data.testcounter), TypeError()]
-        )
+        raise BaseExceptionGroup("", [errors.StopTest(data.conjecture_data.testcounter), TypeError()])
 
     with pytest.raises(BaseExceptionGroup) as excinfo:
         user_error_and_stoptest()
@@ -91,11 +89,7 @@ def test_nested_stoptest() -> None:
     def nested_stoptest(data: DataObject) -> None:
         raise BaseExceptionGroup(
             "",
-            [
-                BaseExceptionGroup(
-                    "", [errors.StopTest(data.conjecture_data.testcounter)]
-                )
-            ],
+            [BaseExceptionGroup("", [errors.StopTest(data.conjecture_data.testcounter)])],
         )
 
     nested_stoptest()
@@ -106,9 +100,7 @@ def test_frozen_and_stoptest() -> None:
     # actually.. I don't think I've got a live repo for this either.
     @given(st.data())
     def frozen_and_stoptest(data: DataObject) -> None:
-        raise BaseExceptionGroup(
-            "", [errors.StopTest(data.conjecture_data.testcounter), errors.Frozen()]
-        )
+        raise BaseExceptionGroup("", [errors.StopTest(data.conjecture_data.testcounter), errors.Frozen()])
 
     frozen_and_stoptest()
 

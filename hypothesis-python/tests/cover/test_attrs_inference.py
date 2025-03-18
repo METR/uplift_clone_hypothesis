@@ -39,16 +39,10 @@ class Inferrables:
             attr.validators.instance_of(object),
         ]
     )
-    validator_optional = attr.ib(
-        validator=attr.validators.optional(lambda inst, atrib, val: float(val))
-    )
+    validator_optional = attr.ib(validator=attr.validators.optional(lambda inst, atrib, val: float(val)))
     validator_in = attr.ib(validator=attr.validators.in_([1, 2, 3]))
-    validator_in_multiple = attr.ib(
-        validator=[attr.validators.in_(list(range(100))), attr.validators.in_([1, -1])]
-    )
-    validator_in_multiple_strings = attr.ib(
-        validator=[attr.validators.in_("abcd"), attr.validators.in_(["ab", "cd"])]
-    )
+    validator_in_multiple = attr.ib(validator=[attr.validators.in_(list(range(100))), attr.validators.in_([1, -1])])
+    validator_in_multiple_strings = attr.ib(validator=[attr.validators.in_("abcd"), attr.validators.in_(["ab", "cd"])])
 
     typing_list = attr.ib(type=list[int])
     typing_list_of_list = attr.ib(type=list[list[int]])
@@ -91,9 +85,7 @@ def test_cannot_infer(c):
 
 def test_cannot_infer_takes_self():
     with pytest.raises(ResolutionFailed):
-        check_can_generate_examples(
-            st.builds(Inferrables, has_default_factory_takes_self=...)
-        )
+        check_can_generate_examples(st.builds(Inferrables, has_default_factory_takes_self=...))
 
 
 @attr.s
@@ -119,9 +111,7 @@ def test_private_attribute_underscore_fails():
 def test_private_attribute_underscore_infer_fails():
     # this has a slightly different failure case, because it goes through
     # attrs-specific resolution logic.
-    with pytest.raises(
-        TypeError, match="Unexpected keyword argument _x for attrs class"
-    ):
+    with pytest.raises(TypeError, match="Unexpected keyword argument _x for attrs class"):
         check_can_generate_examples(st.builds(HasPrivateAttribute, _x=...))
 
 

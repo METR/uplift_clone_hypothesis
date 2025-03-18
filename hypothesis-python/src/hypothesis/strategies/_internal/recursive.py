@@ -100,9 +100,7 @@ class RecursiveStrategy(SearchStrategy):
         extended.validate()
         check_type(int, self.max_leaves, "max_leaves")
         if self.max_leaves <= 0:
-            raise InvalidArgument(
-                f"max_leaves={self.max_leaves!r} must be greater than zero"
-            )
+            raise InvalidArgument(f"max_leaves={self.max_leaves!r} must be greater than zero")
 
     def do_draw(self, data):
         count = 0

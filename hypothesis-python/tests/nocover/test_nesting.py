@@ -20,9 +20,7 @@ def test_nesting_1():
     @settings(max_examples=5, database=None, deadline=None)
     def test_blah(x):
         @given(st.integers())
-        @settings(
-            max_examples=100, phases=no_shrink, database=None, verbosity=Verbosity.quiet
-        )
+        @settings(max_examples=100, phases=no_shrink, database=None, verbosity=Verbosity.quiet)
         def test_nest(y):
             if y >= x:
                 raise ValueError

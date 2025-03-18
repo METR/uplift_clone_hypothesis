@@ -22,6 +22,4 @@ def test_biases_towards_boundary_values():
 
     f()
 
-    assert (
-        not boundary_vals
-    ), f"Expected to see all boundary vals, but still have {boundary_vals}"
+    assert not boundary_vals, f"Expected to see all boundary vals, but still have {boundary_vals}"

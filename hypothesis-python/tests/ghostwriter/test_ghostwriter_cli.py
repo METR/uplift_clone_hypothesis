@@ -32,9 +32,7 @@ from hypothesis.internal.reflection import get_pretty_function_description
 
 
 def run(cmd, *, cwd=None):
-    return subprocess.run(
-        cmd, capture_output=True, shell=True, text=True, cwd=cwd, encoding="utf-8"
-    )
+    return subprocess.run(cmd, capture_output=True, shell=True, text=True, cwd=cwd, encoding="utf-8")
 
 
 @pytest.mark.parametrize(
@@ -87,13 +85,11 @@ def test_cli_python_equivalence(cli, code):
         ),
         (
             "re.srch",
-            "Found the 're' module, but it doesn't have a 'srch' attribute.  "
-            "Closest matches: ['search']",
+            "Found the 're' module, but it doesn't have a 'srch' attribute.  Closest matches: ['search']",
         ),
         (
             "re.fmatch",
-            "Found the 're' module, but it doesn't have a 'fmatch' attribute.  "
-            "Closest matches: ['match', 'fullmatch'",
+            "Found the 're' module, but it doesn't have a 'fmatch' attribute.  Closest matches: ['match', 'fullmatch'",
             # Python >= 3.7 has 'Match' objects too
         ),
     ],
@@ -208,9 +204,7 @@ def test_roundtrip_correct_pairs(tmp_path):
     (tmp_path / "mycode.py").write_text(ROUNDTRIP_CODE_TO_TEST, encoding="utf-8")
     result = run("hypothesis write mycode", cwd=tmp_path)
     assert result.returncode == 0
-    for scope1, scope2 in itertools.product(
-        ["mycode.MyClass", "mycode.OtherClass", "mycode"], repeat=2
-    ):
+    for scope1, scope2 in itertools.product(["mycode.MyClass", "mycode.OtherClass", "mycode"], repeat=2):
         round_trip_code = f"""value0 = {scope1}.to_json(json=json)
     value1 = {scope2}.from_json(json=value0)"""
         if scope1 == scope2:

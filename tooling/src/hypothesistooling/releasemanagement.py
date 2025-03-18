@@ -174,6 +174,5 @@ def commit_pending_release(project):
     tools.git(
         "commit",
         "-m",
-        f"Bump {project.PACKAGE_NAME} version to {project.current_version()} "
-        "and update changelog\n\n[skip ci]",
+        f"Bump {project.PACKAGE_NAME} version to {project.current_version()} and update changelog\n\n[skip ci]",
     )

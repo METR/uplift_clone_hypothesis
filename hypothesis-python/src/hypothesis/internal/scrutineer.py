@@ -65,10 +65,7 @@ class Tracer:
     def can_trace() -> bool:
         return (
             (sys.version_info[:2] < (3, 12) and sys.gettrace() is None)
-            or (
-                sys.version_info[:2] >= (3, 12)
-                and sys.monitoring.get_tool(MONITORING_TOOL_ID) is None
-            )
+            or (sys.version_info[:2] >= (3, 12) and sys.monitoring.get_tool(MONITORING_TOOL_ID) is None)
         ) and not PYPY
 
     def trace(self, frame, event, arg):
@@ -158,10 +155,7 @@ def _glob_to_re(locs: Iterable[str]) -> str:
     characters will only work by chance."""
     # fnmatch.translate is not an option since its "*" consumes path sep
     return "|".join(
-        loc.replace("*", r"[^/]+")
-        .replace(".", re.escape("."))
-        .replace("/", re.escape(sep))
-        + r"\Z"  # right anchored
+        loc.replace("*", r"[^/]+").replace(".", re.escape(".")).replace("/", re.escape(sep)) + r"\Z"  # right anchored
         for loc in locs
     )
 
@@ -176,8 +170,7 @@ def get_explaining_locations(traces):
     seen_passing = {None}.union(*unions.pop(None, set()))
 
     always_failing_never_passing = {
-        origin: reduce(set.intersection, [set().union(*v) for v in values])
-        - seen_passing
+        origin: reduce(set.intersection, [set().union(*v) for v in values]) - seen_passing
         for origin, values in traces.items()
         if origin is not None
     }
@@ -210,8 +203,7 @@ def get_explaining_locations(traces):
     # real divergence (earlier in the trace) and drop that unhelpful explanation.
     filter_regex = re.compile(_glob_to_re(UNHELPFUL_LOCATIONS))
     return {
-        origin: {loc for loc in afnp_locs if not filter_regex.search(loc[0])}
-        for origin, afnp_locs in explanations.items()
+        origin: {loc for loc in afnp_locs if not filter_regex.search(loc[0])} for origin, afnp_locs in explanations.items()
     }
 
 

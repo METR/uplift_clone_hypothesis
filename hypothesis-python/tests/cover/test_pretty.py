@@ -420,9 +420,7 @@ def test_collections_defaultdict():
         (defaultdict(list), "defaultdict(list, {})"),
         (
             defaultdict(list, {"key": "-" * 50}),
-            "defaultdict(list,\n"
-            "            {'key': '-----------------------------------------"
-            "---------'})",
+            "defaultdict(list,\n            {'key': '--------------------------------------------------'})",
         ),
         (a, "defaultdict(defaultdict(...), {})"),
         (b, "defaultdict(list, {'key': defaultdict(...)})"),
@@ -618,9 +616,7 @@ def test_breakable_at_group_boundary():
 )
 def test_nan_reprs(obj, rep):
     assert pretty.pretty(obj) == rep
-    assert float_to_lex(obj) == float_to_lex(
-        eval(rep, {"struct": struct, "nan": float("nan")})
-    )
+    assert float_to_lex(obj) == float_to_lex(eval(rep, {"struct": struct, "nan": float("nan")}))
 
 
 def _repr_call(*args, **kwargs):
@@ -832,10 +828,7 @@ class SomeAttrsClassWithLotsOfFields:
 @pytest.mark.skipif(sys.version_info[:2] >= (3, 14), reason="FIXME-py314")
 def test_will_line_break_between_fields():
     obj = SomeAttrsClassWithLotsOfFields(
-        **{
-            at.name: 12345678900000000000000001
-            for at in SomeAttrsClassWithLotsOfFields.__attrs_attrs__
-        }
+        **{at.name: 12345678900000000000000001 for at in SomeAttrsClassWithLotsOfFields.__attrs_attrs__}
     )
     assert "\n" in pretty.pretty(obj)
 
@@ -926,8 +919,6 @@ def test_prefers_singleton_printing_to_repr_pretty():
     out = io.StringIO()
     printer = pretty.RepresentationPrinter(out)
     banana = Banana()
-    printer.singleton_pprinters[id(banana)] = lambda obj, p, cycle: p.text(
-        "Actually a fish"
-    )
+    printer.singleton_pprinters[id(banana)] = lambda obj, p, cycle: p.text("Actually a fish")
     printer.pretty(banana)
     assert "Actually a fish" in out.getvalue()

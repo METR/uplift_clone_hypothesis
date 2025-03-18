@@ -64,9 +64,7 @@ class TestGetsBasicModels(TestCase):
         assume(len(companies) > 1)
         for c in companies:
             self.assertIsNotNone(c.pk)
-        self.assertEqual(
-            len({c.pk for c in companies}), len({c.name for c in companies})
-        )
+        self.assertEqual(len({c.pk for c in companies}), len({c.name for c in companies}))
 
     @settings(suppress_health_check=[HealthCheck.too_slow])
     @given(from_model(Customer))
@@ -111,9 +109,7 @@ class TestGetsBasicModels(TestCase):
 
     def test_mandatory_computed_fields_may_not_be_provided(self):
         with self.assertRaises(RuntimeError):
-            check_can_generate_examples(
-                from_model(MandatoryComputed, company=from_model(Company))
-            )
+            check_can_generate_examples(from_model(MandatoryComputed, company=from_model(Company)))
 
     @given(from_model(CustomishDefault, customish=...))
     def test_customish_default_overridden_by_infer(self, x):
@@ -149,9 +145,7 @@ class TestGetsBasicModels(TestCase):
     def test_foreign_key_primary(self, data):
         # Regression test for #1307
         company_strategy = from_model(Company, name=just("test"))
-        strategy = from_model(
-            CompanyExtension, company=company_strategy, self_modifying=just(2)
-        )
+        strategy = from_model(CompanyExtension, company=company_strategy, self_modifying=just(2))
         data.draw(strategy)
 
         # Draw again with the same choice sequence. This will cause a duplicate
@@ -177,9 +171,7 @@ class TestRestrictedFields(TestCase):
         self.assertIn(instance.choice_field_text, ("foo", "bar"))
         self.assertIn(instance.choice_field_int, (1, 2))
         self.assertIn(instance.null_choice_field_int, (1, 2, None))
-        self.assertEqual(
-            instance.choice_field_grouped, instance.choice_field_grouped.lower()
-        )
+        self.assertEqual(instance.choice_field_grouped, instance.choice_field_grouped.lower())
         self.assertEqual(instance.even_number_field % 2, 0)
         self.assertTrue(instance.non_blank_text_field)
 

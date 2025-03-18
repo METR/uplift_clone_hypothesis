@@ -38,11 +38,5 @@ def test_can_find_duplicated_subtree():
     # well is unlikely to have been generated without tree mutation, however.
     find_any(
         tree,
-        (
-            lambda v: v is not None
-            and v[1] is not None
-            and v[2] is not None
-            and v[0] == v[2][0]
-            and v[1] == v[2][1]
-        ),
+        (lambda v: v is not None and v[1] is not None and v[2] is not None and v[0] == v[2][0] and v[1] == v[2][1]),
     )

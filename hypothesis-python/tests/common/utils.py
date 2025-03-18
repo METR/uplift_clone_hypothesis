@@ -44,9 +44,7 @@ except ModuleNotFoundError:
         else:
             # This needs to be outside the try/except, so that the helper doesn't
             # trick itself into thinking that an AssertionError was thrown.
-            raise AssertionError(
-                f"Expected to raise an exception ({expected_exception!r}) but didn't"
-            ) from None
+            raise AssertionError(f"Expected to raise an exception ({expected_exception!r}) but didn't") from None
 
 
 try:
@@ -140,9 +138,7 @@ def validate_deprecation():
     finally:
         warnings.simplefilter("error", HypothesisDeprecationWarning)
         if not any(e.category == HypothesisDeprecationWarning for e in w):
-            raise NotDeprecated(
-                f"Expected a deprecation warning but got {[e.category for e in w]!r}"
-            )
+            raise NotDeprecated(f"Expected a deprecation warning but got {[e.category for e in w]!r}")
 
 
 def checks_deprecated_behaviour(func):
@@ -161,9 +157,7 @@ def all_values(db):
 
 
 def non_covering_examples(database):
-    return {
-        v for k, vs in database.data.items() if not k.endswith(b".pareto") for v in vs
-    }
+    return {v for k, vs in database.data.items() if not k.endswith(b".pareto") for v in vs}
 
 
 def counts_calls(func):
@@ -187,9 +181,7 @@ def assert_output_contains_failure(output, test, **kwargs):
         assert f"{k}={v!r}" in output, (f"{k}={v!r}", output)
 
 
-def assert_falsifying_output(
-    test, example_type="Falsifying", expected_exception=AssertionError, **kwargs
-):
+def assert_falsifying_output(test, example_type="Falsifying", expected_exception=AssertionError, **kwargs):
     with capture_out() as out:
         if expected_exception is None:
             # Some tests want to check the output of non-failing runs.

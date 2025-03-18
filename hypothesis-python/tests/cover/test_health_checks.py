@@ -28,9 +28,7 @@ from hypothesis.strategies._internal.strategies import SearchStrategy
 
 from tests.common.utils import no_shrink
 
-HEALTH_CHECK_SETTINGS = settings(
-    max_examples=11, database=None, suppress_health_check=()
-)
+HEALTH_CHECK_SETTINGS = settings(max_examples=11, database=None, suppress_health_check=())
 
 
 def test_slow_generation_fails_a_health_check():
@@ -192,9 +190,7 @@ class ReturningInvariantMachine(RuleBasedStateMachine):
         return "any non-None value"
 
 
-@pytest.mark.parametrize(
-    "cls", [ReturningRuleMachine, ReturningInitializeMachine, ReturningInvariantMachine]
-)
+@pytest.mark.parametrize("cls", [ReturningRuleMachine, ReturningInitializeMachine, ReturningInvariantMachine])
 def test_stateful_returnvalue_healthcheck(cls):
     with pytest.raises(FailedHealthCheck):
         run_state_machine_as_test(cls, settings=settings())

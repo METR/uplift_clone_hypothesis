@@ -37,9 +37,7 @@ from tests.conjecture.common import (
     run_to_nodes,
 )
 
-TEST_SETTINGS = settings(
-    max_examples=5000, database=None, suppress_health_check=list(HealthCheck)
-)
+TEST_SETTINGS = settings(max_examples=5000, database=None, suppress_health_check=list(HealthCheck))
 
 
 def runner_for(*examples):
@@ -442,16 +440,12 @@ def _test_non_observed_draws_are_not_recorded_in_tree(choice_type):
     test()
 
 
-@pytest.mark.parametrize(
-    "choice_type", ["integer", "float", "boolean", "string", "bytes"]
-)
+@pytest.mark.parametrize("choice_type", ["integer", "float", "boolean", "string", "bytes"])
 def test_observed_choice_type_draw(choice_type):
     _test_observed_draws_are_recorded_in_tree(choice_type)
 
 
-@pytest.mark.parametrize(
-    "choice_type", ["integer", "float", "boolean", "string", "bytes"]
-)
+@pytest.mark.parametrize("choice_type", ["integer", "float", "boolean", "string", "bytes"])
 def test_non_observed_choice_type_draw(choice_type):
     _test_non_observed_draws_are_not_recorded_in_tree(choice_type)
 
@@ -496,9 +490,7 @@ def test_can_generate_hard_floats():
             data.draw_float(min_value, max_value, forced=f, allow_nan=False)
             data.mark_interesting()
 
-        data = ConjectureData.for_choices(
-            [n.value for n in nodes], observer=tree.new_observer()
-        )
+        data = ConjectureData.for_choices([n.value for n in nodes], observer=tree.new_observer())
         data.draw_float(min_value, max_value, allow_nan=False)
         data.freeze()
 

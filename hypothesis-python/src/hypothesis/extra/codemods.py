@@ -100,13 +100,9 @@ class HypothesisFixComplexMinMagnitude(VisitorBasedCodemodCommand):
     DESCRIPTION = "Fix a deprecated min_magnitude=None argument for complex numbers."
     METADATA_DEPENDENCIES = (cst.metadata.QualifiedNameProvider,)
 
-    @m.call_if_inside(
-        m.Call(metadata=match_qualname("hypothesis.strategies.complex_numbers"))
-    )
+    @m.call_if_inside(m.Call(metadata=match_qualname("hypothesis.strategies.complex_numbers")))
     def leave_Arg(self, original_node, updated_node):
-        if m.matches(
-            updated_node, m.Arg(keyword=m.Name("min_magnitude"), value=m.Name("None"))
-        ):
+        if m.matches(updated_node, m.Arg(keyword=m.Name("min_magnitude"), value=m.Name("None"))):
             return updated_node.with_changes(value=cst.Integer("0"))
         return updated_node
 

@@ -63,14 +63,10 @@ def make_testcase(
         }[data.status],
         "status_reason": status_reason,
         "representation": string_repr,
-        "arguments": {
-            k.removeprefix("generate:"): v for k, v in (arguments or {}).items()
-        },
+        "arguments": {k.removeprefix("generate:"): v for k, v in (arguments or {}).items()},
         "how_generated": how_generated,  # iid, mutation, etc.
         "features": {
-            **{
-                f"target:{k}".strip(":"): v for k, v in data.target_observations.items()
-            },
+            **{f"target:{k}".strip(":"): v for k, v in data.target_observations.items()},
             **data.events,
         },
         "timing": timing,
@@ -108,21 +104,15 @@ def _system_metadata():
     }
 
 
-OBSERVABILITY_COLLECT_COVERAGE = (
-    "HYPOTHESIS_EXPERIMENTAL_OBSERVABILITY_NOCOVER" not in os.environ
-)
-if OBSERVABILITY_COLLECT_COVERAGE is False and (
-    sys.version_info[:2] >= (3, 12)
-):  # pragma: no cover
+OBSERVABILITY_COLLECT_COVERAGE = "HYPOTHESIS_EXPERIMENTAL_OBSERVABILITY_NOCOVER" not in os.environ
+if OBSERVABILITY_COLLECT_COVERAGE is False and (sys.version_info[:2] >= (3, 12)):  # pragma: no cover
     warnings.warn(
         "Coverage data collection should be quite fast in Python 3.12 or later "
         "so there should be no need to turn coverage reporting off.",
         HypothesisWarning,
         stacklevel=2,
     )
-if "HYPOTHESIS_EXPERIMENTAL_OBSERVABILITY" in os.environ or (
-    OBSERVABILITY_COLLECT_COVERAGE is False
-):  # pragma: no cover
+if "HYPOTHESIS_EXPERIMENTAL_OBSERVABILITY" in os.environ or (OBSERVABILITY_COLLECT_COVERAGE is False):  # pragma: no cover
     TESTCASE_CALLBACKS.append(_deliver_to_file)
 
     # Remove files more than a week old, to cap the size on disk

@@ -47,9 +47,7 @@ def test_keys_and_default_are_not_shared():
 
 
 def test_can_simplify_shared_lists():
-    xs = minimal(
-        st.lists(st.shared(st.integers())), lambda x: len(x) >= 10 and x[0] != 0
-    )
+    xs = minimal(st.lists(st.shared(st.integers())), lambda x: len(x) >= 10 and x[0] != 0)
     assert xs == [1] * 10
 
 

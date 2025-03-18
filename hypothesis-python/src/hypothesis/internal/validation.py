@@ -33,9 +33,7 @@ def check_type(typ: Union[type, tuple[type, ...]], arg: object, name: str) -> No
                 # instead, as it has some helpful "did you mean..." logic.
                 assert typ is not SearchStrategy, "use check_strategy instead"
 
-        raise InvalidArgument(
-            f"Expected {typ_string} but got {name}={arg!r} (type={type(arg).__name__})"
-        )
+        raise InvalidArgument(f"Expected {typ_string} but got {name}={arg!r} (type={type(arg).__name__})")
 
 
 @check_function
@@ -87,8 +85,7 @@ def try_convert(typ, value, name):
         return typ(value)
     except (TypeError, ValueError, ArithmeticError) as err:
         raise InvalidArgument(
-            f"Cannot convert {name}={value!r} of type "
-            f"{type(value).__name__} to type {typ.__name__}"
+            f"Cannot convert {name}={value!r} of type {type(value).__name__} to type {typ.__name__}"
         ) from err
 
 
@@ -116,9 +113,7 @@ def check_valid_interval(lower_bound, upper_bound, lower_name, upper_name):
     if lower_bound is None or upper_bound is None:
         return
     if upper_bound < lower_bound:
-        raise InvalidArgument(
-            f"Cannot have {upper_name}={upper_bound!r} < {lower_name}={lower_bound!r}"
-        )
+        raise InvalidArgument(f"Cannot have {upper_name}={upper_bound!r} < {lower_name}={lower_bound!r}")
 
 
 @check_function

@@ -53,9 +53,7 @@ class RedisExampleDatabase(ExampleDatabase):
         self._pubsub: Any = None
 
     def __repr__(self) -> str:
-        return (
-            f"RedisExampleDatabase({self.redis!r}, expire_after={self._expire_after!r})"
-        )
+        return f"RedisExampleDatabase({self.redis!r}, expire_after={self._expire_after!r})"
 
     @contextmanager
     def _pipeline(

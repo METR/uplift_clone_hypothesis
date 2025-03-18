@@ -175,10 +175,7 @@ def _check_except(except_: Except) -> tuple[type[Exception], ...]:
     if isinstance(except_, tuple):
         for i, e in enumerate(except_):
             if not isinstance(e, type) or not issubclass(e, Exception):
-                raise InvalidArgument(
-                    f"Expected an Exception but got except_[{i}]={e!r}"
-                    f" (type={_get_qualname(type(e))})"
-                )
+                raise InvalidArgument(f"Expected an Exception but got except_[{i}]={e!r} (type={_get_qualname(type(e))})")
         return except_
     if not isinstance(except_, type) or not issubclass(except_, Exception):
         raise InvalidArgument(
@@ -199,9 +196,7 @@ def _exception_string(except_: tuple[type[Exception], ...]) -> tuple[ImportSet, 
         else:
             imports.add(ex.__module__)
             exceptions.append(_get_qualname(ex, include_module=True))
-    return imports, (
-        "(" + ", ".join(exceptions) + ")" if len(exceptions) > 1 else exceptions[0]
-    )
+    return imports, ("(" + ", ".join(exceptions) + ")" if len(exceptions) > 1 else exceptions[0])
 
 
 def _check_style(style: str) -> None:
@@ -300,9 +295,7 @@ def _strategy_for(param: inspect.Parameter, docstring: str) -> st.SearchStrategy
         if (
             param.default is not inspect.Parameter.empty
             and param.default not in elements
-            and not isinstance(
-                param.default, tuple(t for t in types if isinstance(t, type))
-            )
+            and not isinstance(param.default, tuple(t for t in types if isinstance(t, type)))
         ):
             with contextlib.suppress(SyntaxError):
                 compile(repr(st.just(param.default)), "<string>", "eval")
@@ -540,9 +533,7 @@ def _with_any_registered():
             st.from_type.__clear_cache()
 
 
-def _get_strategies(
-    *funcs: Callable, pass_result_to_next_func: bool = False
-) -> dict[str, st.SearchStrategy]:
+def _get_strategies(*funcs: Callable, pass_result_to_next_func: bool = False) -> dict[str, st.SearchStrategy]:
     """Return a dict of strategies for the union of arguments to `funcs`.
 
     If `pass_result_to_next_func` is True, assume that the result of each function
@@ -559,10 +550,7 @@ def _get_strategies(
             del params[next(iter(params))]
         hints = get_type_hints(f)
         docstring = getattr(f, "__doc__", None) or ""
-        builder_args = {
-            k: ... if k in hints else _strategy_for(v, docstring)
-            for k, v in params.items()
-        }
+        builder_args = {k: ... if k in hints else _strategy_for(v, docstring) for k, v in params.items()}
         with _with_any_registered():
             strat = st.builds(f, **builder_args).wrapped_strategy  # type: ignore
 
@@ -624,8 +612,7 @@ def _imports_for_strategy(strategy):
     if isinstance(strategy, LazyStrategy):
         imports = {
             imp
-            for arg in set(strategy._LazyStrategy__args)
-            | set(strategy._LazyStrategy__kwargs.values())
+            for arg in set(strategy._LazyStrategy__args) | set(strategy._LazyStrategy__kwargs.values())
             for imp in _imports_for_object(_strip_typevars(arg))
         }
         if re.match(r"from_(type|regex)\(", repr(strategy)):
@@ -705,17 +692,11 @@ def _valid_syntax_repr(strategy):
             and strategy.function.__name__ == st.from_type.__name__
             and strategy._LazyStrategy__representation is None
         ):
-            strategy._LazyStrategy__args = tuple(
-                _strip_typevars(a) for a in strategy._LazyStrategy__args
-            )
+            strategy._LazyStrategy__args = tuple(_strip_typevars(a) for a in strategy._LazyStrategy__args)
         # Return a syntactically-valid strategy repr, including fixing some
         # strategy reprs and replacing invalid syntax reprs with `"nothing()"`.
         # String-replace to hide the special case in from_type() for Decimal('snan')
-        r = (
-            repr(strategy)
-            .replace(".filter(_can_hash)", "")
-            .replace("hypothesis.strategies.", "")
-        )
+        r = repr(strategy).replace(".filter(_can_hash)", "").replace("hypothesis.strategies.", "")
         # Replace <unknown> with ... in confusing lambdas
         r = re.sub(r"(lambda.*?: )(<unknown>)([,)])", r"\1...\3", r)
         compile(r, "<string>", "eval")
@@ -776,9 +757,7 @@ def _get_qualname(obj: Any, *, include_module: bool = False) -> str:
     return qname
 
 
-def _write_call(
-    func: Callable, *pass_variables: str, except_: Except = Exception, assign: str = ""
-) -> str:
+def _write_call(func: Callable, *pass_variables: str, except_: Except = Exception, assign: str = "") -> str:
     """Write a call to `func` with explicit and implicit arguments.
 
     >>> _write_call(sorted, "my_seq", "func")
@@ -792,11 +771,7 @@ def _write_call(
     subtypes of `except_`, which will be handled in an outer try-except block.
     """
     args = ", ".join(
-        (
-            (v or p.name)
-            if p.kind is inspect.Parameter.POSITIONAL_ONLY
-            else f"{p.name}={v or p.name}"
-        )
+        ((v or p.name) if p.kind is inspect.Parameter.POSITIONAL_ONLY else f"{p.name}={v or p.name}")
         for v, p in zip_longest(pass_variables, _get_params(func).values())
     )
     call = f"{_get_qualname(func, include_module=True)}({args})"
@@ -890,9 +865,7 @@ def _make_test_body(
     return imports, body
 
 
-def _annotate_args(
-    argnames: Iterable[str], funcs: Iterable[Callable], imports: ImportSet
-) -> Iterable[str]:
+def _annotate_args(argnames: Iterable[str], funcs: Iterable[Callable], imports: ImportSet) -> Iterable[str]:
     arg_parameters: DefaultDict[str, set[Any]] = defaultdict(set)
     for func in funcs:
         try:
@@ -919,16 +892,10 @@ class _AnnotationData(NamedTuple):
     imports: set[str]
 
 
-def _parameters_to_annotation_name(
-    parameters: Optional[Iterable[Any]], imports: ImportSet
-) -> Optional[str]:
+def _parameters_to_annotation_name(parameters: Optional[Iterable[Any]], imports: ImportSet) -> Optional[str]:
     if parameters is None:
         return None
-    annotations = tuple(
-        annotation
-        for annotation in map(_parameter_to_annotation, parameters)
-        if annotation is not None
-    )
+    annotations = tuple(annotation for annotation in map(_parameter_to_annotation, parameters) if annotation is not None)
     if not annotations:
         return None
     if len(annotations) == 1:
@@ -952,11 +919,7 @@ def _join_generics(
     # because typing.Optional is converted to a Union, it also contains None
     # since typing.Optional only accepts one type variable, we need to remove it
     if origin_type_data is not None and origin_type_data[0] == "typing.Optional":
-        annotations = (
-            annotation
-            for annotation in annotations
-            if annotation is None or annotation.type_name != "None"
-        )
+        annotations = (annotation for annotation in annotations if annotation is None or annotation.type_name != "None")
 
     origin_type, imports = origin_type_data
     joined = _join_argument_annotations(annotations)
@@ -996,9 +959,7 @@ def _parameter_to_annotation(parameter: Any) -> Optional[_AnnotationData]:
 
     # the arguments of Callable are in a list
     if isinstance(parameter, list):
-        joined = _join_argument_annotations(
-            _parameter_to_annotation(param) for param in parameter
-        )
+        joined = _join_argument_annotations(_parameter_to_annotation(param) for param in parameter)
         if joined is None:
             return None
         arg_type_names, new_imports = joined
@@ -1159,12 +1120,7 @@ def _get_testable_functions(thing: object) -> dict[str, Callable]:
             ]
     for f in funcs:
         try:
-            if (
-                (not is_mock(f))
-                and callable(f)
-                and _get_params(f)
-                and not isinstance(f, enum.EnumMeta)
-            ):
+            if (not is_mock(f)) and callable(f) and _get_params(f) and not isinstance(f, enum.EnumMeta):
                 if getattr(thing, "__name__", None):
                     if inspect.isclass(thing):
                         KNOWN_FUNCTION_LOCATIONS[f] = _get_module_helper(thing)
@@ -1226,8 +1182,7 @@ def magic(
                     mods.append(k)
             if mods:
                 msg += (
-                    f"\n# Try writing tests for submodules, e.g. by using:\n"
-                    f"#     hypothesis write {' '.join(sorted(mods))}"
+                    f"\n# Try writing tests for submodules, e.g. by using:\n#     hypothesis write {' '.join(sorted(mods))}"
                 )
             parts.append(msg)
 
@@ -1248,9 +1203,7 @@ def magic(
             match = re.fullmatch(writename, name.split(".")[-1])
             if match:
                 inverse_name = readname.format(*match.groups())
-                for other in sorted(
-                    n for n in by_name if n.split(".")[-1] == inverse_name
-                ):
+                for other in sorted(n for n in by_name if n.split(".")[-1] == inverse_name):
                     make_(
                         _make_roundtrip_body,
                         (by_name.pop(name), by_name.pop(other)),
@@ -1294,9 +1247,7 @@ def magic(
         hints.pop("return", None)
         params = _get_params(func)
         if (len(hints) == len(params) == 2) or (
-            _get_module(func) == "operator"
-            and "item" not in func.__name__
-            and tuple(params) in [("a", "b"), ("x", "y")]
+            _get_module(func) == "operator" and "item" not in func.__name__ and tuple(params) in [("a", "b"), ("x", "y")]
         ):
             a, b = hints.values() or [Any, Any]
             arg1, arg2 = params
@@ -1471,10 +1422,7 @@ def _make_roundtrip_body(funcs, except_, style, annotate):
     first_param = next(iter(_get_params(funcs[0])))
     test_lines = [
         _write_call(funcs[0], assign="value0", except_=except_),
-        *(
-            _write_call(f, f"value{i}", assign=f"value{i + 1}", except_=except_)
-            for i, f in enumerate(funcs[1:])
-        ),
+        *(_write_call(f, f"value{i}", assign=f"value{i + 1}", except_=except_) for i, f in enumerate(funcs[1:])),
     ]
     return _make_test_body(
         *funcs,
@@ -1531,13 +1479,8 @@ def _get_varnames(funcs):
 
 def _make_equiv_body(funcs, except_, style, annotate):
     var_names = _get_varnames(funcs)
-    test_lines = [
-        _write_call(f, assign=vname, except_=except_)
-        for vname, f in zip(var_names, funcs)
-    ]
-    assertions = "\n".join(
-        _assert_eq(style, var_names[0], vname) for vname in var_names[1:]
-    )
+    test_lines = [_write_call(f, assign=vname, except_=except_) for vname, f in zip(var_names, funcs)]
+    assertions = "\n".join(_assert_eq(style, var_names[0], vname) for vname in var_names[1:])
 
     return _make_test_body(
         *funcs,
@@ -1694,14 +1637,9 @@ def binary_operation(
     check_type(bool, associative, "associative")
     check_type(bool, commutative, "commutative")
     if distributes_over is not None and not callable(distributes_over):
-        raise InvalidArgument(
-            f"{distributes_over=} must be an operation which "
-            f"distributes over {func.__name__}"
-        )
+        raise InvalidArgument(f"{distributes_over=} must be an operation which distributes over {func.__name__}")
     if not any([associative, commutative, identity, distributes_over]):
-        raise InvalidArgument(
-            "You must select at least one property of the binary operation to test."
-        )
+        raise InvalidArgument("You must select at least one property of the binary operation to test.")
 
     if annotate is None:
         annotate = _are_annotations_used(func)
@@ -1879,9 +1817,7 @@ def ufunc(
     if annotate is None:
         annotate = _are_annotations_used(func)
 
-    return _make_test(
-        *_make_ufunc_body(func, except_=except_, style=style, annotate=annotate)
-    )
+    return _make_test(*_make_ufunc_body(func, except_=except_, style=style, annotate=annotate))
 
 
 def _make_ufunc_body(func, *, except_, style, annotate):

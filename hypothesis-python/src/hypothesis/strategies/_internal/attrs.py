@@ -130,11 +130,7 @@ def types_to_strategy(attrib, types):
         type_tuples = [k if isinstance(k, tuple) else (k,) for k in types]
         # Flatten the list, filter types that would fail validation, and
         # sort so that ordering is stable between runs and shrinks well.
-        allowed = [
-            t
-            for t in set(sum(type_tuples, ()))
-            if all(issubclass(t, tup) for tup in type_tuples)
-        ]
+        allowed = [t for t in set(sum(type_tuples, ())) if all(issubclass(t, tup) for tup in type_tuples)]
         allowed.sort(key=type_sorting_key)
         return st.one_of([st.from_type(t) for t in allowed])
 

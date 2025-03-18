@@ -22,9 +22,7 @@ from hypothesis.strategies import data, floats, lists
 from tests.common.debug import find_any
 from tests.common.utils import fails
 
-TRY_HARDER = settings(
-    max_examples=1000, suppress_health_check=[HealthCheck.filter_too_much]
-)
+TRY_HARDER = settings(max_examples=1000, suppress_health_check=[HealthCheck.filter_too_much])
 
 
 @given(floats())
@@ -133,9 +131,6 @@ def test_floats_are_in_range(x, y, data):
 def test_can_find_negative_and_signaling_nans(neg, snan):
     find_any(
         floats().filter(math.isnan),
-        lambda x: (
-            snan is (float_to_int(abs(x)) != float_to_int(float("nan")))
-            and neg is (math.copysign(1, x) == -1)
-        ),
+        lambda x: (snan is (float_to_int(abs(x)) != float_to_int(float("nan"))) and neg is (math.copysign(1, x) == -1)),
         settings=TRY_HARDER,
     )

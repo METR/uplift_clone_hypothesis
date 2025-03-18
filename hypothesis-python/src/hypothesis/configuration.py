@@ -29,9 +29,7 @@ def set_hypothesis_home_dir(directory: Union[str, Path, None]) -> None:
 
 def storage_directory(*names: str, intent_to_write: bool = True) -> Path:
     if intent_to_write:
-        check_sideeffect_during_initialization(
-            "accessing storage for {}", "/".join(names)
-        )
+        check_sideeffect_during_initialization("accessing storage for {}", "/".join(names))
 
     global __hypothesis_home_directory
     if not __hypothesis_home_directory:
@@ -45,9 +43,7 @@ def storage_directory(*names: str, intent_to_write: bool = True) -> Path:
 _first_postinit_what = None
 
 
-def check_sideeffect_during_initialization(
-    what: str, *fmt_args: object, is_restart: bool = False
-) -> None:
+def check_sideeffect_during_initialization(what: str, *fmt_args: object, is_restart: bool = False) -> None:
     """Called from locations that should not be executed during initialization, for example
     touching disk or materializing lazy/deferred strategies from plugins. If initialization
     is in progress, a warning is emitted.
@@ -65,9 +61,7 @@ def check_sideeffect_during_initialization(
         msg = what.format(*fmt_args)
         if is_restart:
             when = "between importing hypothesis and loading the hypothesis plugin"
-        elif "_hypothesis_pytestplugin" in sys.modules or os.getenv(
-            "HYPOTHESIS_EXTEND_INITIALIZATION"
-        ):
+        elif "_hypothesis_pytestplugin" in sys.modules or os.getenv("HYPOTHESIS_EXTEND_INITIALIZATION"):
             when = "during pytest plugin or conftest initialization"
         else:  # pragma: no cover
             # This can be triggered by Hypothesis plugins, but is really annoying

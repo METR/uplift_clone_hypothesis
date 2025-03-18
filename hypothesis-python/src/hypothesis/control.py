@@ -142,9 +142,7 @@ class BuildContext:
         # Use defaultdict(list) here to handle the possibility of having multiple
         # functions registered for the same object (due to caching, small ints, etc).
         # The printer will discard duplicates which return different representations.
-        self.known_object_printers: dict[IDKey, list[PrettyPrintFunction]] = (
-            defaultdict(list)
-        )
+        self.known_object_printers: dict[IDKey, list[PrettyPrintFunction]] = defaultdict(list)
 
     def record_call(
         self,

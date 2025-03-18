@@ -57,9 +57,7 @@ def wrap_array(func: callable, exclude: tuple[str, ...] = ()) -> callable:
     return wrapped
 
 
-def make_mock_xp(
-    *, exclude: tuple[str, ...] = (), exclude_methods: tuple[str, ...] = ()
-) -> SimpleNamespace:
+def make_mock_xp(*, exclude: tuple[str, ...] = (), exclude_methods: tuple[str, ...] = ()) -> SimpleNamespace:
     xp = copy(mock_xp)
     assert isinstance(exclude, tuple)  # sanity check
     assert isinstance(exclude_methods, tuple)  # sanity check

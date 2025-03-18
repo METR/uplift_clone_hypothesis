@@ -175,10 +175,7 @@ def to_jsonable(obj: object) -> object:
             return to_jsonable(obj._asdict())  # treat namedtuples as dicts
         return [to_jsonable(x) for x in obj]
     if isinstance(obj, dict):
-        return {
-            k if isinstance(k, str) else pretty(k): to_jsonable(v)
-            for k, v in obj.items()
-        }
+        return {k if isinstance(k, str) else pretty(k): to_jsonable(v) for k, v in obj.items()}
 
     # Hey, might as well try calling a .to_json() method - it works for Pandas!
     # We try this before the below general-purpose handlers to give folks a
@@ -189,11 +186,7 @@ def to_jsonable(obj: object) -> object:
         pass
 
     # Special handling for dataclasses, attrs, and pydantic classes
-    if (
-        (dcs := sys.modules.get("dataclasses"))
-        and dcs.is_dataclass(obj)
-        and not isinstance(obj, type)
-    ):
+    if (dcs := sys.modules.get("dataclasses")) and dcs.is_dataclass(obj) and not isinstance(obj, type):
         return to_jsonable(dataclass_asdict(obj))
     if attr.has(type(obj)):
         return to_jsonable(attr.asdict(obj, recurse=False))  # type: ignore

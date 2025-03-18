@@ -35,9 +35,7 @@ AnyField = Union[dm.Field, df.Field]
 F = TypeVar("F", bound=AnyField)
 
 
-def numeric_bounds_from_validators(
-    field, min_value=float("-inf"), max_value=float("inf")
-):
+def numeric_bounds_from_validators(field, min_value=float("-inf"), max_value=float("inf")):
     for v in field.validators:
         if isinstance(v, django.core.validators.MinValueValidator):
             min_value = max(min_value, v.limit_value)
@@ -57,9 +55,7 @@ def integers_for_field(min_value, max_value):
 def timezones():
     # From Django 4.0, the default is to use zoneinfo instead of pytz.
     assert getattr(django.conf.settings, "USE_TZ", False)
-    if django.VERSION < (5, 0, 0) and getattr(
-        django.conf.settings, "USE_DEPRECATED_PYTZ", True
-    ):
+    if django.VERSION < (5, 0, 0) and getattr(django.conf.settings, "USE_DEPRECATED_PYTZ", True):
         from hypothesis.extra.pytz import timezones
     else:
         from hypothesis.strategies import timezones
@@ -88,9 +84,7 @@ _global_field_lookup: _FieldLookUpType = {
     df.DateField: st.dates(),
     df.DurationField: st.timedeltas(),
     df.EmailField: emails(),
-    df.FloatField: lambda field: st.floats(
-        *numeric_bounds_from_validators(field), allow_nan=False, allow_infinity=False
-    ),
+    df.FloatField: lambda field: st.floats(*numeric_bounds_from_validators(field), allow_nan=False, allow_infinity=False),
     df.IntegerField: integers_for_field(-2147483648, 2147483647),
     df.NullBooleanField: st.one_of(st.none(), st.booleans()),
     df.URLField: urls(),
@@ -126,12 +120,7 @@ def _for_datetime(field):
 
 def using_sqlite():
     try:
-        return (
-            getattr(django.conf.settings, "DATABASES", {})
-            .get("default", {})
-            .get("ENGINE", "")
-            .endswith(".sqlite3")
-        )
+        return getattr(django.conf.settings, "DATABASES", {}).get("default", {}).get("ENGINE", "").endswith(".sqlite3")
     except django.core.exceptions.ImproperlyConfigured:
         return None
 
@@ -274,9 +263,7 @@ def _model_choice_strategy(field):
         if field.choices is None:
             # The field was instantiated with queryset=None, and not
             # subsequently updated.
-            raise InvalidArgument(
-                "Cannot create strategy for ModelChoicesField with no choices"
-            )
+            raise InvalidArgument("Cannot create strategy for ModelChoicesField with no choices")
         elif hasattr(field, "_choices"):
             # The choices property was set manually.
             choices = field._choices
@@ -318,9 +305,7 @@ def _for_model_multiple_choice(field):
     return st.lists(_model_choice_strategy(field), min_size=min_size, unique=True)
 
 
-def register_field_strategy(
-    field_type: type[AnyField], strategy: st.SearchStrategy
-) -> None:
+def register_field_strategy(field_type: type[AnyField], strategy: st.SearchStrategy) -> None:
     """Add an entry to the global field-to-strategy lookup used by
     :func:`~hypothesis.extra.django.from_field`.
 
@@ -332,10 +317,7 @@ def register_field_strategy(
         raise InvalidArgument(f"{field_type=} must be a subtype of Field")
     check_type(st.SearchStrategy, strategy, "strategy")
     if field_type in _global_field_lookup:
-        raise InvalidArgument(
-            f"{field_type=} already has a registered "
-            f"strategy ({_global_field_lookup[field_type]!r})"
-        )
+        raise InvalidArgument(f"{field_type=} already has a registered strategy ({_global_field_lookup[field_type]!r})")
     if issubclass(field_type, dm.AutoField):
         raise InvalidArgument("Cannot register a strategy for an AutoField")
     _global_field_lookup[field_type] = strategy

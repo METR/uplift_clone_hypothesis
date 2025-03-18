@@ -30,17 +30,13 @@ def test_can_handle_large_codepoints():
 
 
 def test_can_find_mixed_ascii_and_non_ascii_strings():
-    s = minimal(
-        text(), lambda x: (any(t >= "☃" for t in x) and any(ord(t) <= 127 for t in x))
-    )
+    s = minimal(text(), lambda x: (any(t >= "☃" for t in x) and any(ord(t) <= 127 for t in x)))
     assert len(s) == 2
     assert sorted(s) == ["0", "☃"]
 
 
 def test_will_find_ascii_examples_given_the_chance():
-    s = minimal(
-        tuples(text(max_size=1), text(max_size=1)), lambda x: x[0] and (x[0] < x[1])
-    )
+    s = minimal(tuples(text(max_size=1), text(max_size=1)), lambda x: x[0] and (x[0] < x[1]))
     assert ord(s[1]) == ord(s[0]) + 1
     assert "0" in s
 

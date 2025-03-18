@@ -66,15 +66,11 @@ def elements_and_dtype(elements, dtype, source=None):
     else:
         with check("dtype is not None"):
             if dtype is None:
-                raise InvalidArgument(
-                    f"At least one of {prefix}elements or {prefix}dtype must be provided."
-                )
+                raise InvalidArgument(f"At least one of {prefix}elements or {prefix}dtype must be provided.")
 
     with check("isinstance(dtype, CategoricalDtype)"):
         if pandas.api.types.CategoricalDtype.is_dtype(dtype):
-            raise InvalidArgument(
-                f"{prefix}dtype is categorical, which is currently unsupported"
-            )
+            raise InvalidArgument(f"{prefix}dtype is categorical, which is currently unsupported")
 
     if isinstance(dtype, type) and issubclass(dtype, IntegerDtype):
         raise InvalidArgument(
@@ -91,8 +87,7 @@ def elements_and_dtype(elements, dtype, source=None):
             err_msg += ' To generate valid timedeltas, pass `dtype="timedelta64[ns]"`'
             raise InvalidArgument(err_msg)
         note_deprecation(
-            f"{err_msg}  We'll treat it as "
-            "dtype=object for now, but this will be an error in a future version.",
+            f"{err_msg}  We'll treat it as dtype=object for now, but this will be an error in a future version.",
             since="2021-12-31",
             has_codemod=False,
             stacklevel=1,
@@ -130,8 +125,7 @@ def elements_and_dtype(elements, dtype, source=None):
                 return np.array([value], dtype=dtype)[0]
             except (TypeError, ValueError, OverflowError):
                 raise InvalidArgument(
-                    "Cannot convert %s=%r of type %s to dtype %s"
-                    % (name, value, type(value).__name__, dtype.str)
+                    "Cannot convert %s=%r of type %s to dtype %s" % (name, value, type(value).__name__, dtype.str)
                 ) from None
 
         elements = elements.map(convert_element)
@@ -171,12 +165,8 @@ class ValueIndexStrategy(st.SearchStrategy):
                 seen.add(elt)
             result.append(elt)
 
-        dtype = infer_dtype_if_necessary(
-            dtype=self.dtype, values=result, elements=self.elements, draw=data.draw
-        )
-        return pandas.Index(
-            result, dtype=dtype, tupleize_cols=False, name=data.draw(self.name)
-        )
+        dtype = infer_dtype_if_necessary(dtype=self.dtype, values=result, elements=self.elements, draw=data.draw)
+        return pandas.Index(result, dtype=dtype, tupleize_cols=False, name=data.draw(self.name))
 
 
 DEFAULT_MAX_SIZE = 10
@@ -308,11 +298,7 @@ def series(
     index_strategy = index
 
     # if it is converted to an object, use object for series type
-    if (
-        np_dtype is not None
-        and np_dtype.kind == "O"
-        and not isinstance(dtype, IntegerDtype)
-    ):
+    if np_dtype is not None and np_dtype.kind == "O" and not isinstance(dtype, IntegerDtype):
         dtype = np_dtype
 
     @st.composite
@@ -347,11 +333,7 @@ def series(
             return pandas.Series(
                 (),
                 index=index,
-                dtype=(
-                    dtype
-                    if dtype is not None
-                    else draw(dtype_for_elements_strategy(elements))
-                ),
+                dtype=(dtype if dtype is not None else draw(dtype_for_elements_strategy(elements))),
                 name=draw(name),
             )
 
@@ -404,10 +386,7 @@ def columns(
         names: list[Union[int, str, None]] = [None] * names_or_number
     else:
         names = list(names_or_number)
-    return [
-        column(name=n, dtype=dtype, elements=elements, fill=fill, unique=unique)
-        for n in names
-    ]
+    return [column(name=n, dtype=dtype, elements=elements, fill=fill, unique=unique) for n in names]
 
 
 @defines_strategy()
@@ -582,13 +561,9 @@ def data_frames(
         c.elements, _ = elements_and_dtype(c.elements, c.dtype, label)
 
         if c.dtype is None and rows is not None:
-            raise InvalidArgument(
-                "Must specify a dtype for all columns when combining rows with columns."
-            )
+            raise InvalidArgument("Must specify a dtype for all columns when combining rows with columns.")
 
-        c.fill = npst.fill_for(
-            fill=c.fill, elements=c.elements, unique=c.unique, name=label
-        )
+        c.fill = npst.fill_for(fill=c.fill, elements=c.elements, unique=c.unique, name=label)
 
         rewritten_columns.append(c)
 
@@ -642,9 +617,7 @@ def data_frames(
                         except ValueError as err:  # pragma: no cover
                             # This just works in Pandas 1.4 and later, but gives
                             # a confusing error on previous versions.
-                            if c.dtype is None and not isinstance(
-                                value, (float, int, str, bool, datetime, timedelta)
-                            ):
+                            if c.dtype is None and not isinstance(value, (float, int, str, bool, datetime, timedelta)):
                                 raise ValueError(
                                     f"Failed to add {value=} to column "
                                     f"{c.name} with dtype=None.  Maybe passing "
@@ -678,9 +651,7 @@ def data_frames(
                 OrderedDict(
                     (
                         c.name,
-                        pandas.Series(
-                            np.zeros(dtype=c.dtype, shape=len(index)), dtype=c.dtype
-                        ),
+                        pandas.Series(np.zeros(dtype=c.dtype, shape=len(index)), dtype=c.dtype),
                     )
                     for c in rewritten_columns
                 ),
@@ -711,8 +682,7 @@ def data_frames(
                                 except KeyError:
                                     if c.fill.is_empty:
                                         raise InvalidArgument(
-                                            f"Empty fill strategy in {c!r} cannot "
-                                            f"complete row {original_row!r}"
+                                            f"Empty fill strategy in {c!r} cannot complete row {original_row!r}"
                                         ) from None
                                     fills[i] = draw(c.fill)
                                     as_list[i] = fills[i]
@@ -744,10 +714,7 @@ def data_frames(
                     while len(row) < len(rewritten_columns):
                         c = rewritten_columns[len(row)]
                         if c.fill.is_empty:
-                            raise InvalidArgument(
-                                f"Empty fill strategy in {c!r} cannot "
-                                f"complete row {original_row!r}"
-                            )
+                            raise InvalidArgument(f"Empty fill strategy in {c!r} cannot complete row {original_row!r}")
                         row.append(draw(c.fill))
                     result.iloc[row_index] = row
                     break

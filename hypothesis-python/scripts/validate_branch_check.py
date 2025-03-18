@@ -57,6 +57,4 @@ if __name__ == "__main__":
     if failure:
         sys.exit(1)
 
-    print(
-        f"""Successfully validated {len(checks)} branch{"es" if len(checks) > 1 else ""}."""
-    )
+    print(f"""Successfully validated {len(checks)} branch{"es" if len(checks) > 1 else ""}.""")

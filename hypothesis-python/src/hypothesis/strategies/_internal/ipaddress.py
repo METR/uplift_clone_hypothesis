@@ -97,12 +97,12 @@ def ip_addresses(
     if network is None:
         # We use the reserved-address registries to boost the chance
         # of generating one of the various special types of address.
-        four = binary(min_size=4, max_size=4).map(IPv4Address) | sampled_from(
-            SPECIAL_IPv4_RANGES
-        ).flatmap(lambda network: ip_addresses(network=network))
-        six = binary(min_size=16, max_size=16).map(IPv6Address) | sampled_from(
-            SPECIAL_IPv6_RANGES
-        ).flatmap(lambda network: ip_addresses(network=network))
+        four = binary(min_size=4, max_size=4).map(IPv4Address) | sampled_from(SPECIAL_IPv4_RANGES).flatmap(
+            lambda network: ip_addresses(network=network)
+        )
+        six = binary(min_size=16, max_size=16).map(IPv6Address) | sampled_from(SPECIAL_IPv6_RANGES).flatmap(
+            lambda network: ip_addresses(network=network)
+        )
         if v == 4:
             return four
         if v == 6:

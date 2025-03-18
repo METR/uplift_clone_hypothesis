@@ -33,9 +33,7 @@ def test_explore_arbitrary_function(strat, data):
         minimal(
             strat,
             predicate,
-            settings=settings(
-                max_examples=10, database=None, verbosity=Verbosity.quiet
-            ),
+            settings=settings(max_examples=10, database=None, verbosity=Verbosity.quiet),
         )
     except Unsatisfiable:
         reject()

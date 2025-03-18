@@ -38,7 +38,6 @@ through sloppy shrinks, and then precise shrinks guarantee properties of the fin
 result.
 """
 
-
 import itertools
 from functools import lru_cache
 from random import Random
@@ -143,9 +142,7 @@ def minimal_nodes_for_strategy(s):
 
 
 def test_strategy_list_is_in_sorted_order():
-    assert common_strategies == sorted(
-        common_strategies, key=lambda s: sort_key(minimal_nodes_for_strategy(s))
-    )
+    assert common_strategies == sorted(common_strategies, key=lambda s: sort_key(minimal_nodes_for_strategy(s)))
 
 
 @pytest.mark.parametrize("typ,strat", common_strategies_with_types)
@@ -161,15 +158,9 @@ def test_can_precisely_shrink_values(typ, strat, require_truthy):
     assert shrunk == find(strat, cond)
 
 
-alternatives = [
-    comb
-    for n in (2, 3, 4)
-    for comb in itertools.combinations(common_strategies_with_types, n)
-]
+alternatives = [comb for n in (2, 3, 4) for comb in itertools.combinations(common_strategies_with_types, n)]
 
-indexed_alternatives = [
-    (i, j, a) for a in alternatives for i, j in itertools.combinations(range(len(a)), 2)
-]
+indexed_alternatives = [(i, j, a) for a in alternatives for i, j in itertools.combinations(range(len(a)), 2)]
 
 
 @pytest.mark.parametrize("i,j,a", indexed_alternatives)
@@ -187,9 +178,7 @@ def test_can_precisely_shrink_alternatives(i, j, a, seed):
     assert isinstance(value, types[i])
 
 
-@pytest.mark.parametrize(
-    "a", list(itertools.combinations(common_strategies_with_types, 3))
-)
+@pytest.mark.parametrize("a", list(itertools.combinations(common_strategies_with_types, 3)))
 @pytest.mark.parametrize("seed", [0, 4389048901])
 def test_precise_shrink_with_blocker(a, seed):
     # We're reordering this so that there is a "blocking" unusually large
@@ -210,9 +199,7 @@ def test_precise_shrink_with_blocker(a, seed):
     assert isinstance(value, types[0])
 
 
-def find_random(
-    s: st.SearchStrategy[T], condition: Callable[[T], bool], seed=None
-) -> tuple[ConjectureResult, T]:
+def find_random(s: st.SearchStrategy[T], condition: Callable[[T], bool], seed=None) -> tuple[ConjectureResult, T]:
     random = Random(seed)
     while True:
         data = ConjectureData(random=random)
@@ -288,15 +275,11 @@ def test_always_shrinks_to_none(a, seed, block_falsey, allow_sloppy):
     combined_strategy = st.one_of(st.none(), *a)
 
     result, value = find_random(combined_strategy, lambda x: x is not None)
-    shrunk_values = shrinks(
-        combined_strategy, result.nodes, allow_sloppy=allow_sloppy, seed=seed
-    )
+    shrunk_values = shrinks(combined_strategy, result.nodes, allow_sloppy=allow_sloppy, seed=seed)
     assert shrunk_values[0][1] is None
 
 
-@pytest.mark.parametrize(
-    "i,alts", [(i, alt) for alt in alternatives for i in range(1, len(alt))]
-)
+@pytest.mark.parametrize("i,alts", [(i, alt) for alt in alternatives for i in range(1, len(alt))])
 @pytest.mark.parametrize("force_small", [False, True])
 @pytest.mark.parametrize("seed", [0, 2452, 99085240570])
 def test_can_shrink_to_every_smaller_alternative(i, alts, seed, force_small):
@@ -304,13 +287,9 @@ def test_can_shrink_to_every_smaller_alternative(i, alts, seed, force_small):
     strats = [s for _, s in alts]
     combined_strategy = st.one_of(*strats)
     if force_small:
-        result, value = precisely_shrink(
-            combined_strategy, is_interesting=lambda x: type(x) is types[i], seed=seed
-        )
+        result, value = precisely_shrink(combined_strategy, is_interesting=lambda x: type(x) is types[i], seed=seed)
     else:
-        result, value = find_random(
-            combined_strategy, lambda x: type(x) is types[i], seed=seed
-        )
+        result, value = find_random(combined_strategy, lambda x: type(x) is types[i], seed=seed)
 
     shrunk = shrinks(
         combined_strategy,

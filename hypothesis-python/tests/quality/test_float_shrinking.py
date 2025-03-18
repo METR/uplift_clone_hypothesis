@@ -39,9 +39,5 @@ def test_shrinks_downwards_to_integers(f):
 @example(1)
 @given(st.integers(1, 2**16 - 1))
 def test_shrinks_downwards_to_integers_when_fractional(b):
-    g = minimal(
-        st.floats(
-            min_value=b, max_value=2**53, exclude_min=True, exclude_max=True
-        ).filter(lambda x: int(x) != x)
-    )
+    g = minimal(st.floats(min_value=b, max_value=2**53, exclude_min=True, exclude_max=True).filter(lambda x: int(x) != x))
     assert g == b + 0.5

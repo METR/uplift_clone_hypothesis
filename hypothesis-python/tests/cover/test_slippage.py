@@ -28,8 +28,7 @@ def capture_reports(test):
         test()
 
     return o.getvalue() + "\n\n".join(
-        f"{e!r}\n" + "\n".join(getattr(e, "__notes__", []))
-        for e in (err.value, *err.value.exceptions)
+        f"{e!r}\n" + "\n".join(getattr(e, "__notes__", [])) for e in (err.value, *err.value.exceptions)
     )
 
 
@@ -90,9 +89,7 @@ def test_raises_multiple_failures_when_position_varies():
 def test_replays_both_failing_values():
     target = None
 
-    @settings(
-        database=InMemoryExampleDatabase(), max_examples=500, report_multiple_bugs=True
-    )
+    @settings(database=InMemoryExampleDatabase(), max_examples=500, report_multiple_bugs=True)
     @given(st.integers())
     def test(i):
         nonlocal target
@@ -115,9 +112,7 @@ def test_replays_slipped_examples_once_initial_bug_is_fixed(fix):
     target = []
     bug_fixed = False
 
-    @settings(
-        database=InMemoryExampleDatabase(), max_examples=500, report_multiple_bugs=True
-    )
+    @settings(database=InMemoryExampleDatabase(), max_examples=500, report_multiple_bugs=True)
     @given(st.integers())
     def test(i):
         if abs(i) < 1000:
@@ -221,9 +216,7 @@ def test_handles_flaky_tests_where_only_one_is_flaky():
     target = []
     flaky_failed_once = False
 
-    @settings(
-        database=InMemoryExampleDatabase(), max_examples=1000, report_multiple_bugs=True
-    )
+    @settings(database=InMemoryExampleDatabase(), max_examples=1000, report_multiple_bugs=True)
     @given(st.integers())
     def test(i):
         nonlocal flaky_failed_once

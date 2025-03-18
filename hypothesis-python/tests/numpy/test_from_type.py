@@ -60,9 +60,7 @@ def workaround(dtype):
 
 
 # https://numpy.org/devdocs/release/1.22.0-notes.html#ndarray-dtype-and-number-are-now-runtime-subscriptable
-@pytest.mark.skipif(
-    tuple(int(x) for x in np.__version__.split(".")[:2]) < (1, 22), reason="see comment"
-)
+@pytest.mark.skipif(tuple(int(x) for x in np.__version__.split(".")[:2]) < (1, 22), reason="see comment")
 @pytest.mark.parametrize("typ", [workaround(t) for t in STANDARD_TYPES_TYPE])
 def test_resolves_specified_ndarray_type(typ):
     assert_simple_property(
@@ -143,9 +141,7 @@ def test_resolves_SupportsArray():
     test()
 
 
-@pytest.mark.skipif(
-    _NestedSequence is None or _SupportsArray is None, **needs_np_private_typing
-)
+@pytest.mark.skipif(_NestedSequence is None or _SupportsArray is None, **needs_np_private_typing)
 def test_resolve_ArrayLike_equivalent():
     # This is the current (1.24.3) definition of ArrayLike,
     # with problematic parts commented out.

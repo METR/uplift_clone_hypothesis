@@ -20,9 +20,7 @@ from hypothesis.strategies import data, floats, integers
 @pytest.mark.parametrize("low", [-2.0, -1.0, 0.0, 1.0])
 @given(data())
 def test_bad_float_exclude_min_in_array(dtype, low, data):
-    elements = floats(
-        low, low + 1, exclude_min=True, width=np.dtype(dtype).itemsize * 8
-    )
+    elements = floats(low, low + 1, exclude_min=True, width=np.dtype(dtype).itemsize * 8)
     x = data.draw(arrays(dtype, shape=(1,), elements=elements), label="x")
     assert np.all(low < x)
 

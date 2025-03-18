@@ -53,16 +53,12 @@ def test_find_empty_collection_gives_empty(col, strat):
     assert minimal(strat) == col
 
 
-@pytest.mark.parametrize(
-    ("coltype", "strat"), [(list, lists), (set, sets), (frozenset, frozensets)]
-)
+@pytest.mark.parametrize(("coltype", "strat"), [(list, lists), (set, sets), (frozenset, frozensets)])
 def test_find_non_empty_collection_gives_single_zero(coltype, strat):
     assert minimal(strat(integers()), bool) == coltype((0,))
 
 
-@pytest.mark.parametrize(
-    ("coltype", "strat"), [(list, lists), (set, sets), (frozenset, frozensets)]
-)
+@pytest.mark.parametrize(("coltype", "strat"), [(list, lists), (set, sets), (frozenset, frozensets)])
 def test_minimizes_to_empty(coltype, strat):
     assert minimal(strat(integers())) == coltype()
 

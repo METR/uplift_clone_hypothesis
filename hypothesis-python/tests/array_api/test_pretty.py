@@ -32,9 +32,7 @@ from tests.array_api.common import MIN_VER_FOR_COMPLEX
         "unsigned_integer_dtypes",
         "floating_dtypes",
         "real_dtypes",
-        pytest.param(
-            "complex_dtypes", marks=pytest.mark.xp_min_version(MIN_VER_FOR_COMPLEX)
-        ),
+        pytest.param("complex_dtypes", marks=pytest.mark.xp_min_version(MIN_VER_FOR_COMPLEX)),
         "valid_tuple_axes",
         "broadcastable_shapes",
         "mutually_broadcastable_shapes",
@@ -66,9 +64,7 @@ def test_namespaced_methods_meta(xp, xps, name):
         ("unsigned_integer_dtypes", []),
         ("floating_dtypes", []),
         ("real_dtypes", []),
-        pytest.param(
-            "complex_dtypes", [], marks=pytest.mark.xp_min_version(MIN_VER_FOR_COMPLEX)
-        ),
+        pytest.param("complex_dtypes", [], marks=pytest.mark.xp_min_version(MIN_VER_FOR_COMPLEX)),
         ("valid_tuple_axes", [0]),
         ("broadcastable_shapes", [()]),
         ("mutually_broadcastable_shapes", [3]),

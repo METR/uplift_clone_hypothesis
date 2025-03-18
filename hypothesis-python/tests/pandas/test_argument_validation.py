@@ -116,19 +116,13 @@ def test_timestamp_as_datetime_bounds(dt):
 
 @checks_deprecated_behaviour
 def test_confusing_object_dtype_aliases():
-    check_can_generate_examples(
-        pdst.series(elements=st.tuples(st.integers()), dtype=tuple)
-    )
+    check_can_generate_examples(pdst.series(elements=st.tuples(st.integers()), dtype=tuple))
 
 
-@pytest.mark.skipif(
-    not IntegerDtype, reason="Nullable types not available in this version of Pandas"
-)
+@pytest.mark.skipif(not IntegerDtype, reason="Nullable types not available in this version of Pandas")
 def test_pandas_nullable_types_class():
     st = pdst.series(dtype=pd.core.arrays.integer.Int8Dtype)
-    with pytest.raises(
-        InvalidArgument, match="Otherwise it would be treated as dtype=object"
-    ):
+    with pytest.raises(InvalidArgument, match="Otherwise it would be treated as dtype=object"):
         find_any(st, lambda s: s.isna().any())
 
 

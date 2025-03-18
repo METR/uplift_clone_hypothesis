@@ -162,14 +162,8 @@ class Optimiser:
 
                 for _ in range(3):
                     choices = self.current_data.choices
-                    attempt_choices = (
-                        choices[: node.index]
-                        + (new_choice,)
-                        + choices[node.index + 1 :]
-                    )
-                    attempt = self.engine.cached_test_function(
-                        attempt_choices, extend="full"
-                    )
+                    attempt_choices = choices[: node.index] + (new_choice,) + choices[node.index + 1 :]
+                    attempt = self.engine.cached_test_function(attempt_choices, extend="full")
 
                     if self.consider_new_data(attempt):
                         return True
@@ -192,9 +186,7 @@ class Optimiser:
                         replacement = attempt.choices[ex_attempt.start : ex_attempt.end]
                         if self.consider_new_data(
                             self.engine.cached_test_function(
-                                choices[: node.index]
-                                + replacement
-                                + self.current_data.choices[ex.end :]
+                                choices[: node.index] + replacement + self.current_data.choices[ex.end :]
                             )
                         ):
                             return True

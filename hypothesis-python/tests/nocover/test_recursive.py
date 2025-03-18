@@ -116,15 +116,11 @@ def test_can_form_sets_of_recursive_data():
 
 
 def test_drawing_from_recursive_strategy_is_thread_safe():
-    shared_strategy = st.recursive(
-        st.integers(), lambda s: st.lists(s, max_size=2), max_leaves=20
-    )
+    shared_strategy = st.recursive(st.integers(), lambda s: st.lists(s, max_size=2), max_leaves=20)
 
     errors = []
 
-    @settings(
-        database=None, deadline=None, suppress_health_check=[HealthCheck.too_slow]
-    )
+    @settings(database=None, deadline=None, suppress_health_check=[HealthCheck.too_slow])
     @given(data=st.data())
     def test(data):
         try:

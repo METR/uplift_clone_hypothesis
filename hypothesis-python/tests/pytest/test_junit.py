@@ -46,9 +46,7 @@ def suite_properties_ok(junit_xml):
     # Check whether <properties> is included in <testsuite>.  This is currently not
     # the case when using pytest-xdist, which is a shame, but we can live with it.
     testsuite_props = _findall_from_root(junit_xml, "properties")
-    return len(testsuite_props) == 1 and {
-        prop.get("name") for prop in testsuite_props[0].findall("property")
-    } == {
+    return len(testsuite_props) == 1 and {prop.get("name") for prop in testsuite_props[0].findall("property")} == {
         "hypothesis-statistics-test_outputs_valid_xunit2.py::test_valid",
         "hypothesis-statistics-test_outputs_valid_xunit2.py::test_invalid",
     }

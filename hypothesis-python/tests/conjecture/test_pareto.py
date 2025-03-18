@@ -84,9 +84,7 @@ def test_database_contains_only_pareto_front():
 
         runner = ConjectureRunner(
             test,
-            settings=settings(
-                max_examples=500, database=db, suppress_health_check=list(HealthCheck)
-            ),
+            settings=settings(max_examples=500, database=db, suppress_health_check=list(HealthCheck)),
             database_key=b"stuff",
         )
 

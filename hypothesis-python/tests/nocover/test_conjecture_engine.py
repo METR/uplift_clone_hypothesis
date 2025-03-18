@@ -65,9 +65,7 @@ def test_can_discard(monkeypatch):
     monkeypatch.setattr(
         ConjectureRunner,
         "generate_new_examples",
-        lambda runner: runner.cached_test_function(
-            tuple(bytes(v) for i in range(n) for v in [i, i])
-        ),
+        lambda runner: runner.cached_test_function(tuple(bytes(v) for i in range(n) for v in [i, i])),
     )
 
     @run_to_nodes
@@ -110,9 +108,7 @@ def test_node_programs_fail_efficiently(monkeypatch):
         if len(values) == 256:
             data.mark_interesting()
 
-    monkeypatch.setattr(
-        Shrinker, "run_node_program", counts_calls(Shrinker.run_node_program)
-    )
+    monkeypatch.setattr(Shrinker, "run_node_program", counts_calls(Shrinker.run_node_program))
     shrinker.max_stall = 500
     shrinker.fixate_shrink_passes([node_program("XX")])
 

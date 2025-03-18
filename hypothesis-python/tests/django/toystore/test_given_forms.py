@@ -44,9 +44,7 @@ from tests.django.toystore.forms import (
 )
 from tests.django.toystore.models import Company
 
-register_field_strategy(
-    BroadBooleanField, booleans() | sampled_from(["1", "0", "True", "False"])
-)
+register_field_strategy(BroadBooleanField, booleans() | sampled_from(["1", "0", "True", "False"]))
 
 
 class TestGetsBasicForms(TestCase):
@@ -151,23 +149,13 @@ class TestFormsWithModelChoices(TestCase):
         for name in cls.company_names:
             Company.objects.create(name=name)
 
-    @given(
-        choice=from_field(
-            forms.ModelChoiceField(queryset=Company.objects.order_by("name"))
-        )
-    )
+    @given(choice=from_field(forms.ModelChoiceField(queryset=Company.objects.order_by("name"))))
     def test_from_model_choices_field(self, choice):
         assume(choice != "")  # Skip the empty choice.
         self.assertIsInstance(choice, int)
         Company.objects.get(id=choice)
 
-    @given(
-        choice=from_field(
-            forms.ModelChoiceField(
-                queryset=Company.objects.order_by("name"), empty_label=None
-            )
-        )
-    )
+    @given(choice=from_field(forms.ModelChoiceField(queryset=Company.objects.order_by("name"), empty_label=None)))
     def test_from_model_choices_field_no_empty_choice(self, choice):
         Company.objects.get(id=choice)
 
@@ -180,11 +168,7 @@ class TestFormsWithModelChoices(TestCase):
         assume(form.data["company"])
         self.assertTrue(form.is_valid())
 
-    @given(
-        choice=from_field(
-            forms.ModelMultipleChoiceField(queryset=Company.objects.order_by("name"))
-        )
-    )
+    @given(choice=from_field(forms.ModelMultipleChoiceField(queryset=Company.objects.order_by("name"))))
     def test_from_model_multiple_choices_field(self, choice):
         n_choices = len(choice)
         self.assertEqual(n_choices, len(set(choice)))

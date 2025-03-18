@@ -74,10 +74,7 @@ def dominance(left, right):
 
     # Things that are interesting for different reasons are incomparable in
     # the dominance relationship.
-    if (
-        left.status == Status.INTERESTING
-        and left.interesting_origin != right.interesting_origin
-    ):
+    if left.status == Status.INTERESTING and left.interesting_origin != right.interesting_origin:
         return DominanceRelation.NO_DOMINANCE
 
     for target in set(left.target_observations) | set(right.target_observations):
@@ -244,9 +241,7 @@ class ParetoFront:
         self.__eviction_listeners.append(f)
 
     def __contains__(self, data):
-        return isinstance(data, (ConjectureData, ConjectureResult)) and (
-            data.as_result() in self.front
-        )
+        return isinstance(data, (ConjectureData, ConjectureResult)) and (data.as_result() in self.front)
 
     def __iter__(self):
         return iter(self.front)

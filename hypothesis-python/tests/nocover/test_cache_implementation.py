@@ -49,11 +49,7 @@ class CacheRules(RuleBasedStateMachine):
             assert score == self.cache.scores[evicted_key]
             assert value == self.__values[evicted_key]
             for k in self.cache:
-                assert (
-                    self.__pins[k] > 0
-                    or self.cache.scores[k] >= score
-                    or k == self.__last_key
-                )
+                assert self.__pins[k] > 0 or self.cache.scores[k] >= score or k == self.__last_key
 
         self.cache.on_evict = on_evict
 

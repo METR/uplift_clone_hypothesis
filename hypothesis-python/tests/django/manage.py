@@ -19,9 +19,7 @@ from tests.common.setup import run
 if __name__ == "__main__":
     run()
 
-    settings.register_profile(
-        "default", settings(suppress_health_check=[HealthCheck.too_slow])
-    )
+    settings.register_profile("default", settings(suppress_health_check=[HealthCheck.too_slow]))
 
     settings.load_profile(os.getenv("HYPOTHESIS_PROFILE", "default"))
 

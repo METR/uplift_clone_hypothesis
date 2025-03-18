@@ -83,9 +83,7 @@ def test_default_database_is_in_memory():
 
 
 def test_default_on_disk_database_is_dir(tmp_path):
-    assert isinstance(
-        ExampleDatabase(tmp_path.joinpath("foo")), DirectoryBasedExampleDatabase
-    )
+    assert isinstance(ExampleDatabase(tmp_path.joinpath("foo")), DirectoryBasedExampleDatabase)
 
 
 def test_does_not_error_when_fetching_when_not_exist(tmp_path):
@@ -147,9 +145,7 @@ def test_can_handle_disappearing_files(tmp_path, monkeypatch):
     db = DirectoryBasedExampleDatabase(tmp_path)
     db.save(b"foo", b"bar")
     base_listdir = os.listdir
-    monkeypatch.setattr(
-        os, "listdir", lambda d: [*base_listdir(d), "this-does-not-exist"]
-    )
+    monkeypatch.setattr(os, "listdir", lambda d: [*base_listdir(d), "this-does-not-exist"])
     assert list(db.fetch(b"foo")) == [b"bar"]
 
 
@@ -203,9 +199,7 @@ def test_ga_require_readonly_wrapping():
 
 
 @contextmanager
-def ga_empty_artifact(
-    date: Optional[datetime] = None, path: Optional[Path] = None
-) -> Iterator[tuple[Path, Path]]:
+def ga_empty_artifact(date: Optional[datetime] = None, path: Optional[Path] = None) -> Iterator[tuple[Path, Path]]:
     """Creates an empty GitHub artifact."""
     if date:
         timestamp = date.isoformat().replace(":", "_")
@@ -304,13 +298,9 @@ def test_ga_triggers_fetching(monkeypatch, tmp_path):
         def fake_fetch_artifact(self) -> Optional[Path]:
             return artifact
 
-        monkeypatch.setattr(
-            GitHubArtifactDatabase, "_fetch_artifact", fake_fetch_artifact
-        )
+        monkeypatch.setattr(GitHubArtifactDatabase, "_fetch_artifact", fake_fetch_artifact)
 
-        database = GitHubArtifactDatabase(
-            "test", "test", path=tmp_path, cache_timeout=timedelta(days=1)
-        )
+        database = GitHubArtifactDatabase("test", "test", path=tmp_path, cache_timeout=timedelta(days=1))
 
         # Test without an existing artifact
         list(database.fetch(b""))
@@ -326,9 +316,7 @@ def test_ga_triggers_fetching(monkeypatch, tmp_path):
             path_with_artifact,
             old_artifact,
         ):
-            database = GitHubArtifactDatabase(
-                "test", "test", path=path_with_artifact, cache_timeout=timedelta(days=1)
-            )
+            database = GitHubArtifactDatabase("test", "test", path=path_with_artifact, cache_timeout=timedelta(days=1))
 
             # Trigger initialization
             list(database.fetch(b""))
@@ -347,17 +335,13 @@ def test_ga_fallback_expired(monkeypatch):
     """
     now = datetime.now(timezone.utc)
     with ga_empty_artifact(date=now - timedelta(days=2)) as (path, artifact):
-        database = GitHubArtifactDatabase(
-            "test", "test", path=path, cache_timeout=timedelta(days=1)
-        )
+        database = GitHubArtifactDatabase("test", "test", path=path, cache_timeout=timedelta(days=1))
 
         # This should trigger the fallback
         def fake_fetch_artifact(self) -> Optional[Path]:
             return None
 
-        monkeypatch.setattr(
-            GitHubArtifactDatabase, "_fetch_artifact", fake_fetch_artifact
-        )
+        monkeypatch.setattr(GitHubArtifactDatabase, "_fetch_artifact", fake_fetch_artifact)
 
         # Trigger initialization
         with pytest.warns(HypothesisWarning):
@@ -452,15 +436,9 @@ def test_gadb_coverage():
 
 @pytest.mark.parametrize("dirs", [[], ["subdir"]])
 def test_database_directory_inaccessible(dirs, tmp_path, monkeypatch):
-    monkeypatch.setattr(
-        configuration, "__hypothesis_home_directory", tmp_path.joinpath(*dirs)
-    )
+    monkeypatch.setattr(configuration, "__hypothesis_home_directory", tmp_path.joinpath(*dirs))
     tmp_path.chmod(0o000)
-    with (
-        nullcontext()
-        if WINDOWS
-        else pytest.warns(HypothesisWarning, match=".*the default location is unusable")
-    ):
+    with nullcontext() if WINDOWS else pytest.warns(HypothesisWarning, match=".*the default location is unusable"):
         database = ExampleDatabase(not_set)
     database.save(b"fizz", b"buzz")
 
@@ -674,14 +652,10 @@ def test_warns_when_listening_not_supported():
     db = DoesNotSupportListening()
     listener = lambda event: event
 
-    with pytest.warns(
-        HypothesisWarning, match="does not support listening for changes"
-    ):
+    with pytest.warns(HypothesisWarning, match="does not support listening for changes"):
         db.add_listener(listener)
 
-    with pytest.warns(
-        HypothesisWarning, match="does not support stopping listening for changes"
-    ):
+    with pytest.warns(HypothesisWarning, match="does not support stopping listening for changes"):
         db.remove_listener(listener)
 
 

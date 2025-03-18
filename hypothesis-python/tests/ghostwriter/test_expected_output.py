@@ -176,7 +176,8 @@ else:
         (
             "re_compile_except",
             lambda: ghostwriter.fuzz(re.compile, except_=re.error).replace(
-                "re.PatternError", "re.error"  # changed in Python 3.13
+                "re.PatternError",
+                "re.error",  # changed in Python 3.13
             ),
         ),
         ("re_compile_unittest", lambda: ghostwriter.fuzz(re.compile, style="unittest")),
@@ -224,9 +225,7 @@ else:
         ),
         (
             "division_roundtrip_arithmeticerror_handler",
-            lambda: ghostwriter.roundtrip(
-                divide, operator.mul, except_=ArithmeticError
-            ),
+            lambda: ghostwriter.roundtrip(divide, operator.mul, except_=ArithmeticError),
         ),
         (
             "division_roundtrip_typeerror_handler",
@@ -234,21 +233,15 @@ else:
         ),
         (
             "division_operator",
-            lambda: ghostwriter.binary_operation(
-                operator.truediv, associative=False, commutative=False
-            ),
+            lambda: ghostwriter.binary_operation(operator.truediv, associative=False, commutative=False),
         ),
         (
             "division_operator_with_annotations",
-            lambda: ghostwriter.binary_operation(
-                operator.truediv, associative=False, commutative=False, annotate=True
-            ),
+            lambda: ghostwriter.binary_operation(operator.truediv, associative=False, commutative=False, annotate=True),
         ),
         (
             "multiplication_operator",
-            lambda: ghostwriter.binary_operation(
-                operator.mul, identity=1, distributes_over=operator.add
-            ),
+            lambda: ghostwriter.binary_operation(operator.mul, identity=1, distributes_over=operator.add),
         ),
         (
             "multiplication_operator_unittest",
@@ -265,9 +258,7 @@ else:
         ),
         (
             "sorted_self_error_equivalent_threefuncs",
-            lambda: ghostwriter.equivalent(
-                sorted, sorted, sorted, allow_same_errors=True
-            ),
+            lambda: ghostwriter.equivalent(sorted, sorted, sorted, allow_same_errors=True),
         ),
         (
             "sorted_self_error_equivalent_1error",
@@ -326,9 +317,7 @@ def test_ghostwriter_on_hypothesis(update_recorded_outputs):
     exec(expected, {"not_set": not_set})
 
 
-def test_ghostwriter_suggests_submodules_for_empty_toplevel(
-    tmp_path, update_recorded_outputs
-):
+def test_ghostwriter_suggests_submodules_for_empty_toplevel(tmp_path, update_recorded_outputs):
     foo = tmp_path / "foo"
     foo.mkdir()
     (foo / "__init__.py").write_text("from . import bar\n", encoding="utf-8")

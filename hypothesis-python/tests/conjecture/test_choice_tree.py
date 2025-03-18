@@ -30,9 +30,7 @@ def exhaust(f):
     prefix = ()
 
     while not tree.exhausted:
-        prefix = tree.step(
-            prefix_selection_order(prefix), lambda chooser: results.append(f(chooser))
-        )
+        prefix = tree.step(prefix_selection_order(prefix), lambda chooser: results.append(f(chooser)))
     return results
 
 

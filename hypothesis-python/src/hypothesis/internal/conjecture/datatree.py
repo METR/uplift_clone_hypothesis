@@ -47,9 +47,7 @@ if TYPE_CHECKING:
 
     from hypothesis.vendor.pretty import RepresentationPrinter
 
-ChildrenCacheValueT: "TypeAlias" = tuple[
-    Generator[ChoiceT, None, None], list[ChoiceT], set[ChoiceT]
-]
+ChildrenCacheValueT: "TypeAlias" = tuple[Generator[ChoiceT, None, None], list[ChoiceT], set[ChoiceT]]
 
 
 class PreviouslyUnseenBehaviour(HypothesisException):
@@ -80,9 +78,7 @@ class Killed:
         p.text("Killed")
 
 
-def _node_pretty(
-    choice_type: ChoiceTypeT, value: ChoiceT, kwargs: ChoiceKwargsT, *, forced: bool
-) -> str:
+def _node_pretty(choice_type: ChoiceTypeT, value: ChoiceT, kwargs: ChoiceKwargsT, *, forced: bool) -> str:
     forced_marker = " [forced]" if forced else ""
     return f"{choice_type} {value!r}{forced_marker} {kwargs}"
 
@@ -124,9 +120,7 @@ class Conclusion:
         assert cycle is False
         o = self.interesting_origin
         # avoid str(o), which can include multiple lines of context
-        origin = (
-            "" if o is None else f", {o.exc_type.__name__} at {o.filename}:{o.lineno}"
-        )
+        origin = "" if o is None else f", {o.exc_type.__name__} at {o.filename}:{o.lineno}"
         p.text(f"Conclusion ({self.status!r}{origin})")
 
 
@@ -170,9 +164,7 @@ def _count_distinct_strings(*, alphabet_size: int, min_size: int, max_size: int)
     #     x**y > n
     # <=> log(x**y)  > log(n)
     # <=> y * log(x) > log(n)
-    definitely_too_large = max_size * math.log(alphabet_size) > math.log(
-        MAX_CHILDREN_EFFECTIVELY_INFINITE
-    )
+    definitely_too_large = max_size * math.log(alphabet_size) > math.log(MAX_CHILDREN_EFFECTIVELY_INFINITE)
     if definitely_too_large:
         return MAX_CHILDREN_EFFECTIVELY_INFINITE
 
@@ -207,9 +199,7 @@ def compute_max_children(choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT) -> int
         return 2
     elif choice_type == "bytes":
         kwargs = cast(BytesKWargs, kwargs)
-        return _count_distinct_strings(
-            alphabet_size=2**8, min_size=kwargs["min_size"], max_size=kwargs["max_size"]
-        )
+        return _count_distinct_strings(alphabet_size=2**8, min_size=kwargs["min_size"], max_size=kwargs["max_size"])
     elif choice_type == "string":
         kwargs = cast(StringKWargs, kwargs)
         min_size = kwargs["min_size"]
@@ -226,9 +216,7 @@ def compute_max_children(choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT) -> int
         if len(intervals) == 1 and max_size > MAX_CHILDREN_EFFECTIVELY_INFINITE:
             return MAX_CHILDREN_EFFECTIVELY_INFINITE
 
-        return _count_distinct_strings(
-            alphabet_size=len(intervals), min_size=min_size, max_size=max_size
-        )
+        return _count_distinct_strings(alphabet_size=len(intervals), min_size=min_size, max_size=max_size)
     elif choice_type == "float":
         kwargs = cast(FloatKWargs, kwargs)
         min_value_f = kwargs["min_value"]
@@ -277,9 +265,7 @@ def _floats_between(a: float, b: float) -> Generator[float, None, None]:
         yield int_to_float(n)
 
 
-def all_children(
-    choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT
-) -> Generator[ChoiceT, None, None]:
+def all_children(choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT) -> Generator[ChoiceT, None, None]:
     if choice_type != "float":
         for index in range(compute_max_children(choice_type, kwargs)):
             yield choice_from_index(index, choice_type, kwargs)
@@ -503,23 +489,17 @@ class TreeNode:
             if isinstance(self.transition, (Conclusion, Killed)):
                 self.is_exhausted = True
             elif len(self.transition.children) == self.transition.max_children:
-                self.is_exhausted = all(
-                    v.is_exhausted for v in self.transition.children.values()
-                )
+                self.is_exhausted = all(v.is_exhausted for v in self.transition.children.values())
         return self.is_exhausted
 
     def _repr_pretty_(self, p: "RepresentationPrinter", cycle: bool) -> None:
         assert cycle is False
         indent = 0
-        for i, (choice_type, kwargs, value) in enumerate(
-            zip(self.choice_types, self.kwargs, self.values)
-        ):
+        for i, (choice_type, kwargs, value) in enumerate(zip(self.choice_types, self.kwargs, self.values)):
             with p.indent(indent):
                 if i > 0:
                     p.break_()
-                p.text(
-                    _node_pretty(choice_type, value, kwargs, forced=i in self.forced)
-                )
+                p.text(_node_pretty(choice_type, value, kwargs, forced=i in self.forced))
             indent += 2
 
         with p.indent(indent):
@@ -717,9 +697,7 @@ class DataTree:
                     while True:
                         if attempts <= 10:
                             try:
-                                node_value = self._draw(
-                                    choice_type, kwargs, random=random
-                                )
+                                node_value = self._draw(choice_type, kwargs, random=random)
                             except StopTest:  # pragma: no cover
                                 # it is possible that drawing from a fresh data can
                                 # overrun BUFFER_SIZE, due to eg unlucky rejection sampling
@@ -727,17 +705,13 @@ class DataTree:
                                 attempts += 1
                                 continue
                         else:
-                            node_value = self._draw_from_cache(
-                                choice_type, kwargs, key=id(current_node), random=random
-                            )
+                            node_value = self._draw_from_cache(choice_type, kwargs, key=id(current_node), random=random)
 
                         if node_value != value:
                             append_choice(choice_type, node_value)
                             break
                         attempts += 1
-                        self._reject_child(
-                            choice_type, kwargs, child=node_value, key=id(current_node)
-                        )
+                        self._reject_child(choice_type, kwargs, child=node_value, key=id(current_node))
                     # We've now found a value that is allowed to
                     # vary, so what follows is not fixed.
                     return tuple(prefix)
@@ -752,9 +726,7 @@ class DataTree:
                 while True:
                     if attempts <= 10:
                         try:
-                            node_value = self._draw(
-                                branch.choice_type, branch.kwargs, random=random
-                            )
+                            node_value = self._draw(branch.choice_type, branch.kwargs, random=random)
                         except StopTest:  # pragma: no cover
                             attempts += 1
                             continue
@@ -823,9 +795,7 @@ class DataTree:
 
         try:
             while True:
-                for i, (choice_type, kwargs, previous) in enumerate(
-                    zip(node.choice_types, node.kwargs, node.values)
-                ):
+                for i, (choice_type, kwargs, previous) in enumerate(zip(node.choice_types, node.kwargs, node.values)):
                     v = draw(
                         choice_type,
                         kwargs,
@@ -854,9 +824,7 @@ class DataTree:
     def new_observer(self):
         return TreeRecordingObserver(self)
 
-    def _draw(
-        self, choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT, *, random: Random
-    ) -> ChoiceT:
+    def _draw(self, choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT, *, random: Random) -> ChoiceT:
         from hypothesis.internal.conjecture.data import draw_choice
 
         value = draw_choice(choice_type, kwargs, random=random)
@@ -872,9 +840,7 @@ class DataTree:
             value = float_to_int(value)
         return value
 
-    def _get_children_cache(
-        self, choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT, *, key: ChoiceT
-    ) -> ChildrenCacheValueT:
+    def _get_children_cache(self, choice_type: ChoiceTypeT, kwargs: ChoiceKwargsT, *, key: ChoiceT) -> ChildrenCacheValueT:
         # cache the state of the children generator per node/branch (passed as
         # `key` here), such that we track which children we've already tried
         # for this branch across draws.
@@ -900,9 +866,7 @@ class DataTree:
         key: ChoiceT,
         random: Random,
     ) -> ChoiceT:
-        (generator, children, rejected) = self._get_children_cache(
-            choice_type, kwargs, key=key
-        )
+        (generator, children, rejected) = self._get_children_cache(choice_type, kwargs, key=key)
         # Keep a stock of 100 potentially-valid children at all times.
         # This number is chosen to balance memory/speed vs randomness. Ideally
         # we would sample uniformly from all not-yet-rejected children, but
@@ -930,9 +894,7 @@ class DataTree:
         child: ChoiceT,
         key: ChoiceT,
     ) -> None:
-        (_generator, children, rejected) = self._get_children_cache(
-            choice_type, kwargs, key=key
-        )
+        (_generator, children, rejected) = self._get_children_cache(choice_type, kwargs, key=key)
         rejected.add(child)
         # we remove a child from the list of possible children *only* when it is
         # rejected, and not when it is initially drawn in _draw_from_cache. The
@@ -965,29 +927,19 @@ class TreeRecordingObserver(DataObserver):
         self.__trail: list[TreeNode] = [self.__current_node]
         self.killed: bool = False
 
-    def draw_integer(
-        self, value: int, *, was_forced: bool, kwargs: IntegerKWargs
-    ) -> None:
+    def draw_integer(self, value: int, *, was_forced: bool, kwargs: IntegerKWargs) -> None:
         self.draw_value("integer", value, was_forced=was_forced, kwargs=kwargs)
 
-    def draw_float(
-        self, value: float, *, was_forced: bool, kwargs: FloatKWargs
-    ) -> None:
+    def draw_float(self, value: float, *, was_forced: bool, kwargs: FloatKWargs) -> None:
         self.draw_value("float", value, was_forced=was_forced, kwargs=kwargs)
 
-    def draw_string(
-        self, value: str, *, was_forced: bool, kwargs: StringKWargs
-    ) -> None:
+    def draw_string(self, value: str, *, was_forced: bool, kwargs: StringKWargs) -> None:
         self.draw_value("string", value, was_forced=was_forced, kwargs=kwargs)
 
-    def draw_bytes(
-        self, value: bytes, *, was_forced: bool, kwargs: BytesKWargs
-    ) -> None:
+    def draw_bytes(self, value: bytes, *, was_forced: bool, kwargs: BytesKWargs) -> None:
         self.draw_value("bytes", value, was_forced=was_forced, kwargs=kwargs)
 
-    def draw_boolean(
-        self, value: bool, *, was_forced: bool, kwargs: BooleanKWargs
-    ) -> None:
+    def draw_boolean(self, value: bool, *, was_forced: bool, kwargs: BooleanKWargs) -> None:
         self.draw_value("boolean", value, was_forced=was_forced, kwargs=kwargs)
 
     def draw_value(
@@ -1079,8 +1031,7 @@ class TreeRecordingObserver(DataObserver):
         self.killed = True
 
         if self.__index_in_current_node < len(self.__current_node.values) or (
-            self.__current_node.transition is not None
-            and not isinstance(self.__current_node.transition, Killed)
+            self.__current_node.transition is not None and not isinstance(self.__current_node.transition, Killed)
         ):
             raise FlakyStrategyDefinition(_FLAKY_STRAT_MSG)
 
@@ -1092,9 +1043,7 @@ class TreeRecordingObserver(DataObserver):
         self.__index_in_current_node = 0
         self.__trail.append(self.__current_node)
 
-    def conclude_test(
-        self, status: Status, interesting_origin: Optional[InterestingOrigin]
-    ) -> None:
+    def conclude_test(self, status: Status, interesting_origin: Optional[InterestingOrigin]) -> None:
         """Says that ``status`` occurred at node ``node``. This updates the
         node if necessary and checks for consistency."""
         if status == Status.OVERRUN:
@@ -1112,8 +1061,7 @@ class TreeRecordingObserver(DataObserver):
             # where tests go from interesting to valid, because it's much easier
             # to produce good error messages for these further up the stack.
             if isinstance(node.transition, Conclusion) and (
-                node.transition.status != Status.INTERESTING
-                or new_transition.status != Status.VALID
+                node.transition.status != Status.INTERESTING or new_transition.status != Status.VALID
             ):
                 old_origin = node.transition.interesting_origin
                 new_origin = new_transition.interesting_origin

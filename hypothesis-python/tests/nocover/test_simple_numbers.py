@@ -32,10 +32,7 @@ def test_positive_negative_int():
 boundaries = pytest.mark.parametrize(
     "boundary",
     sorted(
-        [2**i for i in range(10)]
-        + [2**i - 1 for i in range(10)]
-        + [2**i + 1 for i in range(10)]
-        + [10**i for i in range(6)]
+        [2**i for i in range(10)] + [2**i - 1 for i in range(10)] + [2**i + 1 for i in range(10)] + [10**i for i in range(6)]
     ),
 )
 

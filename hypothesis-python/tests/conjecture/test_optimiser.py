@@ -95,9 +95,7 @@ def test_can_optimise_last_with_following_empty():
             data.start_span(1)
             data.stop_span()
 
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, max_examples=100)
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, max_examples=100))
         runner.cached_test_function((0,) * 101)
 
         with pytest.raises(RunIsComplete):
@@ -118,9 +116,7 @@ def test_can_find_endpoints_of_a_range(lower, upper, score_up):
                 n = -n
             data.target_observations["n"] = n
 
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, max_examples=1000)
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, max_examples=1000))
         runner.cached_test_function(((lower + upper) // 2,))
 
         try:
@@ -246,9 +242,7 @@ def test_optimiser_when_test_grows_buffer_to_overflow():
         was_forced=False,
     )
 )
-@example(
-    ChoiceNode(type="integer", value=1, kwargs=integer_kw(0, 200), was_forced=False)
-)
+@example(ChoiceNode(type="integer", value=1, kwargs=integer_kw(0, 200), was_forced=False))
 def test_optimising_all_nodes(node):
     assume(compute_max_children(node.type, node.kwargs) > 50)
     size_function = {
@@ -264,9 +258,7 @@ def test_optimising_all_nodes(node):
             v = getattr(data, f"draw_{node.type}")(**node.kwargs)
             data.target_observations["v"] = size_function[node.type](v)
 
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, max_examples=50)
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, max_examples=50))
         runner.cached_test_function([node.value])
 
         try:

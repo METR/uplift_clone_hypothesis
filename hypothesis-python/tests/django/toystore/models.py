@@ -121,9 +121,7 @@ class RestrictedFields(models.Model):
     char_field_4 = models.CharField(max_length=4, blank=True)
     choice_field_text = models.TextField(choices=(("foo", "Foo"), ("bar", "Bar")))
     choice_field_int = models.IntegerField(choices=((1, "First"), (2, "Second")))
-    null_choice_field_int = models.IntegerField(
-        choices=((1, "First"), (2, "Second")), null=True, blank=True
-    )
+    null_choice_field_int = models.IntegerField(choices=((1, "First"), (2, "Second")), null=True, blank=True)
     choice_field_grouped = models.TextField(
         choices=(
             ("Audio", (("vinyl", "Vinyl"), ("cd", "CD"))),

@@ -58,9 +58,7 @@ BYTES_LOOKUP = {
 }
 
 
-GROUP_CACHE_STRATEGY: st.SearchStrategy[dict] = st.shared(
-    st.builds(dict), key="hypothesis.regex.group_cache"
-)
+GROUP_CACHE_STRATEGY: st.SearchStrategy[dict] = st.shared(st.builds(dict), key="hypothesis.regex.group_cache")
 
 
 class IncompatibleWithAlphabet(InvalidArgument):
@@ -135,9 +133,7 @@ class CharactersBuilder:
         self.code_to_char = chr
         self._alphabet = unwrap_strategies(alphabet)
         if flags & re.ASCII:
-            self._alphabet = OneCharStringStrategy(
-                self._alphabet.intervals & charmap.query(max_codepoint=127)
-            )
+            self._alphabet = OneCharStringStrategy(self._alphabet.intervals & charmap.query(max_codepoint=127))
 
     @property
     def strategy(self):
@@ -183,10 +179,7 @@ class CharactersBuilder:
     def add_char(self, c):
         """Add given char to the whitelist."""
         self._whitelist_chars.add(c)
-        if (
-            self._ignorecase
-            and re.match(re.escape(c), c.swapcase(), flags=re.IGNORECASE) is not None
-        ):
+        if self._ignorecase and re.match(re.escape(c), c.swapcase(), flags=re.IGNORECASE) is not None:
             # Note that it is possible that `len(c.swapcase()) > 1`
             self._whitelist_chars.add(c.swapcase())
 
@@ -243,9 +236,7 @@ def base_regex_strategy(regex, parsed=None, alphabet=None):
     return clear_cache_after_draw(s)
 
 
-def regex_strategy(
-    regex, fullmatch, *, alphabet, _temp_jsonschema_hack_no_end_newline=False
-):
+def regex_strategy(regex, fullmatch, *, alphabet, _temp_jsonschema_hack_no_end_newline=False):
     if not hasattr(regex, "pattern"):
         regex = re.compile(regex)
 
@@ -281,9 +272,7 @@ def regex_strategy(
             right_pad = empty
         elif parsed[-1][1] == sre.AT_END:
             if regex.flags & re.MULTILINE:
-                right_pad = st.one_of(
-                    empty, st.builds(operator.add, newline, right_pad)
-                )
+                right_pad = st.one_of(empty, st.builds(operator.add, newline, right_pad))
             else:
                 right_pad = st.one_of(empty, newline)
 
@@ -365,8 +354,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
                     chars = empty.join(to_char(charcode) for _, charcode in codes[i:j])
                     if invalid := chars_not_in_alphabet(alphabet, chars):
                         raise IncompatibleWithAlphabet(
-                            f"Literal {chars!r} contains characters {invalid!r} "
-                            f"which are not in the specified alphabet"
+                            f"Literal {chars!r} contains characters {invalid!r} which are not in the specified alphabet"
                         )
                     strategies.append(st.just(chars))
                     i = j
@@ -390,9 +378,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
             # Regex 'a' (single char)
             c = to_char(value)
             if chars_not_in_alphabet(alphabet, c):
-                raise IncompatibleWithAlphabet(
-                    f"Literal {c!r} is not in the specified alphabet"
-                )
+                raise IncompatibleWithAlphabet(f"Literal {c!r} is not in the specified alphabet")
             if (
                 context.flags & re.IGNORECASE
                 and c != c.swapcase()
@@ -408,10 +394,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
             # Regex '[^a]' (negation of a single char)
             c = to_char(value)
             blacklist = {c}
-            if (
-                context.flags & re.IGNORECASE
-                and re.match(re.escape(c), c.swapcase(), re.IGNORECASE) is not None
-            ):
+            if context.flags & re.IGNORECASE and re.match(re.escape(c), c.swapcase(), re.IGNORECASE) is not None:
                 # There are a few cases where .swapcase() returns two characters,
                 # but is still a case-insensitive match.  In such cases we add *both*
                 # characters to our blacklist, to avoid doing the wrong thing for
@@ -431,8 +414,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
 
             if is_unicode:
                 return OneCharStringStrategy(
-                    unwrap_strategies(alphabet).intervals
-                    & charmap.query(exclude_characters=blacklist)
+                    unwrap_strategies(alphabet).intervals & charmap.query(exclude_characters=blacklist)
                 )
             else:
                 return binary_char.filter(lambda c: c not in blacklist)
@@ -441,9 +423,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
             # Regex '[abc0-9]' (set of characters)
             negate = value[0][0] == sre.NEGATE
             if is_unicode:
-                builder = CharactersBuilder(
-                    flags=context.flags, negate=negate, alphabet=alphabet
-                )
+                builder = CharactersBuilder(flags=context.flags, negate=negate, alphabet=alphabet)
             else:
                 builder = BytesBuilder(flags=context.flags, negate=negate)
 
@@ -456,17 +436,13 @@ def _strategy(codes, context, is_unicode, *, alphabet):
                     # Regex '[a]' (single char)
                     c = builder.code_to_char(charset_value)
                     if chars_not_in_alphabet(builder._alphabet, c):
-                        raise IncompatibleWithAlphabet(
-                            f"Literal {c!r} is not in the specified alphabet"
-                        )
+                        raise IncompatibleWithAlphabet(f"Literal {c!r} is not in the specified alphabet")
                     builder.add_char(c)
                 elif charset_code == sre.RANGE:
                     # Regex '[a-z]' (char range)
                     low, high = charset_value
                     chars = empty.join(map(builder.code_to_char, range(low, high + 1)))
-                    if len(chars) == len(
-                        invalid := set(chars_not_in_alphabet(alphabet, chars))
-                    ):
+                    if len(chars) == len(invalid := set(chars_not_in_alphabet(alphabet, chars))):
                         raise IncompatibleWithAlphabet(
                             f"Charset '[{chr(low)}-{chr(high)}]' contains characters {invalid!r} "
                             f"which are not in the specified alphabet"
@@ -491,10 +467,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
                 assert alphabet is not None
                 if context.flags & re.DOTALL:
                     return alphabet
-                return OneCharStringStrategy(
-                    unwrap_strategies(alphabet).intervals
-                    & charmap.query(exclude_characters="\n")
-                )
+                return OneCharStringStrategy(unwrap_strategies(alphabet).intervals & charmap.query(exclude_characters="\n"))
             else:
                 if context.flags & re.DOTALL:
                     return binary_char
@@ -553,9 +526,7 @@ def _strategy(codes, context, is_unicode, *, alphabet):
                 at_most = None
             if at_least == 0 and at_most == 1:
                 return st.just(empty) | recurse(subregex)
-            return st.lists(recurse(subregex), min_size=at_least, max_size=at_most).map(
-                empty.join
-            )
+            return st.lists(recurse(subregex), min_size=at_least, max_size=at_most).map(empty.join)
 
         elif code == sre.GROUPREF_EXISTS:
             # Regex '(?(id/name)yes-pattern|no-pattern)'
@@ -571,6 +542,4 @@ def _strategy(codes, context, is_unicode, *, alphabet):
         else:
             # Currently there are no known code points other than handled here.
             # This code is just future proofing
-            raise NotImplementedError(
-                f"Unknown code point: {code!r}.  Please open an issue."
-            )
+            raise NotImplementedError(f"Unknown code point: {code!r}.  Please open an issue.")

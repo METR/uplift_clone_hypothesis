@@ -39,9 +39,7 @@ def test_generate_optional_indices(xp, xps, condition):
 
 def test_cannot_generate_newaxis_when_disabled(xp, xps):
     """Strategy does not generate newaxis when disabled (i.e. the default)."""
-    assert_all_examples(
-        xps.indices((3, 3, 3)), lambda idx: idx == ... or None not in idx
-    )
+    assert_all_examples(xps.indices((3, 3, 3)), lambda idx: idx == ... or None not in idx)
 
 
 def test_generate_indices_for_0d_shape(xp, xps):
@@ -69,8 +67,7 @@ def test_generate_long_ellipsis(xp, xps):
     find_any(strat, lambda ix: len(ix) == 3 and ix[1] == Ellipsis)
     find_any(
         strat,
-        lambda ix: len(ix) == 5
-        and all(isinstance(key, slice) and key == slice(None) for key in ix[1:3]),
+        lambda ix: len(ix) == 5 and all(isinstance(key, slice) and key == slice(None) for key in ix[1:3]),
     )
 
 
@@ -79,9 +76,7 @@ def test_indices_replaces_whole_axis_slices_with_ellipsis(xp, xps):
     # zero, so if all dimensions are 0 then a `...` will replace all the
     # slices because we generate `...` for entire contiguous runs of `:`
     assert_all_examples(
-        xps.indices(shape=(0, 0, 0, 0, 0), max_dims=5).filter(
-            lambda idx: isinstance(idx, tuple) and Ellipsis in idx
-        ),
+        xps.indices(shape=(0, 0, 0, 0, 0), max_dims=5).filter(lambda idx: isinstance(idx, tuple) and Ellipsis in idx),
         lambda idx: slice(None) not in idx,
     )
 
@@ -95,8 +90,7 @@ def test_efficiently_generate_indexers(xp, xps):
 def test_generate_valid_indices(xp, xps, allow_newaxis, allow_ellipsis, data):
     """Strategy generates valid indices."""
     shape = data.draw(
-        xps.array_shapes(min_dims=1, max_side=4)
-        | xps.array_shapes(min_dims=1, min_side=0, max_side=10),
+        xps.array_shapes(min_dims=1, max_side=4) | xps.array_shapes(min_dims=1, min_side=0, max_side=10),
         label="shape",
     )
     min_dims = data.draw(
@@ -104,8 +98,7 @@ def test_generate_valid_indices(xp, xps, allow_newaxis, allow_ellipsis, data):
         label="min_dims",
     )
     max_dims = data.draw(
-        st.none()
-        | st.integers(min_dims, len(shape) if not allow_newaxis else NDIM_MAX),
+        st.none() | st.integers(min_dims, len(shape) if not allow_newaxis else NDIM_MAX),
         label="max_dims",
     )
     indexer = data.draw(

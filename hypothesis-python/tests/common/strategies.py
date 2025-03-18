@@ -80,7 +80,5 @@ def interval_lists(*, min_codepoint=0, max_codepoint=sys.maxunicode, min_size=0)
 def intervals(*, min_codepoint=0, max_codepoint=sys.maxunicode, min_size=0):
     return st.builds(
         IntervalSet,
-        interval_lists(
-            min_codepoint=min_codepoint, max_codepoint=max_codepoint, min_size=min_size
-        ),
+        interval_lists(min_codepoint=min_codepoint, max_codepoint=max_codepoint, min_size=min_size),
     )

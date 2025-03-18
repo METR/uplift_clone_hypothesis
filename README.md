@@ -21,6 +21,17 @@ def test_matches_builtin(ls):
     assert sorted(ls) == my_sort(ls)
 ```
 
+Here's another simple example showing how to test that reversing a string twice gets you back to the original string:
+
+```python
+from hypothesis import given, strategies as st
+
+
+@given(st.text())
+def test_reverse_twice_equals_original(s):
+    assert s[::-1][::-1] == s
+```
+
 Additionally, when a property fails, Hypothesis doesn't just report any failing example — it reports the simplest possible one. This makes property-based tests a powerful tool for debugging, as well as testing.
 
 For instance,

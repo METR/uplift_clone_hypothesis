@@ -31,9 +31,7 @@ def minimal(definition, condition=lambda x: True, settings=None):
         # This sure seems pointless, but `test_sum_of_pair` fails otherwise...
         return condition(x)
 
-    if (
-        context := _current_build_context.value
-    ) and context.data.provider.avoid_realization:
+    if (context := _current_build_context.value) and context.data.provider.avoid_realization:
         raise SkipTest("`minimal()` helper not supported under symbolic execution")
 
     if settings is None:
@@ -65,8 +63,7 @@ def minimal(definition, condition=lambda x: True, settings=None):
     except Found:
         return result
     raise Unsatisfiable(
-        "Could not find any examples from %r that satisfied %s"
-        % (definition, get_pretty_function_description(condition))
+        "Could not find any examples from %r that satisfied %s" % (definition, get_pretty_function_description(condition))
     )
 
 
@@ -82,9 +79,7 @@ def find_any(definition, condition=lambda _: True, settings=None):
     return minimal(
         definition,
         condition,
-        settings=Settings(
-            settings, phases=no_shrink, max_examples=max(1000, settings.max_examples)
-        ),
+        settings=Settings(settings, phases=no_shrink, max_examples=max(1000, settings.max_examples)),
     )
 
 

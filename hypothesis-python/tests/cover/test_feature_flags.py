@@ -31,9 +31,7 @@ def test_minimizes_open():
 def test_minimizes_individual_features_to_open():
     features = list(range(10))
 
-    flags = minimal(
-        STRAT, lambda x: sum(x.is_enabled(i) for i in features) < len(features)
-    )
+    flags = minimal(STRAT, lambda x: sum(x.is_enabled(i) for i in features) < len(features))
 
     assert all(flags.is_enabled(i) for i in features[:-1])
     assert not flags.is_enabled(features[-1])

@@ -91,11 +91,7 @@ def test_mutually_recursive_tuples_draw_nothing():
 
 
 def test_literals_strategy_is_valid():
-    literals = st.deferred(
-        lambda: st.one_of(
-            st.booleans(), st.tuples(literals, literals), literals.map(lambda x: [x])
-        )
-    )
+    literals = st.deferred(lambda: st.one_of(st.booleans(), st.tuples(literals, literals), literals.map(lambda x: [x])))
 
     @given(literals)
     def test(e):

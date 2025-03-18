@@ -72,16 +72,10 @@ def test_matmul_gufunc_shapes(everything):
     ("(i),(i)->()", "(m,n),(n,p)->(m,p)", "(n),(n,p)->(p)", "(m,n),(n)->(m)"),
 )
 @given(data=st.data())
-def test_matmul_signature_can_exercise_all_combination_of_optional_dims(
-    target_sig, data
-):
-    target_shapes = data.draw(
-        nps.mutually_broadcastable_shapes(signature=target_sig, max_dims=0)
-    )
+def test_matmul_signature_can_exercise_all_combination_of_optional_dims(target_sig, data):
+    target_shapes = data.draw(nps.mutually_broadcastable_shapes(signature=target_sig, max_dims=0))
     find_any(
-        nps.mutually_broadcastable_shapes(
-            signature="(m?,n),(n,p?)->(m?,p?)", max_dims=0
-        ),
+        nps.mutually_broadcastable_shapes(signature="(m?,n),(n,p?)->(m?,p?)", max_dims=0),
         lambda shapes: shapes == target_shapes,
     )
 
@@ -118,14 +112,10 @@ def test_matmul_sig_shrinks_as_documented(min_dims, min_side, n_fixed, data):
 
     # if min_dims >= 1 then core dims are never excluded
     # otherwise, should shrink towards excluding all optional dims
-    expected_input_0 = (
-        (n_value,) if min_dims == 0 else (min_side,) * min_dims + (min_side, n_value)
-    )
+    expected_input_0 = (n_value,) if min_dims == 0 else (min_side,) * min_dims + (min_side, n_value)
     assert expected_input_0 == smallest_shapes[0]
 
-    expected_input_1 = (
-        (n_value,) if min_dims == 0 else (min_side,) * min_dims + (n_value, min_side)
-    )
+    expected_input_1 = (n_value,) if min_dims == 0 else (min_side,) * min_dims + (n_value, min_side)
     assert expected_input_1 == smallest_shapes[1]
 
 

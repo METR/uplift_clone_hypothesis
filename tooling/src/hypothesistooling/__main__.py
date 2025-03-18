@@ -27,10 +27,7 @@ from hypothesistooling import installers as install, releasemanagement as rm
 from hypothesistooling.scripts import pip_tool
 
 TASKS = {}
-BUILD_FILES = tuple(
-    os.path.join(tools.ROOT, f)
-    for f in ["tooling", "requirements", ".github", "hypothesis-python/tox.ini"]
-)
+BUILD_FILES = tuple(os.path.join(tools.ROOT, f) for f in ["tooling", "requirements", ".github", "hypothesis-python/tox.ini"])
 TODAY = date.today().isoformat()
 
 
@@ -280,9 +277,7 @@ def update_python_versions():
         capture_output=True,
     )
     cmd = "bin/pyenv install --list"
-    result = subprocess.run(
-        cmd, shell=True, stdout=subprocess.PIPE, cwd=where
-    ).stdout.decode()
+    result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, cwd=where).stdout.decode()
     # pyenv reports available versions in chronological order, so we keep the newest
     # *unless* our current ends with a digit (is stable) and the candidate does not.
     # (plus some special cases for the `t` suffix for free-threading builds)
@@ -532,13 +527,9 @@ for key, version in PYTHONS.items():
     else:
         ALIASES[version] = f"python{key}"
         name = f"py3{key[2:]}"
-    TASKS[f"check-{name}"] = python_tests(
-        lambda n=f"{name}-full", v=version, *args: run_tox(n, v, *args)
-    )
+    TASKS[f"check-{name}"] = python_tests(lambda n=f"{name}-full", v=version, *args: run_tox(n, v, *args))
     for subtask in ("brief", "full", "cover", "nocover", "niche", "custom"):
-        TASKS[f"check-{name}-{subtask}"] = python_tests(
-            lambda n=f"{name}-{subtask}", v=version, *args: run_tox(n, v, *args)
-        )
+        TASKS[f"check-{name}-{subtask}"] = python_tests(lambda n=f"{name}-{subtask}", v=version, *args: run_tox(n, v, *args))
 
 
 @python_tests
@@ -555,9 +546,7 @@ def tox(*args):
 
 
 def standard_tox_task(name, py=ci_version):
-    TASKS["check-" + name] = python_tests(
-        lambda *args: run_tox(name, PYTHONS.get(py, py), *args)
-    )
+    TASKS["check-" + name] = python_tests(lambda *args: run_tox(name, PYTHONS.get(py, py), *args))
 
 
 standard_tox_task("py39-nose", py="3.9")
@@ -596,9 +585,7 @@ def check_examples3(*args):
 @task()
 def check_whole_repo_tests(*args):
     install.ensure_shellcheck()
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "--upgrade", hp.HYPOTHESIS_PYTHON]
-    )
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", hp.HYPOTHESIS_PYTHON])
 
     if not args:
         args = ["-n", "auto", tools.REPO_TESTS]
@@ -696,10 +683,7 @@ def tasks():
 
 if __name__ == "__main__":
     if "SNAKEPIT" not in os.environ:
-        print(
-            "This module should not be executed directly, but instead via "
-            "build.sh (which sets up its environment)"
-        )
+        print("This module should not be executed directly, but instead via build.sh (which sets up its environment)")
         sys.exit(1)
 
     if len(sys.argv) > 1:

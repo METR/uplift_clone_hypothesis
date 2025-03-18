@@ -200,9 +200,7 @@ with_cheap_bad_machines = pytest.mark.parametrize(
 )
 
 
-@pytest.mark.parametrize(
-    "machine", bad_machines, ids=[t.__name__ for t in bad_machines]
-)
+@pytest.mark.parametrize("machine", bad_machines, ids=[t.__name__ for t in bad_machines])
 def test_bad_machines_fail(machine):
     test_class = machine.TestCase
     try:

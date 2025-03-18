@@ -89,9 +89,7 @@ def test_draw_arrays_from_int_shapes(xp, xps, data):
         "unsigned_integer_dtypes",
         "floating_dtypes",
         "real_dtypes",
-        pytest.param(
-            "complex_dtypes", marks=pytest.mark.xp_min_version(MIN_VER_FOR_COMPLEX)
-        ),
+        pytest.param("complex_dtypes", marks=pytest.mark.xp_min_version(MIN_VER_FOR_COMPLEX)),
     ],
 )
 def test_draw_arrays_from_dtype_strategies(xp, xps, strat_name):
@@ -108,9 +106,7 @@ def test_draw_arrays_from_dtype_name_strategies(xp, xps, data):
     all_names = ("bool", *REAL_NAMES)
     if xps.api_version > "2021.12":
         all_names += COMPLEX_NAMES
-    sample_names = data.draw(
-        st.lists(st.sampled_from(all_names), min_size=1, unique=True)
-    )
+    sample_names = data.draw(st.lists(st.sampled_from(all_names), min_size=1, unique=True))
     find_any(xps.arrays(st.sampled_from(sample_names), ()))
 
 
@@ -151,9 +147,7 @@ def test_generate_arrays_from_0d_arrays(xp, xps):
         xps.arrays(
             dtype=xp.uint8,
             shape=(5, 5),
-            elements=xps.from_dtype(xp.uint8).map(
-                lambda e: xp.asarray(e, dtype=xp.uint8)
-            ),
+            elements=xps.from_dtype(xp.uint8).map(lambda e: xp.asarray(e, dtype=xp.uint8)),
         ),
         lambda x: x.shape == (5, 5),
     )
@@ -231,17 +225,13 @@ def test_cannot_draw_unique_arrays_with_too_small_elements(xp, xps):
     """Unique strategy with elements strategy range smaller than its size raises
     helpful error."""
     with pytest.raises(InvalidArgument):
-        check_can_generate_examples(
-            xps.arrays(xp.int8, 10, elements=st.integers(0, 5), unique=True)
-        )
+        check_can_generate_examples(xps.arrays(xp.int8, 10, elements=st.integers(0, 5), unique=True))
 
 
 def test_cannot_fill_arrays_with_non_castable_value(xp, xps):
     """Strategy with fill not castable to dtype raises helpful error."""
     with pytest.raises(InvalidArgument):
-        check_can_generate_examples(
-            xps.arrays(xp.int8, 10, fill=st.just("not a castable value"))
-        )
+        check_can_generate_examples(xps.arrays(xp.int8, 10, fill=st.just("not a castable value")))
 
 
 def test_generate_unique_arrays_with_high_collision_elements(xp, xps):
@@ -360,9 +350,7 @@ def test_floats_can_be_constrained(xp, xps):
     """Strategy with float dtype and specified elements strategy range
     (inclusive) generates arrays with elements inside said range."""
     assert_all_examples(
-        xps.arrays(
-            dtype=xp.float32, shape=10, elements={"min_value": 0, "max_value": 1}
-        ),
+        xps.arrays(dtype=xp.float32, shape=10, elements={"min_value": 0, "max_value": 1}),
         lambda x: xp.all(x >= 0) and xp.all(x <= 1),
     )
 

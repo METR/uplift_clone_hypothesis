@@ -67,11 +67,7 @@ class IntegersStrategy(SearchStrategy[int]):
     def do_draw(self, data):
         # For bounded integers, make the bounds and near-bounds more likely.
         weights = None
-        if (
-            self.end is not None
-            and self.start is not None
-            and self.end - self.start > 127
-        ):
+        if self.end is not None and self.start is not None and self.end - self.start > 127:
             weights = {
                 self.start: (2 / 128),
                 self.start + 1: (1 / 128),
@@ -79,9 +75,7 @@ class IntegersStrategy(SearchStrategy[int]):
                 self.end: (2 / 128),
             }
 
-        return data.draw_integer(
-            min_value=self.start, max_value=self.end, weights=weights
-        )
+        return data.draw_integer(min_value=self.start, max_value=self.end, weights=weights)
 
     def filter(self, condition):
         if condition is math.isfinite:
@@ -126,15 +120,13 @@ def integers(
     if min_value is not None:
         if min_value != int(min_value):
             raise InvalidArgument(
-                "min_value=%r of type %r cannot be exactly represented as an integer."
-                % (min_value, type(min_value))
+                "min_value=%r of type %r cannot be exactly represented as an integer." % (min_value, type(min_value))
             )
         min_value = int(min_value)
     if max_value is not None:
         if max_value != int(max_value):
             raise InvalidArgument(
-                "max_value=%r of type %r cannot be exactly represented as an integer."
-                % (max_value, type(max_value))
+                "max_value=%r of type %r cannot be exactly represented as an integer." % (max_value, type(max_value))
             )
         max_value = int(max_value)
 
@@ -197,11 +189,7 @@ class FloatStrategy(SearchStrategy):
                 smallest_nonzero_magnitude=self.smallest_nonzero_magnitude,
             )
         if condition is math.isinf:
-            if permitted_infs := [
-                x
-                for x in (-math.inf, math.inf)
-                if self.min_value <= x <= self.max_value
-            ]:
+            if permitted_infs := [x for x in (-math.inf, math.inf) if self.min_value <= x <= self.max_value]:
                 return SampledFromStrategy(permitted_infs)
             return nothing()
         if condition is math.isnan:
@@ -300,10 +288,7 @@ def floats(
         raise InvalidArgument(f"Cannot have {allow_nan=}, with min_value or max_value")
 
     if width not in (16, 32, 64):
-        raise InvalidArgument(
-            f"Got {width=}, but the only valid values "
-            "are the integers 16, 32, and 64."
-        )
+        raise InvalidArgument(f"Got {width=}, but the only valid values are the integers 16, 32, and 64.")
 
     check_valid_bound(min_value, "min_value")
     check_valid_bound(max_value, "max_value")
@@ -359,13 +344,11 @@ def floats(
 
     if min_value != min_arg:
         raise InvalidArgument(
-            f"min_value={min_arg!r} cannot be exactly represented as a float "
-            f"of width {width} - use {min_value=} instead."
+            f"min_value={min_arg!r} cannot be exactly represented as a float of width {width} - use {min_value=} instead."
         )
     if max_value != max_arg:
         raise InvalidArgument(
-            f"max_value={max_arg!r} cannot be exactly represented as a float "
-            f"of width {width} - use {max_value=} instead."
+            f"max_value={max_arg!r} cannot be exactly represented as a float of width {width} - use {max_value=} instead."
         )
 
     if exclude_min and (min_value is None or min_value == math.inf):
@@ -374,33 +357,21 @@ def floats(
         raise InvalidArgument(f"Cannot exclude {max_value=}")
 
     assumed_allow_subnormal = allow_subnormal is None or allow_subnormal
-    if min_value is not None and (
-        exclude_min or (min_arg is not None and min_value < min_arg)
-    ):
-        min_value = next_up_normal(
-            min_value, width, allow_subnormal=assumed_allow_subnormal
-        )
+    if min_value is not None and (exclude_min or (min_arg is not None and min_value < min_arg)):
+        min_value = next_up_normal(min_value, width, allow_subnormal=assumed_allow_subnormal)
         if min_value == min_arg:
             assert min_value == min_arg == 0
             assert is_negative(min_arg)
             assert not is_negative(min_value)
-            min_value = next_up_normal(
-                min_value, width, allow_subnormal=assumed_allow_subnormal
-            )
+            min_value = next_up_normal(min_value, width, allow_subnormal=assumed_allow_subnormal)
         assert min_value > min_arg  # type: ignore
-    if max_value is not None and (
-        exclude_max or (max_arg is not None and max_value > max_arg)
-    ):
-        max_value = next_down_normal(
-            max_value, width, allow_subnormal=assumed_allow_subnormal
-        )
+    if max_value is not None and (exclude_max or (max_arg is not None and max_value > max_arg)):
+        max_value = next_down_normal(max_value, width, allow_subnormal=assumed_allow_subnormal)
         if max_value == max_arg:
             assert max_value == max_arg == 0
             assert is_negative(max_value)
             assert not is_negative(max_arg)
-            max_value = next_down_normal(
-                max_value, width, allow_subnormal=assumed_allow_subnormal
-            )
+            max_value = next_down_normal(max_value, width, allow_subnormal=assumed_allow_subnormal)
         assert max_value < max_arg  # type: ignore
 
     if min_value == -math.inf:
@@ -408,22 +379,11 @@ def floats(
     if max_value == math.inf:
         max_value = None
 
-    bad_zero_bounds = (
-        min_value == max_value == 0
-        and is_negative(max_value)
-        and not is_negative(min_value)
-    )
-    if (
-        min_value is not None
-        and max_value is not None
-        and (min_value > max_value or bad_zero_bounds)
-    ):
+    bad_zero_bounds = min_value == max_value == 0 and is_negative(max_value) and not is_negative(min_value)
+    if min_value is not None and max_value is not None and (min_value > max_value or bad_zero_bounds):
         # This is a custom alternative to check_valid_interval, because we want
         # to include the bit-width and exclusion information in the message.
-        msg = (
-            "There are no %s-bit floating-point values between min_value=%r "
-            "and max_value=%r" % (width, min_arg, max_arg)
-        )
+        msg = "There are no %s-bit floating-point values between min_value=%r and max_value=%r" % (width, min_arg, max_arg)
         if exclude_min or exclude_max:
             msg += f", {exclude_min=} and {exclude_max=}"
         raise InvalidArgument(msg)
@@ -432,23 +392,15 @@ def floats(
         allow_infinity = bool(min_value is None or max_value is None)
     elif allow_infinity:
         if min_value is not None and max_value is not None:
-            raise InvalidArgument(
-                f"Cannot have {allow_infinity=}, with both min_value and max_value"
-            )
+            raise InvalidArgument(f"Cannot have {allow_infinity=}, with both min_value and max_value")
     elif min_value == math.inf:
         if min_arg == math.inf:
             raise InvalidArgument("allow_infinity=False excludes min_value=inf")
-        raise InvalidArgument(
-            f"exclude_min=True turns min_value={min_arg!r} into inf, "
-            "but allow_infinity=False"
-        )
+        raise InvalidArgument(f"exclude_min=True turns min_value={min_arg!r} into inf, but allow_infinity=False")
     elif max_value == -math.inf:
         if max_arg == -math.inf:
             raise InvalidArgument("allow_infinity=False excludes max_value=-inf")
-        raise InvalidArgument(
-            f"exclude_max=True turns max_value={max_arg!r} into -inf, "
-            "but allow_infinity=False"
-        )
+        raise InvalidArgument(f"exclude_max=True turns max_value={max_arg!r} into -inf, but allow_infinity=False")
 
     smallest_normal = width_smallest_normals[width]
     if allow_subnormal is None:
@@ -456,9 +408,7 @@ def floats(
             if min_value == max_value:
                 allow_subnormal = -smallest_normal < min_value < smallest_normal
             else:
-                allow_subnormal = (
-                    min_value < smallest_normal and max_value > -smallest_normal
-                )
+                allow_subnormal = min_value < smallest_normal and max_value > -smallest_normal
         elif min_value is not None:
             allow_subnormal = min_value < smallest_normal
         elif max_value is not None:
@@ -488,9 +438,7 @@ def floats(
         max_value = min(max_value, next_down(float("inf")))
     assert isinstance(min_value, float)
     assert isinstance(max_value, float)
-    smallest_nonzero_magnitude = (
-        SMALLEST_SUBNORMAL if allow_subnormal else smallest_normal
-    )
+    smallest_nonzero_magnitude = SMALLEST_SUBNORMAL if allow_subnormal else smallest_normal
     result: SearchStrategy = FloatStrategy(
         min_value=min_value,
         max_value=max_value,

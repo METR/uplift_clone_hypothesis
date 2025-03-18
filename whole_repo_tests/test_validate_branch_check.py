@@ -38,11 +38,7 @@ def run_validate_branch_check(tmp_path, *, check, **kwargs):
 def test_validates_branches(tmp_path):
     write_entries(
         tmp_path,
-        [
-            {"name": name, "value": value}
-            for name in ("first", "second", "third")
-            for value in (False, True)
-        ],
+        [{"name": name, "value": value} for name in ("first", "second", "third") for value in (False, True)],
     )
 
     output = run_validate_branch_check(tmp_path, check=True)
@@ -50,9 +46,7 @@ def test_validates_branches(tmp_path):
 
 
 def test_validates_one_branch(tmp_path):
-    write_entries(
-        tmp_path, [{"name": "sole", "value": value} for value in (False, True)]
-    )
+    write_entries(tmp_path, [{"name": "sole", "value": value} for value in (False, True)])
 
     output = run_validate_branch_check(tmp_path, check=True)
     assert output.stdout == "Successfully validated 1 branch.\n"

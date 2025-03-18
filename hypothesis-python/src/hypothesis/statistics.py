@@ -116,11 +116,7 @@ def describe_statistics(stats_dict: "StatisticsDict") -> str:
                 ]
         # Some additional details on the shrinking phase
         if phase == "shrink":
-            lines.append(
-                "    - Tried {} shrinks of which {} were successful".format(
-                    len(cases), d["shrinks-successful"]
-                )
-            )
+            lines.append("    - Tried {} shrinks of which {} were successful".format(len(cases), d["shrinks-successful"]))
         lines.append("")
 
     target_lines = describe_targets(stats_dict.get("targets", {}))

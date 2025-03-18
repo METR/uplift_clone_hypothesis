@@ -248,11 +248,7 @@ class RepresentationPrinter:
                                     obj,
                                     self,
                                     cycle,
-                                    [
-                                        k
-                                        for k, v in cls.__dataclass_fields__.items()
-                                        if v.init
-                                    ],
+                                    [k for k, v in cls.__dataclass_fields__.items() if v.init],
                                 )
                 # Now check for object-specific printers which show how this
                 # object was constructed (a Hypothesis special feature).
@@ -347,9 +343,7 @@ class RepresentationPrinter:
             self.indentation -= indent
 
     @contextmanager
-    def group(
-        self, indent: int = 0, open: str = "", close: str = ""
-    ) -> Generator[None, None, None]:
+    def group(self, indent: int = 0, open: str = "", close: str = "") -> Generator[None, None, None]:
         """Context manager for an indented group.
 
             with p.group(1, '{', '}'):
@@ -464,9 +458,7 @@ class RepresentationPrinter:
         # int indicates the position of a positional argument, rather than a keyword
         # argument. Currently no callers use this; see #3624.
         comments: dict[Union[int, str], object] = {
-            k: self.slice_comments[v]
-            for k, v in (arg_slices or {}).items()
-            if v in self.slice_comments
+            k: self.slice_comments[v] for k, v in (arg_slices or {}).items() if v in self.slice_comments
         }
 
         if leading_comment or any(k in comments for k, _ in all_args):
@@ -591,14 +583,10 @@ def _seq_pprinter_factory(start: str, end: str, basetype: type) -> PrettyPrintFu
     Used by the default pprint for tuples, dicts, and lists.
     """
 
-    def inner(
-        obj: Union[tuple[object], list[object]], p: RepresentationPrinter, cycle: bool
-    ) -> None:
+    def inner(obj: Union[tuple[object], list[object]], p: RepresentationPrinter, cycle: bool) -> None:
         typ = type(obj)
         if (
-            basetype is not None
-            and typ is not basetype
-            and typ.__repr__ != basetype.__repr__  # type: ignore[comparison-overlap]
+            basetype is not None and typ is not basetype and typ.__repr__ != basetype.__repr__  # type: ignore[comparison-overlap]
         ):
             # If the subclass provides its own repr, use it instead.
             return p.text(typ.__repr__(obj))
@@ -625,9 +613,7 @@ def get_class_name(cls: type[object]) -> str:
     return class_name
 
 
-def _set_pprinter_factory(
-    start: str, end: str, basetype: type[object]
-) -> PrettyPrintFunction:
+def _set_pprinter_factory(start: str, end: str, basetype: type[object]) -> PrettyPrintFunction:
     """Factory that returns a pprint function useful for sets and
     frozensets."""
 
@@ -637,11 +623,7 @@ def _set_pprinter_factory(
         cycle: bool,
     ) -> None:
         typ = type(obj)
-        if (
-            basetype is not None
-            and typ is not basetype
-            and typ.__repr__ != basetype.__repr__
-        ):
+        if basetype is not None and typ is not basetype and typ.__repr__ != basetype.__repr__:
             # If the subclass provides its own repr, use it instead.
             return p.text(typ.__repr__(obj))
 
@@ -670,19 +652,13 @@ def _set_pprinter_factory(
     return inner
 
 
-def _dict_pprinter_factory(
-    start: str, end: str, basetype: Optional[type[object]] = None
-) -> PrettyPrintFunction:
+def _dict_pprinter_factory(start: str, end: str, basetype: Optional[type[object]] = None) -> PrettyPrintFunction:
     """Factory that returns a pprint function used by the default pprint of
     dicts and dict proxies."""
 
     def inner(obj: dict[object, object], p: RepresentationPrinter, cycle: bool) -> None:
         typ = type(obj)
-        if (
-            basetype is not None
-            and typ is not basetype
-            and typ.__repr__ != basetype.__repr__
-        ):
+        if basetype is not None and typ is not basetype and typ.__repr__ != basetype.__repr__:
             # If the subclass provides its own repr, use it instead.
             return p.text(typ.__repr__(obj))
 
@@ -783,9 +759,7 @@ def _repr_pprint(obj: object, p: RepresentationPrinter, cycle: bool) -> None:
         p.text(output_line)
 
 
-def pprint_fields(
-    obj: object, p: RepresentationPrinter, cycle: bool, fields: Iterable[str]
-) -> None:
+def pprint_fields(obj: object, p: RepresentationPrinter, cycle: bool, fields: Iterable[str]) -> None:
     name = get_class_name(obj.__class__)
     if cycle:
         return p.text(f"{name}(...)")
@@ -810,9 +784,7 @@ def _function_pprint(
     p.text(get_pretty_function_description(obj))
 
 
-def _exception_pprint(
-    obj: BaseException, p: RepresentationPrinter, cycle: bool
-) -> None:
+def _exception_pprint(obj: BaseException, p: RepresentationPrinter, cycle: bool) -> None:
     """Base pprint for all exceptions."""
     name = getattr(obj.__class__, "__qualname__", obj.__class__.__name__)
     if obj.__class__.__module__ not in ("exceptions", "builtins"):
@@ -838,9 +810,7 @@ def _repr_integer(obj: int, p: RepresentationPrinter, cycle: bool) -> None:
         p.text(f"{obj:#_x}")
 
 
-def _repr_float_counting_nans(
-    obj: float, p: RepresentationPrinter, cycle: bool
-) -> None:
+def _repr_float_counting_nans(obj: float, p: RepresentationPrinter, cycle: bool) -> None:
     if isnan(obj):
         if struct.pack("!d", abs(obj)) != struct.pack("!d", float("nan")):
             show = hex(*struct.unpack("Q", struct.pack("d", obj)))
@@ -878,9 +848,7 @@ _type_pprinters: dict[type, PrettyPrintFunction] = {
 _deferred_type_pprinters: dict[tuple[str, str], PrettyPrintFunction] = {}
 
 
-def for_type_by_name(
-    type_module: str, type_name: str, func: PrettyPrintFunction
-) -> Optional[PrettyPrintFunction]:
+def for_type_by_name(type_module: str, type_name: str, func: PrettyPrintFunction) -> Optional[PrettyPrintFunction]:
     """Add a pretty printer for a type specified by the module and name of a
     type rather than the type object itself."""
     key = (type_module, type_name)
@@ -895,9 +863,7 @@ _singleton_pprinters: dict[int, PrettyPrintFunction] = dict.fromkeys(
 )
 
 
-def _defaultdict_pprint(
-    obj: defaultdict[object, object], p: RepresentationPrinter, cycle: bool
-) -> None:
+def _defaultdict_pprint(obj: defaultdict[object, object], p: RepresentationPrinter, cycle: bool) -> None:
     name = obj.__class__.__name__
     with p.group(len(name) + 1, name + "(", ")"):
         if cycle:
@@ -909,9 +875,7 @@ def _defaultdict_pprint(
             p.pretty(dict(obj))
 
 
-def _ordereddict_pprint(
-    obj: OrderedDict[object, object], p: RepresentationPrinter, cycle: bool
-) -> None:
+def _ordereddict_pprint(obj: OrderedDict[object, object], p: RepresentationPrinter, cycle: bool) -> None:
     name = obj.__class__.__name__
     with p.group(len(name) + 1, name + "(", ")"):
         if cycle:
@@ -929,9 +893,7 @@ def _deque_pprint(obj: deque[object], p: RepresentationPrinter, cycle: bool) -> 
             p.pretty(list(obj))
 
 
-def _counter_pprint(
-    obj: Counter[object], p: RepresentationPrinter, cycle: bool
-) -> None:
+def _counter_pprint(obj: Counter[object], p: RepresentationPrinter, cycle: bool) -> None:
     name = obj.__class__.__name__
     with p.group(len(name) + 1, name + "(", ")"):
         if cycle:
@@ -940,9 +902,7 @@ def _counter_pprint(
             p.pretty(dict(obj))
 
 
-def _repr_dataframe(
-    obj: object, p: RepresentationPrinter, cycle: bool
-) -> None:  # pragma: no cover
+def _repr_dataframe(obj: object, p: RepresentationPrinter, cycle: bool) -> None:  # pragma: no cover
     with p.indent(4):
         p.break_()
         _repr_pprint(obj, p, cycle)

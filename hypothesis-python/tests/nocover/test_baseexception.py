@@ -15,9 +15,7 @@ from hypothesis.errors import Flaky, FlakyFailure
 from hypothesis.strategies import composite, integers, none
 
 
-@pytest.mark.parametrize(
-    "e", [KeyboardInterrupt, SystemExit, GeneratorExit, ValueError]
-)
+@pytest.mark.parametrize("e", [KeyboardInterrupt, SystemExit, GeneratorExit, ValueError])
 def test_exception_propagates_fine(e):
     @given(integers())
     def test_raise(x):
@@ -27,9 +25,7 @@ def test_exception_propagates_fine(e):
         test_raise()
 
 
-@pytest.mark.parametrize(
-    "e", [KeyboardInterrupt, SystemExit, GeneratorExit, ValueError]
-)
+@pytest.mark.parametrize("e", [KeyboardInterrupt, SystemExit, GeneratorExit, ValueError])
 def test_exception_propagates_fine_from_strategy(e):
     @composite
     def interrupt_eventually(draw):
@@ -69,9 +65,7 @@ def test_baseexception_no_rerun_no_flaky(e):
             test_raise_baseexception()
 
 
-@pytest.mark.parametrize(
-    "e", [KeyboardInterrupt, SystemExit, GeneratorExit, ValueError]
-)
+@pytest.mark.parametrize("e", [KeyboardInterrupt, SystemExit, GeneratorExit, ValueError])
 def test_baseexception_in_strategy_no_rerun_no_flaky(e):
     runs = 0
     interrupt = 3
@@ -122,9 +116,7 @@ def test(data, x):
 @pytest.mark.parametrize("exc_name", ["SystemExit", "GeneratorExit"])
 @pytest.mark.parametrize("use_composite", [True, False])
 def test_explanations(testdir, exc_name, use_composite):
-    code = TEMPLATE.format(
-        exception=exc_name, strategy="things()" if use_composite else "st.none()"
-    )
+    code = TEMPLATE.format(exception=exc_name, strategy="things()" if use_composite else "st.none()")
     test_file = str(testdir.makepyfile(code))
     pytest_stdout = str(testdir.runpytest_inprocess(test_file, "--tb=native").stdout)
     assert "x=101" in pytest_stdout

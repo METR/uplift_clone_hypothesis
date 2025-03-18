@@ -39,9 +39,7 @@ else:  # pragma: no cover
 # with their respective Random instances even as new ones are registered and old
 # ones go out of scope and get garbage collected.  Keys are ascending integers.
 _RKEY = count()
-RANDOMS_TO_MANAGE: WeakValueDictionary[int, RandomLike] = WeakValueDictionary(
-    {next(_RKEY): random}
-)
+RANDOMS_TO_MANAGE: WeakValueDictionary[int, RandomLike] = WeakValueDictionary({next(_RKEY): random})
 
 
 class NumpyRandomWrapper:

@@ -9,6 +9,7 @@
 # obtain one at https://mozilla.org/MPL/2.0/.
 
 """This module provides the core primitives of Hypothesis, such as given."""
+
 import base64
 import contextlib
 import datetime
@@ -173,9 +174,7 @@ class example:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         if args and kwargs:
-            raise InvalidArgument(
-                "Cannot mix positional and keyword arguments for examples"
-            )
+            raise InvalidArgument("Cannot mix positional and keyword arguments for examples")
         if not (args or kwargs):
             raise InvalidArgument("An example must provide at least one argument")
 
@@ -193,9 +192,7 @@ class example:
         condition: bool = True,  # noqa: FBT002
         *,
         reason: str = "",
-        raises: Union[
-            type[BaseException], tuple[type[BaseException], ...]
-        ] = BaseException,
+        raises: Union[type[BaseException], tuple[type[BaseException], ...]] = BaseException,
     ) -> "example":
         """Mark this example as an expected failure, similarly to
         :obj:`pytest.mark.xfail(strict=True) <pytest.mark.xfail>`.
@@ -232,22 +229,14 @@ class example:
         """
         check_type(bool, condition, "condition")
         check_type(str, reason, "reason")
-        if not (
-            isinstance(raises, type) and issubclass(raises, BaseException)
-        ) and not (
+        if not (isinstance(raises, type) and issubclass(raises, BaseException)) and not (
             isinstance(raises, tuple)
             and raises  # () -> expected to fail with no error, which is impossible
-            and all(
-                isinstance(r, type) and issubclass(r, BaseException) for r in raises
-            )
+            and all(isinstance(r, type) and issubclass(r, BaseException) for r in raises)
         ):
-            raise InvalidArgument(
-                f"{raises=} must be an exception type or tuple of exception types"
-            )
+            raise InvalidArgument(f"{raises=} must be an exception type or tuple of exception types")
         if condition:
-            self._this_example = attr.evolve(
-                self._this_example, raises=raises, reason=reason
-            )
+            self._this_example = attr.evolve(self._this_example, raises=raises, reason=reason)
         return self
 
     def via(self, whence: str, /) -> "example":
@@ -292,9 +281,7 @@ def seed(seed: Hashable) -> Callable[[TestFunc], TestFunc]:
     def accept(test):
         test._hypothesis_internal_use_seed = seed
         current_settings = getattr(test, "_hypothesis_internal_use_settings", None)
-        test._hypothesis_internal_use_settings = Settings(
-            current_settings, database=None
-        )
+        test._hypothesis_internal_use_settings = Settings(current_settings, database=None)
         return test
 
     return accept
@@ -345,13 +332,9 @@ def decode_failure(blob: bytes) -> Sequence[ChoiceT]:
         try:
             decoded = zlib.decompress(decoded[1:])
         except zlib.error as err:
-            raise InvalidArgument(
-                f"Invalid zlib compression for blob {blob!r}"
-            ) from err
+            raise InvalidArgument(f"Invalid zlib compression for blob {blob!r}") from err
     else:
-        raise InvalidArgument(
-            f"Could not decode blob {blob!r}: Invalid start byte {prefix!r}"
-        )
+        raise InvalidArgument(f"Could not decode blob {blob!r}: Invalid start byte {prefix!r}")
 
     choices = choices_from_bytes(decoded)
     if choices is None:
@@ -411,9 +394,7 @@ def is_invalid_test(test, original_sig, given_arguments, given_kwargs):
 
     if given_arguments and given_kwargs:
         return invalid("cannot mix positional and keyword arguments to @given")
-    extra_kwargs = [
-        k for k in given_kwargs if k not in {p.name for p in pos_params + kwonly_params}
-    ]
+    extra_kwargs = [k for k in given_kwargs if k not in {p.name for p in pos_params + kwonly_params}]
     if extra_kwargs and (params == [] or params[-1].kind is not params[-1].VAR_KEYWORD):
         arg = extra_kwargs[0]
         extra = ""
@@ -428,9 +409,9 @@ def is_invalid_test(test, original_sig, given_arguments, given_kwargs):
 
     # This case would raise Unsatisfiable *anyway*, but by detecting it here we can
     # provide a much more helpful error message for people e.g. using the Ghostwriter.
-    empty = [
-        f"{s!r} (arg {idx})" for idx, s in enumerate(given_arguments) if s is NOTHING
-    ] + [f"{name}={s!r}" for name, s in given_kwargs.items() if s is NOTHING]
+    empty = [f"{s!r} (arg {idx})" for idx, s in enumerate(given_arguments) if s is NOTHING] + [
+        f"{name}={s!r}" for name, s in given_kwargs.items() if s is NOTHING
+    ]
     if empty:
         strats = "strategies" if len(empty) > 1 else "strategy"
         return invalid(
@@ -441,11 +422,7 @@ def is_invalid_test(test, original_sig, given_arguments, given_kwargs):
 
 def execute_explicit_examples(state, wrapped_test, arguments, kwargs, original_sig):
     assert isinstance(state, StateForActualGivenExecution)
-    posargs = [
-        p.name
-        for p in original_sig.parameters.values()
-        if p.kind is p.POSITIONAL_OR_KEYWORD
-    ]
+    posargs = [p.name for p in original_sig.parameters.values() if p.kind is p.POSITIONAL_OR_KEYWORD]
 
     for example in reversed(getattr(wrapped_test, "hypothesis_explicit_examples", ())):
         assert isinstance(example, Example)
@@ -454,29 +431,23 @@ def execute_explicit_examples(state, wrapped_test, arguments, kwargs, original_s
         # be any mixture of positional and keyword arguments.
         if example.args:
             assert not example.kwargs
-            if any(
-                p.kind is p.POSITIONAL_ONLY for p in original_sig.parameters.values()
-            ):
+            if any(p.kind is p.POSITIONAL_ONLY for p in original_sig.parameters.values()):
                 raise InvalidArgument(
                     "Cannot pass positional arguments to @example() when decorating "
                     "a test function which has positional-only parameters."
                 )
             if len(example.args) > len(posargs):
                 raise InvalidArgument(
-                    "example has too many arguments for test. Expected at most "
-                    f"{len(posargs)} but got {len(example.args)}"
+                    f"example has too many arguments for test. Expected at most {len(posargs)} but got {len(example.args)}"
                 )
             example_kwargs = dict(zip(posargs[-len(example.args) :], example.args))
         else:
             example_kwargs = dict(example.kwargs)
-        given_kws = ", ".join(
-            repr(k) for k in sorted(wrapped_test.hypothesis._given_kwargs)
-        )
+        given_kws = ", ".join(repr(k) for k in sorted(wrapped_test.hypothesis._given_kwargs))
         example_kws = ", ".join(repr(k) for k in sorted(example_kwargs))
         if given_kws != example_kws:
             raise InvalidArgument(
-                f"Inconsistent args: @given() got strategies for {given_kws}, "
-                f"but @example() got arguments for {example_kws}"
+                f"Inconsistent args: @given() got strategies for {given_kws}, but @example() got arguments for {example_kws}"
             ) from None
 
         # This is certainly true because the example_kwargs exactly match the params
@@ -513,9 +484,7 @@ def execute_explicit_examples(state, wrapped_test, arguments, kwargs, original_s
                                 raise
                             # Save a string form of this example; we'll warn if it's
                             # ever generated by the strategy (which can't be xfailed)
-                            state.xfail_example_reprs.add(
-                                repr_call(state.test, arguments, example_kwargs)
-                            )
+                            state.xfail_example_reprs.add(repr_call(state.test, arguments, example_kwargs))
                         except example.raises as err:
                             # We'd usually check this as early as possible, but it's
                             # possible for failure_exceptions_to_catch() to grow when
@@ -540,8 +509,7 @@ def execute_explicit_examples(state, wrapped_test, arguments, kwargs, original_s
                                 )
                             vowel = name.upper()[0] in "AEIOU"
                             raise AssertionError(
-                                f"Expected a{'n' * vowel} {name} from @example({bits})"
-                                f"{reason}, but no exception was raised."
+                                f"Expected a{'n' * vowel} {name} from @example({bits}){reason}, but no exception was raised."
                             )
             except UnsatisfiedAssumption:
                 # Odd though it seems, we deliberately support explicit examples that
@@ -562,8 +530,7 @@ def execute_explicit_examples(state, wrapped_test, arguments, kwargs, original_s
                 # times is to pass strategies to @example() where values are expected.
                 # Checking is easy, and false-positives not much of a problem, so:
                 if isinstance(err, failure_exceptions_to_catch()) and any(
-                    isinstance(arg, SearchStrategy)
-                    for arg in example.args + tuple(example.kwargs.values())
+                    isinstance(arg, SearchStrategy) for arg in example.args + tuple(example.kwargs.values())
                 ):
                     new = HypothesisWarning(
                         "The @example() decorator expects to be passed values, but "
@@ -716,10 +683,7 @@ def new_given_signature(original_sig, given_kwargs):
         parameters=[
             p
             for p in original_sig.parameters.values()
-            if not (
-                p.name in given_kwargs
-                and p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
-            )
+            if not (p.name in given_kwargs and p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY))
         ],
         return_annotation=None,
     )
@@ -782,18 +746,14 @@ def unwrap_markers_from_group() -> Generator[None, None, None]:
         # in all other cases they are discarded
 
         # Can RewindRecursive end up in this group?
-        _, user_exceptions = non_frozen_exceptions.split(
-            lambda e: isinstance(e, (StopTest, HypothesisException))
-        )
+        _, user_exceptions = non_frozen_exceptions.split(lambda e: isinstance(e, (StopTest, HypothesisException)))
 
         # this might contain marker exceptions, or internal errors, but not frozen.
         if user_exceptions is not None:
             raise
 
         # single marker exception - reraise it
-        flattened_non_frozen_exceptions: list[BaseException] = _flatten_group(
-            non_frozen_exceptions
-        )
+        flattened_non_frozen_exceptions: list[BaseException] = _flatten_group(non_frozen_exceptions)
         if len(flattened_non_frozen_exceptions) == 1:
             e = flattened_non_frozen_exceptions[0]
             # preserve the cause of the original exception to not hinder debugging
@@ -833,9 +793,7 @@ class StateForActualGivenExecution:
 
         self.test = test
 
-        self.print_given_args = getattr(
-            wrapped_test, "_hypothesis_internal_print_given_args", True
-        )
+        self.print_given_args = getattr(wrapped_test, "_hypothesis_internal_print_given_args", True)
 
         self.files_to_propagate = set()
         self.failed_normally = False
@@ -848,9 +806,7 @@ class StateForActualGivenExecution:
 
     @property
     def test_identifier(self):
-        return getattr(
-            current_pytest_item.value, "nodeid", None
-        ) or get_pretty_function_description(self.wrapped_test)
+        return getattr(current_pytest_item.value, "nodeid", None) or get_pretty_function_description(self.wrapped_test)
 
     def _should_trace(self):
         _trace_obs = TESTCASE_CALLBACKS and OBSERVABILITY_COLLECT_COVERAGE
@@ -907,9 +863,7 @@ class StateForActualGivenExecution:
                 finally:
                     finish = time.perf_counter()
                     in_drawtime = math.fsum(data.draw_times.values()) - arg_drawtime
-                    in_stateful = (
-                        math.fsum(data._stateful_run_times.values()) - arg_stateful
-                    )
+                    in_stateful = math.fsum(data._stateful_run_times.values()) - arg_stateful
                     in_gctime = gc_cumulative_time() - arg_gctime
                     runtime = finish - start - in_drawtime - in_stateful - in_gctime
                     self._timing_features = {
@@ -923,9 +877,7 @@ class StateForActualGivenExecution:
                     if not is_final:
                         current_deadline = (current_deadline // 4) * 5
                     if runtime >= current_deadline.total_seconds():
-                        raise DeadlineExceeded(
-                            datetime.timedelta(seconds=runtime), self.settings.deadline
-                        )
+                        raise DeadlineExceeded(datetime.timedelta(seconds=runtime), self.settings.deadline)
                 return result
 
         def run(data):
@@ -936,9 +888,7 @@ class StateForActualGivenExecution:
             args = self.stuff.args
             kwargs = dict(self.stuff.kwargs)
             if example_kwargs is None:
-                kw, argslices = context.prep_args_kwargs_from_strategies(
-                    self.stuff.given_kwargs
-                )
+                kw, argslices = context.prep_args_kwargs_from_strategies(self.stuff.given_kwargs)
             else:
                 kw = example_kwargs
                 argslices = {}
@@ -971,9 +921,7 @@ class StateForActualGivenExecution:
                             force_split=True,
                             arg_slices=argslices,
                             leading_comment=(
-                                "# " + context.data.slice_comments[(0, 0)]
-                                if (0, 0) in context.data.slice_comments
-                                else None
+                                "# " + context.data.slice_comments[(0, 0)] if (0, 0) in context.data.slice_comments else None
                             ),
                         )
                 report(printer.getvalue())
@@ -987,9 +935,7 @@ class StateForActualGivenExecution:
                     force_split=True,
                     arg_slices=argslices,
                     leading_comment=(
-                        "# " + context.data.slice_comments[(0, 0)]
-                        if (0, 0) in context.data.slice_comments
-                        else None
+                        "# " + context.data.slice_comments[(0, 0)] if (0, 0) in context.data.slice_comments else None
                     ),
                 )
                 self._string_repr = printer.getvalue()
@@ -1003,10 +949,7 @@ class StateForActualGivenExecution:
             except TypeError as e:
                 # If we sampled from a sequence of strategies, AND failed with a
                 # TypeError, *AND that exception mentions SearchStrategy*, add a note:
-                if (
-                    "SearchStrategy" in str(e)
-                    and data._sampled_from_all_strategies_elements_message is not None
-                ):
+                if "SearchStrategy" in str(e) and data._sampled_from_all_strategies_elements_message is not None:
                     msg, format_arg = data._sampled_from_all_strategies_elements_message
                     add_note(e, msg.format(format_arg))
                 raise
@@ -1032,11 +975,7 @@ class StateForActualGivenExecution:
         if expected_failure is not None:
             exception, traceback = expected_failure
             if isinstance(exception, DeadlineExceeded) and (
-                runtime_secs := math.fsum(
-                    v
-                    for k, v in self._timing_features.items()
-                    if k.startswith("execute:")
-                )
+                runtime_secs := math.fsum(v for k, v in self._timing_features.items() if k.startswith("execute:"))
             ):
                 report(
                     "Unreliable test timings! On an initial run, this "
@@ -1060,9 +999,7 @@ class StateForActualGivenExecution:
             )
         return result
 
-    def _flaky_replay_to_failure(
-        self, err: FlakyReplay, context: BaseException
-    ) -> FlakyFailure:
+    def _flaky_replay_to_failure(self, err: FlakyReplay, context: BaseException) -> FlakyFailure:
         # Note that in the mark_interesting case, _context_ itself
         # is part of err._interesting_examples - but it's not in
         # _runner.interesting_examples - this is fine, as the context
@@ -1089,9 +1026,7 @@ class StateForActualGivenExecution:
             with Tracer(should_trace=self._should_trace()) as tracer:
                 try:
                     result = self.execute_once(data)
-                    if (
-                        data.status == Status.VALID and tracer.branches
-                    ):  # pragma: no cover
+                    if data.status == Status.VALID and tracer.branches:  # pragma: no cover
                         # This is in fact covered by our *non-coverage* tests, but due
                         # to the settrace() contention *not* by our coverage tests.
                         self.explain_traces[None].add(frozenset(tracer.branches))
@@ -1100,8 +1035,7 @@ class StateForActualGivenExecution:
             if result is not None:
                 fail_health_check(
                     self.settings,
-                    "Tests run under @given should return None, but "
-                    f"{self.test.__name__} returned {result!r} instead.",
+                    f"Tests run under @given should return None, but {self.test.__name__} returned {result!r} instead.",
                     HealthCheck.return_value,
                 )
         except UnsatisfiedAssumption as e:
@@ -1189,13 +1123,10 @@ class StateForActualGivenExecution:
                     else:
                         phase = "unknown"
                 backend_desc = f", using backend={self.settings.backend!r}" * (
-                    self.settings.backend != "hypothesis"
-                    and not getattr(runner, "_switch_to_hypothesis_provider", False)
+                    self.settings.backend != "hypothesis" and not getattr(runner, "_switch_to_hypothesis_provider", False)
                 )
                 try:
-                    data._observability_args = data.provider.realize(
-                        data._observability_args
-                    )
+                    data._observability_args = data.provider.realize(data._observability_args)
                     self._string_repr = data.provider.realize(self._string_repr)
                 except BackendCannotProceed:
                     data._observability_args = {}
@@ -1214,15 +1145,11 @@ class StateForActualGivenExecution:
                     backend_metadata=data.provider.observe_test_case(),
                 )
                 deliver_json_blob(tc)
-                for msg in data.provider.observe_information_messages(
-                    lifetime="test_case"
-                ):
+                for msg in data.provider.observe_information_messages(lifetime="test_case"):
                     self._deliver_information_message(**msg)
             self._timing_features = {}
 
-    def _deliver_information_message(
-        self, *, type: str, title: str, content: Union[str, dict]
-    ) -> None:
+    def _deliver_information_message(self, *, type: str, title: str, content: Union[str, dict]) -> None:
         deliver_json_blob(
             {
                 "type": type,
@@ -1263,9 +1190,9 @@ class StateForActualGivenExecution:
                 title="Hypothesis Statistics",
                 content=describe_statistics(runner.statistics),
             )
-            for msg in (
-                p if isinstance(p := runner.provider, PrimitiveProvider) else p(None)
-            ).observe_information_messages(lifetime="test_function"):
+            for msg in (p if isinstance(p := runner.provider, PrimitiveProvider) else p(None)).observe_information_messages(
+                lifetime="test_function"
+            ):
                 self._deliver_information_message(**msg)
 
         if runner.call_count == 0:
@@ -1301,18 +1228,12 @@ class StateForActualGivenExecution:
                         "reducing the typical size of your inputs?"
                     )
                 rep = get_pretty_function_description(self.test)
-                raise Unsatisfiable(
-                    f"Unable to satisfy assumptions of {rep}. "
-                    f"{' Also, '.join(explanations)}"
-                )
+                raise Unsatisfiable(f"Unable to satisfy assumptions of {rep}. {' Also, '.join(explanations)}")
 
         # If we have not traced executions, warn about that now (but only when
         # we'd expect to do so reliably, i.e. on CPython>=3.12)
         if (
-            sys.version_info[:2] >= (3, 12)
-            and not PYPY
-            and self._should_trace()
-            and not Tracer.can_trace()
+            sys.version_info[:2] >= (3, 12) and not PYPY and self._should_trace() and not Tracer.can_trace()
         ):  # pragma: no cover
             # actually covered by our tests, but only on >= 3.12
             warnings.warn(
@@ -1342,9 +1263,7 @@ class StateForActualGivenExecution:
         for falsifying_example in self.falsifying_examples:
             fragments = []
 
-            ran_example = runner.new_conjecture_data(
-                falsifying_example.choices, max_choices=len(falsifying_example.choices)
-            )
+            ran_example = runner.new_conjecture_data(falsifying_example.choices, max_choices=len(falsifying_example.choices))
             ran_example.slice_comments = falsifying_example.slice_comments
             tb = None
             origin = None
@@ -1380,17 +1299,14 @@ class StateForActualGivenExecution:
                 errors_to_report.append((fragments, err))
             except UnsatisfiedAssumption as e:  # pragma: no cover  # ironically flaky
                 err = FlakyFailure(
-                    "Unreliable assumption: An example which satisfied "
-                    "assumptions on the first run now fails it.",
+                    "Unreliable assumption: An example which satisfied assumptions on the first run now fails it.",
                     [e],
                 )
                 errors_to_report.append((fragments, err))
             except BaseException as e:
                 # If we have anything for explain-mode, this is the time to report.
                 fragments.extend(explanations[falsifying_example.interesting_origin])
-                errors_to_report.append(
-                    (fragments, e.with_traceback(get_trimmed_traceback()))
-                )
+                errors_to_report.append((fragments, e.with_traceback(get_trimmed_traceback())))
                 tb = format_exception(e, get_trimmed_traceback(e))
                 origin = InterestingOrigin.from_exception(e)
             else:
@@ -1408,10 +1324,7 @@ class StateForActualGivenExecution:
                     "arguments": ran_example._observability_args,
                     "how_generated": "minimal failing example",
                     "features": {
-                        **{
-                            f"target:{k}".strip(":"): v
-                            for k, v in ran_example.target_observations.items()
-                        },
+                        **{f"target:{k}".strip(":"): v for k, v in ran_example.target_observations.items()},
                         **ran_example.events,
                     },
                     "timing": self._timing_features,
@@ -1444,9 +1357,7 @@ class StateForActualGivenExecution:
         )
 
 
-def _raise_to_user(
-    errors_to_report, settings, target_lines, trailer="", verified_by=None
-):
+def _raise_to_user(errors_to_report, settings, target_lines, trailer="", verified_by=None):
     """Helper function for attaching notes and grouping multiple errors."""
     failing_prefix = "Falsifying example: "
     ls = []
@@ -1540,36 +1451,28 @@ class HypothesisHandle:
 @overload
 def given(
     _: EllipsisType, /
-) -> Callable[
-    [Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[[], None]
-]:  # pragma: no cover
+) -> Callable[[Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[[], None]]:  # pragma: no cover
     ...
 
 
 @overload
 def given(
     *_given_arguments: SearchStrategy[Any],
-) -> Callable[
-    [Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[..., None]
-]:  # pragma: no cover
+) -> Callable[[Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[..., None]]:  # pragma: no cover
     ...
 
 
 @overload
 def given(
     **_given_kwargs: Union[SearchStrategy[Any], EllipsisType],
-) -> Callable[
-    [Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[..., None]
-]:  # pragma: no cover
+) -> Callable[[Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[..., None]]:  # pragma: no cover
     ...
 
 
 def given(
     *_given_arguments: Union[SearchStrategy[Any], EllipsisType],
     **_given_kwargs: Union[SearchStrategy[Any], EllipsisType],
-) -> Callable[
-    [Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[..., None]
-]:
+) -> Callable[[Callable[..., Optional[Coroutine[Any, Any, None]]]], Callable[..., None]]:
     """A decorator for turning a test function that accepts arguments into a
     randomized test.
 
@@ -1594,9 +1497,7 @@ def given(
             }
             given_arguments = ()
 
-        check_invalid = is_invalid_test(
-            test, original_sig, given_arguments, given_kwargs
-        )
+        check_invalid = is_invalid_test(test, original_sig, given_arguments, given_kwargs)
 
         # If the argument check found problems, return a dummy test function
         # that will raise an error if it is actually called.
@@ -1607,11 +1508,7 @@ def given(
         # positional arguments into keyword arguments for simplicity.
         if given_arguments:
             assert not given_kwargs
-            posargs = [
-                p.name
-                for p in original_sig.parameters.values()
-                if p.kind is p.POSITIONAL_OR_KEYWORD
-            ]
+            posargs = [p.name for p in original_sig.parameters.values() if p.kind is p.POSITIONAL_OR_KEYWORD]
             given_kwargs = dict(list(zip(posargs[::-1], given_arguments[::-1]))[::-1])
         # These have been converted, so delete them to prevent accidental use.
         del given_arguments
@@ -1624,8 +1521,7 @@ def given(
         for name in [name for name, value in given_kwargs.items() if value is ...]:
             if name not in hints:
                 return _invalid(
-                    f"passed {name}=... for {test.__name__}, but {name} has "
-                    "no type annotation",
+                    f"passed {name}=... for {test.__name__}, but {name} has no type annotation",
                     test=test,
                     given_kwargs=given_kwargs,
                 )
@@ -1659,10 +1555,7 @@ def given(
                 wrapped_test, arguments, kwargs, given_kwargs, new_signature.parameters
             )
 
-            if (
-                inspect.iscoroutinefunction(test)
-                and get_executor(stuff.selfy) is default_executor
-            ):
+            if inspect.iscoroutinefunction(test) and get_executor(stuff.selfy) is default_executor:
                 # See https://github.com/HypothesisWorks/hypothesis/issues/3054
                 # If our custom executor doesn't handle coroutines, or we return an
                 # awaitable from a non-async-def function, we just rely on the
@@ -1696,11 +1589,7 @@ def given(
 
             nonlocal prev_self
             # Check selfy really is self (not e.g. a mock) before we health-check
-            cur_self = (
-                stuff.selfy
-                if getattr(type(stuff.selfy), test.__name__, None) is wrapped_test
-                else None
-            )
+            cur_self = stuff.selfy if getattr(type(stuff.selfy), test.__name__, None) is wrapped_test else None
             if prev_self is Unset:
                 prev_self = cur_self
             elif cur_self is not prev_self:
@@ -1711,9 +1600,7 @@ def given(
                 )
                 fail_health_check(settings, msg, HealthCheck.differing_executors)
 
-            state = StateForActualGivenExecution(
-                stuff, test, settings, random, wrapped_test
-            )
+            state = StateForActualGivenExecution(stuff, test, settings, random, wrapped_test)
 
             reproduce_failure = wrapped_test._hypothesis_internal_use_reproduce_failure
 
@@ -1727,8 +1614,7 @@ def given(
                         "Attempting to reproduce a failure from a different "
                         "version of Hypothesis. This failure is from %s, but "
                         "you are currently running %r. Please change your "
-                        "Hypothesis version to a matching one."
-                        % (expected_version, __version__)
+                        "Hypothesis version to a matching one." % (expected_version, __version__)
                     )
                 try:
                     state.execute_once(
@@ -1736,10 +1622,7 @@ def given(
                         print_example=True,
                         is_final=True,
                     )
-                    raise DidNotReproduce(
-                        "Expected the test to raise an error, but it "
-                        "completed successfully."
-                    )
+                    raise DidNotReproduce("Expected the test to raise an error, but it completed successfully.")
                 except StopTest:
                     raise DidNotReproduce(
                         "The shape of the test data has changed in some way "
@@ -1754,11 +1637,7 @@ def given(
 
             # There was no @reproduce_failure, so start by running any explicit
             # examples from @example decorators.
-            errors = list(
-                execute_explicit_examples(
-                    state, wrapped_test, arguments, kwargs, original_sig
-                )
-            )
+            errors = list(execute_explicit_examples(state, wrapped_test, arguments, kwargs, original_sig))
             if errors:
                 # If we're not going to report multiple bugs, we would have
                 # stopped running explicit examples at the first failure.
@@ -1780,12 +1659,8 @@ def given(
             ran_explicit_examples = Phase.explicit in state.settings.phases and getattr(
                 wrapped_test, "hypothesis_explicit_examples", ()
             )
-            SKIP_BECAUSE_NO_EXAMPLES = unittest.SkipTest(
-                "Hypothesis has been told to run no examples for this test."
-            )
-            if not (
-                Phase.reuse in settings.phases or Phase.generate in settings.phases
-            ):
+            SKIP_BECAUSE_NO_EXAMPLES = unittest.SkipTest("Hypothesis has been told to run no examples for this test.")
+            if not (Phase.reuse in settings.phases or Phase.generate in settings.phases):
                 if not ran_explicit_examples:
                     raise SKIP_BECAUSE_NO_EXAMPLES
                 return
@@ -1814,10 +1689,7 @@ def given(
                                 "to reproduce this failure."
                             )
                         else:
-                            report(
-                                f"You can add @seed({generated_seed}) to this test to "
-                                "reproduce this failure."
-                            )
+                            report(f"You can add @seed({generated_seed}) to this test to reproduce this failure.")
                     # The dance here is to avoid showing users long tracebacks
                     # full of Hypothesis internals they don't care about.
                     # We have to do this inline, to avoid adding another
@@ -1827,18 +1699,14 @@ def given(
                     # which will actually appear in tracebacks is as clear as
                     # possible - "raise the_error_hypothesis_found".
                     the_error_hypothesis_found = e.with_traceback(
-                        None
-                        if isinstance(e, BaseExceptionGroup)
-                        else get_trimmed_traceback()
+                        None if isinstance(e, BaseExceptionGroup) else get_trimmed_traceback()
                     )
                     raise the_error_hypothesis_found
 
             if not (ran_explicit_examples or state.ever_executed):
                 raise SKIP_BECAUSE_NO_EXAMPLES
 
-        def _get_fuzz_target() -> (
-            Callable[[Union[bytes, bytearray, memoryview, BinaryIO]], Optional[bytes]]
-        ):
+        def _get_fuzz_target() -> Callable[[Union[bytes, bytearray, memoryview, BinaryIO]], Optional[bytes]]:
             # Because fuzzing interfaces are very performance-sensitive, we use a
             # somewhat more complicated structure here.  `_get_fuzz_target()` is
             # called by the `HypothesisHandle.fuzz_one_input` property, allowing
@@ -1849,18 +1717,12 @@ def given(
             # many invocations of the target.  We explicitly force `deadline=None`
             # for performance reasons, saving ~40% the runtime of an empty test.
             test = wrapped_test.hypothesis.inner_test
-            settings = Settings(
-                parent=wrapped_test._hypothesis_internal_use_settings, deadline=None
-            )
+            settings = Settings(parent=wrapped_test._hypothesis_internal_use_settings, deadline=None)
             random = get_random_for_wrapped_test(test, wrapped_test)
-            _args, _kwargs, stuff = process_arguments_to_given(
-                wrapped_test, (), {}, given_kwargs, new_signature.parameters
-            )
+            _args, _kwargs, stuff = process_arguments_to_given(wrapped_test, (), {}, given_kwargs, new_signature.parameters)
             assert not _args
             assert not _kwargs
-            state = StateForActualGivenExecution(
-                stuff, test, settings, random, wrapped_test
-            )
+            state = StateForActualGivenExecution(stuff, test, settings, random, wrapped_test)
             database_key = function_digest(test) + b".secondary"
             # We track the minimal-so-far example for each distinct origin, so
             # that we track log-n instead of n examples for long runs.  In particular
@@ -1887,12 +1749,8 @@ def given(
                     return None
                 except BaseException:
                     known = minimal_failures.get(data.interesting_origin)
-                    if settings.database is not None and (
-                        known is None or sort_key(data.nodes) <= sort_key(known)
-                    ):
-                        settings.database.save(
-                            database_key, choices_to_bytes(data.choices)
-                        )
+                    if settings.database is not None and (known is None or sort_key(data.nodes) <= sort_key(known)):
+                        settings.database.save(database_key, choices_to_bytes(data.choices))
                         minimal_failures[data.interesting_origin] = data.nodes
                     raise
                 assert isinstance(data.provider, BytestringProvider)
@@ -1911,9 +1769,7 @@ def given(
         if hasattr(test, "_hypothesis_internal_settings_applied"):
             # Used to check if @settings is applied twice.
             wrapped_test._hypothesis_internal_settings_applied = True
-        wrapped_test._hypothesis_internal_use_seed = getattr(
-            test, "_hypothesis_internal_use_seed", None
-        )
+        wrapped_test._hypothesis_internal_use_seed = getattr(test, "_hypothesis_internal_use_seed", None)
         wrapped_test._hypothesis_internal_use_settings = (
             getattr(test, "_hypothesis_internal_use_settings", None) or Settings.default
         )
@@ -1938,9 +1794,7 @@ def find(
     matches the predicate function ``condition``."""
     if settings is None:
         settings = Settings(max_examples=2000)
-    settings = Settings(
-        settings, suppress_health_check=list(HealthCheck), report_multiple_bugs=False
-    )
+    settings = Settings(settings, suppress_health_check=list(HealthCheck), report_multiple_bugs=False)
 
     if database_key is None and settings.database is not None:
         # Note: The database key is not guaranteed to be unique. If not, replaying
@@ -1949,10 +1803,7 @@ def find(
         database_key = function_digest(condition)
 
     if not isinstance(specifier, SearchStrategy):
-        raise InvalidArgument(
-            f"Expected SearchStrategy but got {specifier!r} of "
-            f"type {type(specifier).__name__}"
-        )
+        raise InvalidArgument(f"Expected SearchStrategy but got {specifier!r} of type {type(specifier).__name__}")
     specifier.validate()
 
     last: list[Ex] = []

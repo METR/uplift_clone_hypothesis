@@ -55,9 +55,7 @@ def test_caching(api_version, monkeypatch):
     assert len(array_api._args_to_xps) == 0
 
 
-@pytest.mark.parametrize(
-    "api_version1, api_version2", [(None, "2021.12"), ("2021.12", None)]
-)
+@pytest.mark.parametrize("api_version1, api_version2", [(None, "2021.12"), ("2021.12", None)])
 def test_inferred_namespace_shares_cache(api_version1, api_version2, monkeypatch):
     """Results from inferred versions share the same cache key as results
     from specified versions."""

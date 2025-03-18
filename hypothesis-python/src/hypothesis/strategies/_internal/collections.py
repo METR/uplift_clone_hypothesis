@@ -46,9 +46,7 @@ class TupleStrategy(SearchStrategy):
             s.validate()
 
     def calc_label(self):
-        return combine_labels(
-            self.class_label, *(s.label for s in self.element_strategies)
-        )
+        return combine_labels(self.class_label, *(s.label for s in self.element_strategies))
 
     def __repr__(self):
         tuple_string = ", ".join(map(repr, self.element_strategies))
@@ -75,9 +73,7 @@ def tuples(__a1: SearchStrategy[Ex]) -> SearchStrategy[tuple[Ex]]:  # pragma: no
 
 
 @overload
-def tuples(
-    __a1: SearchStrategy[Ex], __a2: SearchStrategy[T]
-) -> SearchStrategy[tuple[Ex, T]]:  # pragma: no cover
+def tuples(__a1: SearchStrategy[Ex], __a2: SearchStrategy[T]) -> SearchStrategy[tuple[Ex, T]]:  # pragma: no cover
     ...
 
 
@@ -198,8 +194,7 @@ class ListStrategy(SearchStrategy):
 
     def __repr__(self):
         return (
-            f"{self.__class__.__name__}({self.element_strategy!r}, "
-            f"min_size={self.min_size:_}, max_size={self.max_size:_})"
+            f"{self.__class__.__name__}({self.element_strategy!r}, min_size={self.min_size:_}, max_size={self.max_size:_})"
         )
 
     def filter(self, condition):
@@ -257,9 +252,7 @@ class UniqueListStrategy(ListStrategy):
         def not_yet_in_unique_list(val):
             return all(key(val) not in seen for key, seen in zip(self.keys, seen_sets))
 
-        filtered = self.element_strategy._filter_for_filtered_draw(
-            not_yet_in_unique_list
-        )
+        filtered = self.element_strategy._filter_for_filtered_draw(not_yet_in_unique_list)
         while elements.more():
             value = filtered.do_filtered_draw(data)
             if value is filter_not_satisfied:
@@ -290,18 +283,14 @@ class UniqueSampledListStrategy(UniqueListStrategy):
         while remaining and should_draw.more():
             j = data.draw_integer(0, len(remaining) - 1)
             value = self.element_strategy._transform(remaining.pop(j))
-            if value is not filter_not_satisfied and all(
-                key(value) not in seen for key, seen in zip(self.keys, seen_sets)
-            ):
+            if value is not filter_not_satisfied and all(key(value) not in seen for key, seen in zip(self.keys, seen_sets)):
                 for key, seen in zip(self.keys, seen_sets):
                     seen.add(key(value))
                 if self.tuple_suffixes is not None:
                     value = (value, *data.draw(self.tuple_suffixes))
                 result.append(value)
             else:
-                should_draw.reject(
-                    "UniqueSampledListStrategy filter not satisfied or value already seen"
-                )
+                should_draw.reject("UniqueSampledListStrategy filter not satisfied or value already seen")
         assert self.max_size >= len(result) >= self.min_size
         return result
 
@@ -322,9 +311,7 @@ class FixedDictStrategy(SearchStrategy):
     ):
         dict_type = type(mapping)
         keys = tuple(mapping.keys())
-        self.fixed = st.tuples(*[mapping[k] for k in keys]).map(
-            lambda value: dict_type(zip(keys, value))
-        )
+        self.fixed = st.tuples(*[mapping[k] for k in keys]).map(lambda value: dict_type(zip(keys, value)))
         self.optional = optional
 
     def do_draw(self, data):
@@ -333,9 +320,7 @@ class FixedDictStrategy(SearchStrategy):
             return value
 
         remaining = [k for k, v in self.optional.items() if not v.is_empty]
-        should_draw = cu.many(
-            data, min_size=0, max_size=len(remaining), average_size=len(remaining) / 2
-        )
+        should_draw = cu.many(data, min_size=0, max_size=len(remaining), average_size=len(remaining) / 2)
         while should_draw.more():
             j = data.draw_integer(0, len(remaining) - 1)
             remaining[-1], remaining[j] = remaining[j], remaining[-1]

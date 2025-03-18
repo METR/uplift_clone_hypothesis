@@ -33,17 +33,13 @@ except ImportError:
 @pytest.mark.parametrize("non_runtime_type", NON_RUNTIME_TYPES)
 def test_non_runtime_type_cannot_be_resolved(non_runtime_type):
     strategy = st.from_type(non_runtime_type)
-    with pytest.raises(
-        InvalidArgument, match="there is no such thing as a runtime instance"
-    ):
+    with pytest.raises(InvalidArgument, match="there is no such thing as a runtime instance"):
         check_can_generate_examples(strategy)
 
 
 @pytest.mark.parametrize("non_runtime_type", NON_RUNTIME_TYPES)
 def test_non_runtime_type_cannot_be_registered(non_runtime_type):
-    with pytest.raises(
-        InvalidArgument, match="there is no such thing as a runtime instance"
-    ):
+    with pytest.raises(InvalidArgument, match="there is no such thing as a runtime instance"):
         st.register_type_strategy(non_runtime_type, st.none())
 
 
@@ -85,8 +81,7 @@ def test_callable_return_typegard_type(typ):
     strategy = st.from_type(Callable[[], typ[int]])
     with pytest.raises(
         InvalidArgument,
-        match="Hypothesis cannot yet construct a strategy for callables "
-        "which are PEP-647 TypeGuards or PEP-742 TypeIs",
+        match="Hypothesis cannot yet construct a strategy for callables which are PEP-647 TypeGuards or PEP-742 TypeIs",
     ):
         check_can_generate_examples(strategy)
 

@@ -22,9 +22,7 @@ from tests.common.utils import all_values, capture_out
 @pytest.mark.parametrize("in_pytest", [False, True])
 @pytest.mark.parametrize("fail_healthcheck", [False, True])
 @pytest.mark.parametrize("verbosity", [Verbosity.normal, Verbosity.quiet])
-def test_prints_seed_only_on_healthcheck(
-    monkeypatch, in_pytest, fail_healthcheck, verbosity
-):
+def test_prints_seed_only_on_healthcheck(monkeypatch, in_pytest, fail_healthcheck, verbosity):
     monkeypatch.setattr(core, "running_under_pytest", in_pytest)
 
     strategy = st.integers()

@@ -40,9 +40,7 @@ def test_can_generate_subnormals():
 
 
 @skipif_ftz
-@pytest.mark.parametrize(
-    "min_value, max_value", [(None, None), (-1, 0), (0, 1), (-1, 1)]
-)
+@pytest.mark.parametrize("min_value, max_value", [(None, None), (-1, 0), (0, 1), (-1, 1)])
 @pytest.mark.parametrize("width", [16, 32, 64])
 def test_does_not_generate_subnormals_when_disallowed(width, min_value, max_value):
     strat = floats(

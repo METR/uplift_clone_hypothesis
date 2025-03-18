@@ -26,9 +26,7 @@ def e_to_str(elt):
 
 
 def argument_validation_test(bad_args):
-    @pytest.mark.parametrize(
-        ("function", "args", "kwargs"), bad_args, ids=list(map(e_to_str, bad_args))
-    )
+    @pytest.mark.parametrize(("function", "args", "kwargs"), bad_args, ids=list(map(e_to_str, bad_args)))
     def test_raise_invalid_argument(function, args, kwargs):
         # some invalid argument tests may find multiple distinct invalid inputs,
         # which hypothesis raises as an exception group (and is not caught by

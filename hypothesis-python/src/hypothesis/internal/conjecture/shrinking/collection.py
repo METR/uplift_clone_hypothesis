@@ -16,9 +16,7 @@ from hypothesis.internal.conjecture.utils import identity
 
 
 class Collection(Shrinker):
-    def setup(
-        self, *, ElementShrinker, min_size, to_order=identity, from_order=identity
-    ):
+    def setup(self, *, ElementShrinker, min_size, to_order=identity, from_order=identity):
         self.ElementShrinker = ElementShrinker
         self.to_order = to_order
         self.from_order = from_order
@@ -67,16 +65,12 @@ class Collection(Shrinker):
         for val in duplicated:
             self.ElementShrinker.shrink(
                 self.to_order(val),
-                lambda v: self.consider(
-                    tuple(self.from_order(v) if x == val else x for x in self.current)
-                ),
+                lambda v: self.consider(tuple(self.from_order(v) if x == val else x for x in self.current)),
             )
 
         # then try minimizing each element in turn
         for i, val in enumerate(self.current):
             self.ElementShrinker.shrink(
                 self.to_order(val),
-                lambda v: self.consider(
-                    self.current[:i] + (self.from_order(v),) + self.current[i + 1 :]
-                ),
+                lambda v: self.consider(self.current[:i] + (self.from_order(v),) + self.current[i + 1 :]),
             )

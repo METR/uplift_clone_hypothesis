@@ -50,9 +50,7 @@ class HypothesisRandom(Random):
             return
 
         args, kwargs = convert_kwargs(method, kwargs)
-        argstr = ", ".join(
-            list(map(repr, args)) + [f"{k}={v!r}" for k, v in kwargs.items()]
-        )
+        argstr = ", ".join(list(map(repr, args)) + [f"{k}={v!r}" for k, v in kwargs.items()])
         report(f"{self!r}.{method}({argstr}) -> {result!r}")
 
     def _hypothesis_do_random(self, method, kwargs):
@@ -130,9 +128,7 @@ def define_copy_method(name):
 
     sig = inspect.signature(STUBS.get(name, target))
 
-    result = define_function_signature(target.__name__, target.__doc__, sig)(
-        implementation
-    )
+    result = define_function_signature(target.__name__, target.__doc__, sig)(implementation)
 
     result.__module__ = __name__
     result.__qualname__ = "HypothesisRandom." + result.__name__
@@ -239,9 +235,7 @@ class ArtificialRandom(HypothesisRandom):
             result = self.__data.draw(floats(min_value=0.0, allow_infinity=False))
         elif method in ("gauss", "normalvariate"):
             mu = kwargs["mu"]
-            result = mu + self.__data.draw(
-                floats(allow_nan=False, allow_infinity=False)
-            )
+            result = mu + self.__data.draw(floats(allow_nan=False, allow_infinity=False))
         elif method == "vonmisesvariate":
             result = self.__data.draw(floats(0, 2 * math.pi))
         elif method == "randrange":
@@ -287,9 +281,7 @@ class ArtificialRandom(HypothesisRandom):
             seq = kwargs["population"]
 
             if k > len(seq) or k < 0:
-                raise ValueError(
-                    f"Sample size {k} not in expected range 0 <= k <= {len(seq)}"
-                )
+                raise ValueError(f"Sample size {k} not in expected range 0 <= k <= {len(seq)}")
 
             if k == 0:
                 result = []
@@ -366,10 +358,7 @@ def convert_kwargs(name, kwargs):
     bound.apply_defaults()
 
     for k in list(kwargs):
-        if (
-            kwargs[k] is params[k].default
-            or params[k].kind != inspect.Parameter.KEYWORD_ONLY
-        ):
+        if kwargs[k] is params[k].default or params[k].kind != inspect.Parameter.KEYWORD_ONLY:
             kwargs.pop(k)
 
     arg_names = list(params)[1:]
@@ -439,6 +428,4 @@ class RandomStrategy(SearchStrategy):
             seed = data.draw_integer(0, 2**64 - 1)
             return TrueRandom(seed=seed, note_method_calls=self.__note_method_calls)
         else:
-            return ArtificialRandom(
-                note_method_calls=self.__note_method_calls, data=data
-            )
+            return ArtificialRandom(note_method_calls=self.__note_method_calls, data=data)

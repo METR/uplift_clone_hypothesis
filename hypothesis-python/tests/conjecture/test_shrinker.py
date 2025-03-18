@@ -348,9 +348,7 @@ def test_zig_zags_quickly():
         (0, 100, 100, 65, (75, 75)),
     ],
 )
-def test_zig_zags_quickly_with_shrink_towards(
-    min_value, max_value, forced, shrink_towards, expected
-):
+def test_zig_zags_quickly_with_shrink_towards(min_value, max_value, forced, shrink_towards, expected):
     # we should be able to efficiently incorporate shrink_towards when dealing
     # with zig zags.
 
@@ -377,9 +375,7 @@ def test_zero_irregular_examples():
         data.draw_integer(0, 2**16 - 1)
         data.stop_span()
         data.start_span(1)
-        interesting = (
-            data.draw_integer(0, 2**8 - 1) > 0 and data.draw_integer(0, 2**16 - 1) > 0
-        )
+        interesting = data.draw_integer(0, 2**8 - 1) > 0 and data.draw_integer(0, 2**16 - 1) > 0
         data.stop_span()
         if interesting:
             data.mark_interesting()
@@ -609,11 +605,7 @@ def test_redistribute_numeric_pairs(node1, node2, stop):
     assume(node1.value + node2.value > stop)
     # avoid exhausting the tree while generating, which causes @shrinking_from's
     # runner to raise
-    assume(
-        compute_max_children(node1.type, node1.kwargs)
-        + compute_max_children(node2.type, node2.kwargs)
-        > 2
-    )
+    assume(compute_max_children(node1.type, node1.kwargs) + compute_max_children(node2.type, node2.kwargs) > 2)
 
     @shrinking_from([node1.value, node2.value])
     def shrinker(data: ConjectureData):

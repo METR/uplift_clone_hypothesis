@@ -374,9 +374,7 @@ class RequiresInit(RuleBasedStateMachine):
 
 def test_can_use_factory_for_tests():
     with raises(ValueError):
-        run_state_machine_as_test(
-            lambda: RequiresInit(42), settings=Settings(max_examples=100)
-        )
+        run_state_machine_as_test(lambda: RequiresInit(42), settings=Settings(max_examples=100))
 
 
 class FailsEventually(RuleBasedStateMachine):
@@ -396,16 +394,10 @@ FailsEventually.TestCase.settings = Settings(stateful_step_count=5)
 def test_can_explicitly_pass_settings():
     run_state_machine_as_test(FailsEventually)
     try:
-        FailsEventually.TestCase.settings = Settings(
-            FailsEventually.TestCase.settings, stateful_step_count=15
-        )
-        run_state_machine_as_test(
-            FailsEventually, settings=Settings(stateful_step_count=2)
-        )
+        FailsEventually.TestCase.settings = Settings(FailsEventually.TestCase.settings, stateful_step_count=15)
+        run_state_machine_as_test(FailsEventually, settings=Settings(stateful_step_count=2))
     finally:
-        FailsEventually.TestCase.settings = Settings(
-            FailsEventually.TestCase.settings, stateful_step_count=5
-        )
+        FailsEventually.TestCase.settings = Settings(FailsEventually.TestCase.settings, stateful_step_count=5)
 
 
 def test_settings_argument_is_validated():
@@ -430,9 +422,7 @@ def test_settings_attribute_is_validated():
 
 def test_saves_failing_example_in_database():
     db = ExampleDatabase(":memory:")
-    ss = Settings(
-        database=db, max_examples=1000, suppress_health_check=list(HealthCheck)
-    )
+    ss = Settings(database=db, max_examples=1000, suppress_health_check=list(HealthCheck))
     with raises(AssertionError):
         run_state_machine_as_test(DepthMachine, settings=ss)
     assert any(list(db.data.values()))
@@ -440,9 +430,7 @@ def test_saves_failing_example_in_database():
 
 def test_can_run_with_no_db():
     with deterministic_PRNG(), raises(AssertionError):
-        run_state_machine_as_test(
-            DepthMachine, settings=Settings(database=None, max_examples=10_000)
-        )
+        run_state_machine_as_test(DepthMachine, settings=Settings(database=None, max_examples=10_000))
 
 
 def test_stateful_double_rule_is_forbidden(recwarn):

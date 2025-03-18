@@ -117,9 +117,7 @@ def test_terminates_shrinks(n, monkeypatch):
     def generate_new_examples(self):
         self.cached_test_function((255,) * 1000)
 
-    monkeypatch.setattr(
-        ConjectureRunner, "generate_new_examples", generate_new_examples
-    )
+    monkeypatch.setattr(ConjectureRunner, "generate_new_examples", generate_new_examples)
     monkeypatch.setattr(engine_module, "MAX_SHRINKS", n)
 
     runner = ConjectureRunner(
@@ -232,9 +230,7 @@ def test_stops_after_max_examples_when_reading():
     def f(data):
         seen.append(data.draw_bytes(1, 1))
 
-    runner = ConjectureRunner(
-        f, settings=settings(max_examples=1, database=db), database_key=key
-    )
+    runner = ConjectureRunner(f, settings=settings(max_examples=1, database=db), database_key=key)
     runner.run()
     assert len(seen) == 1
 
@@ -266,9 +262,7 @@ def test_stops_after_max_examples_when_generating_more_bugs(examples):
         err_common = True
         raise Exception
 
-    runner = ConjectureRunner(
-        f, settings=settings(max_examples=examples, phases=[Phase.generate])
-    )
+    runner = ConjectureRunner(f, settings=settings(max_examples=examples, phases=[Phase.generate]))
     try:
         runner.run()
     except Exception:
@@ -307,9 +301,7 @@ def test_phases_can_disable_shrinking():
         seen.add(bytes(data.draw_bytes(32, 32)))
         data.mark_interesting()
 
-    runner = ConjectureRunner(
-        f, settings=settings(database=None, phases=(Phase.reuse, Phase.generate))
-    )
+    runner = ConjectureRunner(f, settings=settings(database=None, phases=(Phase.reuse, Phase.generate)))
     runner.run()
     assert len(seen) == 1
 
@@ -383,9 +375,7 @@ def test_does_not_save_on_interrupt():
         raise KeyboardInterrupt
 
     db = InMemoryExampleDatabase()
-    runner = ConjectureRunner(
-        interrupts, settings=settings(database=db), database_key=b"key"
-    )
+    runner = ConjectureRunner(interrupts, settings=settings(database=db), database_key=b"key")
     with pytest.raises(KeyboardInterrupt):
         runner.run()
     assert not db.data
@@ -406,9 +396,7 @@ def fails_health_check(label, **kwargs):
     def accept(f):
         runner = ConjectureRunner(
             f,
-            settings=settings(
-                max_examples=100, phases=no_shrink, database=None, **kwargs
-            ),
+            settings=settings(max_examples=100, phases=no_shrink, database=None, **kwargs),
         )
 
         with pytest.raises(FailedHealthCheck) as e:
@@ -563,15 +551,11 @@ def test_uniqueness_is_preserved_when_writing_at_beginning():
 
 @pytest.mark.parametrize("skip_target", [False, True])
 @pytest.mark.parametrize("initial_attempt", [(127,), (128,)])
-def test_clears_out_its_database_on_shrinking(
-    initial_attempt, skip_target, monkeypatch
-):
+def test_clears_out_its_database_on_shrinking(initial_attempt, skip_target, monkeypatch):
     def generate_new_examples(self):
         self.cached_test_function(initial_attempt)
 
-    monkeypatch.setattr(
-        ConjectureRunner, "generate_new_examples", generate_new_examples
-    )
+    monkeypatch.setattr(ConjectureRunner, "generate_new_examples", generate_new_examples)
 
     key = b"key"
     db = InMemoryExampleDatabase()
@@ -601,9 +585,7 @@ def test_shrinks_both_interesting_examples(monkeypatch):
     def generate_new_examples(self):
         self.cached_test_function((1,))
 
-    monkeypatch.setattr(
-        ConjectureRunner, "generate_new_examples", generate_new_examples
-    )
+    monkeypatch.setattr(ConjectureRunner, "generate_new_examples", generate_new_examples)
 
     def f(data):
         n = data.draw_integer(0, 2**8 - 1)
@@ -742,9 +724,7 @@ def test_database_clears_secondary_key():
 
     runner = ConjectureRunner(
         f,
-        settings=settings(
-            max_examples=1, database=database, suppress_health_check=list(HealthCheck)
-        ),
+        settings=settings(max_examples=1, database=database, suppress_health_check=list(HealthCheck)),
         database_key=key,
     )
 
@@ -775,9 +755,7 @@ def test_database_uses_values_from_secondary_key():
 
     runner = ConjectureRunner(
         f,
-        settings=settings(
-            max_examples=1, database=database, suppress_health_check=list(HealthCheck)
-        ),
+        settings=settings(max_examples=1, database=database, suppress_health_check=list(HealthCheck)),
         database_key=key,
     )
     for i in range(10):
@@ -791,9 +769,7 @@ def test_database_uses_values_from_secondary_key():
     runner.clear_secondary_key()
 
     assert len(set(database.fetch(key))) == 1
-    assert {
-        choices_from_bytes(b)[0] for b in database.fetch(runner.secondary_key)
-    } == set(range(6, 11))
+    assert {choices_from_bytes(b)[0] for b in database.fetch(runner.secondary_key)} == set(range(6, 11))
 
     (v,) = runner.interesting_examples.values()
     assert v.choices == (5,)
@@ -806,9 +782,7 @@ def test_exit_because_max_iterations():
 
     runner = ConjectureRunner(
         f,
-        settings=settings(
-            max_examples=1, database=None, suppress_health_check=list(HealthCheck)
-        ),
+        settings=settings(max_examples=1, database=None, suppress_health_check=list(HealthCheck)),
     )
 
     runner.run()
@@ -996,9 +970,7 @@ def test_branch_ending_in_write():
 
 def test_exhaust_space():
     with deterministic_PRNG():
-        runner = ConjectureRunner(
-            lambda data: data.draw_boolean(), settings=TEST_SETTINGS
-        )
+        runner = ConjectureRunner(lambda data: data.draw_boolean(), settings=TEST_SETTINGS)
         runner.run()
         assert runner.tree.is_exhausted
         assert runner.valid_examples == 2
@@ -1067,9 +1039,7 @@ def test_does_not_shrink_multiple_bugs_when_told_not_to():
             data.mark_interesting(interesting_origin(2))
 
     with deterministic_PRNG():
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, report_multiple_bugs=False)
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, report_multiple_bugs=False))
         runner.cached_test_function((255, 255))
         runner.shrink_interesting_examples()
 
@@ -1087,9 +1057,7 @@ def test_does_not_keep_generating_when_multiple_bugs():
     with deterministic_PRNG():
         runner = ConjectureRunner(
             test,
-            settings=settings(
-                TEST_SETTINGS, report_multiple_bugs=False, phases=[Phase.generate]
-            ),
+            settings=settings(TEST_SETTINGS, report_multiple_bugs=False, phases=[Phase.generate]),
         )
 
         runner.run()
@@ -1349,9 +1317,7 @@ def test_runs_optimisation_even_if_not_generating():
         data.target_observations["n"] = data.draw_integer(0, 2**16 - 1)
 
     with deterministic_PRNG():
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, phases=[Phase.target])
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, phases=[Phase.target]))
         runner.cached_test_function((0,))
         runner.run()
 
@@ -1363,9 +1329,7 @@ def test_runs_optimisation_once_when_generating():
         data.target_observations["n"] = data.draw_integer(0, 2**16 - 1)
 
     with deterministic_PRNG():
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, max_examples=100)
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, max_examples=100))
 
         runner.optimise_targets = Mock(name="optimise_targets")
         try:
@@ -1380,9 +1344,7 @@ def test_does_not_run_optimisation_when_max_examples_is_small():
         data.target_observations["n"] = data.draw_integer(0, 2**16 - 1)
 
     with deterministic_PRNG():
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, max_examples=10)
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, max_examples=10))
 
         runner.optimise_targets = Mock(name="optimise_targets")
         try:
@@ -1484,9 +1446,7 @@ def test_can_be_set_to_ignore_limits():
         data.draw_integer(0, 2**8 - 1)
 
     with deterministic_PRNG():
-        runner = ConjectureRunner(
-            test, settings=settings(TEST_SETTINGS, max_examples=1), ignore_limits=True
-        )
+        runner = ConjectureRunner(test, settings=settings(TEST_SETTINGS, max_examples=1), ignore_limits=True)
         for c in range(256):
             runner.cached_test_function((c,))
 
@@ -1578,9 +1538,7 @@ def test_simulate_to_evicted_data(monkeypatch):
         (st.lists(st.integers(), min_size=5), lambda v: True),
         (st.lists(st.text(), min_size=2, unique=True), lambda v: True),
         (
-            st.sampled_from(
-                enum.Flag("LargeFlag", {f"bit{i}": enum.auto() for i in range(64)})
-            ),
+            st.sampled_from(enum.Flag("LargeFlag", {f"bit{i}": enum.auto() for i in range(64)})),
             lambda f: bit_count(f.value) > 1,
         ),
     ],
@@ -1632,9 +1590,7 @@ def test_stops_if_hits_interesting_early_and_only_want_one_bug():
         data.draw_integer(0, 255)
         data.mark_interesting()
 
-    runner = ConjectureRunner(
-        f, settings=settings(database=db, report_multiple_bugs=False), database_key=key
-    )
+    runner = ConjectureRunner(f, settings=settings(database=db, report_multiple_bugs=False), database_key=key)
     for i in range(256):
         runner.save_choices([i])
     runner.run()

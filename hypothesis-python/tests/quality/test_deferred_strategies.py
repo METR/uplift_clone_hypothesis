@@ -27,9 +27,7 @@ def test_non_trivial_json():
 
     assert minimal(json) is None
     assert minimal(json, lambda x: isinstance(x, list) and x) == [None]
-    assert minimal(
-        json, lambda x: isinstance(x, dict) and isinstance(x.get(""), list)
-    ) == {"": []}
+    assert minimal(json, lambda x: isinstance(x, dict) and isinstance(x.get(""), list)) == {"": []}
 
 
 def test_self_recursive_lists():

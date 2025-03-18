@@ -82,11 +82,7 @@ def convert(node: ast.AST, argname: str) -> object:
             raise ValueError("Non-local variable")
         return ARG
     if isinstance(node, ast.Call):
-        if (
-            isinstance(node.func, ast.Name)
-            and node.func.id == "len"
-            and len(node.args) == 1
-        ):
+        if isinstance(node.func, ast.Name) and node.func.id == "len" and len(node.args) == 1:
             # error unless comparison is to the len *of the lambda arg*
             return convert(node.args[0], argname)
     return ast.literal_eval(node)
@@ -138,9 +134,7 @@ def merge_preds(*con_predicates: ConstructivePredicate) -> ConstructivePredicate
     }
     predicate = None
     for kw, p in con_predicates:
-        assert (
-            not p or not predicate or p is predicate
-        ), "Can't merge two partially-constructive preds"
+        assert not p or not predicate or p is predicate, "Can't merge two partially-constructive preds"
         predicate = p or predicate
         if "min_value" in kw:
             if kw["min_value"] > base["min_value"]:
@@ -171,9 +165,7 @@ def merge_preds(*con_predicates: ConstructivePredicate) -> ConstructivePredicate
     return ConstructivePredicate(base, predicate)
 
 
-def numeric_bounds_from_ast(
-    tree: ast.AST, argname: str, fallback: ConstructivePredicate
-) -> ConstructivePredicate:
+def numeric_bounds_from_ast(tree: ast.AST, argname: str, fallback: ConstructivePredicate) -> ConstructivePredicate:
     """Take an AST; return a ConstructivePredicate.
 
     >>> lambda x: x >= 0
@@ -206,9 +198,7 @@ def numeric_bounds_from_ast(
         return merge_preds(*bounds)
 
     if isinstance(tree, ast.BoolOp) and isinstance(tree.op, ast.And):
-        return merge_preds(
-            *(numeric_bounds_from_ast(node, argname, fallback) for node in tree.values)
-        )
+        return merge_preds(*(numeric_bounds_from_ast(node, argname, fallback) for node in tree.values))
 
     return fallback
 
@@ -221,11 +211,7 @@ def get_numeric_predicate_bounds(predicate: Predicate) -> ConstructivePredicate:
     so that the strategy validation doesn't complain.
     """
     unchanged = ConstructivePredicate.unchanged(predicate)
-    if (
-        isinstance(predicate, partial)
-        and len(predicate.args) == 1
-        and not predicate.keywords
-    ):
+    if isinstance(predicate, partial) and len(predicate.args) == 1 and not predicate.keywords:
         arg = predicate.args[0]
         if (
             (isinstance(arg, Decimal) and Decimal.is_snan(arg))
@@ -315,17 +301,13 @@ def get_float_predicate_bounds(predicate: Predicate) -> ConstructivePredicate:
     if "min_value" in kwargs:
         min_value = kwargs["min_value"]
         kwargs["min_value"] = float(kwargs["min_value"])
-        if min_value < kwargs["min_value"] or (
-            min_value == kwargs["min_value"] and kwargs.get("exclude_min", False)
-        ):
+        if min_value < kwargs["min_value"] or (min_value == kwargs["min_value"] and kwargs.get("exclude_min", False)):
             kwargs["min_value"] = next_up(kwargs["min_value"])
 
     if "max_value" in kwargs:
         max_value = kwargs["max_value"]
         kwargs["max_value"] = float(kwargs["max_value"])
-        if max_value > kwargs["max_value"] or (
-            max_value == kwargs["max_value"] and kwargs.get("exclude_max", False)
-        ):
+        if max_value > kwargs["max_value"] or (max_value == kwargs["max_value"] and kwargs.get("exclude_max", False)):
             kwargs["max_value"] = next_down(kwargs["max_value"])
 
     kwargs = {k: v for k, v in kwargs.items() if k in {"min_value", "max_value"}}

@@ -99,9 +99,7 @@ def update_changelog_and_version():
             assert CHANGELOG_BORDER.match(lines[i + 2]), repr(lines[i + 2])
             assert CHANGELOG_HEADER.match(lines[i + 3]), repr(lines[i + 3])
             assert CHANGELOG_BORDER.match(lines[i + 4]), repr(lines[i + 4])
-            assert lines[i + 3].startswith(
-                __version__
-            ), f"{__version__=}   {lines[i + 3]=}"
+            assert lines[i + 3].startswith(__version__), f"{__version__=}   {lines[i + 3]=}"
             beginning = "\n".join(lines[:i])
             rest = "\n".join(lines[i:])
             assert f"{beginning}\n{rest}" == contents
@@ -109,9 +107,7 @@ def update_changelog_and_version():
 
     release_type, release_contents = parse_release_file()
 
-    new_version_string, new_version_info = rm.bump_version_info(
-        __version_info__, release_type
-    )
+    new_version_string, new_version_info = rm.bump_version_info(__version_info__, release_type)
 
     __version_info__ = new_version_info
     __version__ = new_version_string
@@ -167,9 +163,7 @@ def changelog():
 def build_distribution():
     if os.path.exists(DIST):
         shutil.rmtree(DIST)
-    subprocess.check_output(
-        [sys.executable, "setup.py", "sdist", "bdist_wheel", "--dist-dir", DIST]
-    )
+    subprocess.check_output([sys.executable, "setup.py", "sdist", "bdist_wheel", "--dist-dir", DIST])
 
 
 def upload_distribution():
@@ -261,7 +255,4 @@ def get_autoupdate_message(domainlist_changed):
             "<https://www.iana.org/domains/root/db>`__,\nwhich is used by the "
             "provisional :func:`~hypothesis.provisional.domains` strategy.\n"
         )
-    return (
-        "This patch updates our autoformatting tools, "
-        "improving our code style without any API changes."
-    )
+    return "This patch updates our autoformatting tools, improving our code style without any API changes."

@@ -68,24 +68,19 @@ def test_cathetus_nan(h, a):
     assert math.isnan(cathetus(h, a))
 
 
-@pytest.mark.parametrize(
-    "h,a", [(math.inf, 3), (math.inf, -3), (math.inf, 0), (math.inf, math.nan)]
-)
+@pytest.mark.parametrize("h,a", [(math.inf, 3), (math.inf, -3), (math.inf, 0), (math.inf, math.nan)])
 def test_cathetus_infinite(h, a):
     assert math.isinf(cathetus(h, a))
 
 
-@pytest.mark.parametrize(
-    "h,a,b", [(-5, 4, 3), (5, -4, 3), (-5, -4, 3), (0, 0, 0), (1, 0, 1)]
-)
+@pytest.mark.parametrize("h,a,b", [(-5, 4, 3), (5, -4, 3), (-5, -4, 3), (0, 0, 0), (1, 0, 1)])
 def test_cathetus_signs(h, a, b):
     assert abs(cathetus(h, a) - b) <= abs(b) * float_info.epsilon
 
 
 @given(
     h=floats(0) | floats(min_value=1e308, allow_infinity=False),
-    a=floats(0, allow_infinity=False)
-    | floats(min_value=0, max_value=1e250, allow_infinity=False),
+    a=floats(0, allow_infinity=False) | floats(min_value=0, max_value=1e250, allow_infinity=False),
 )
 def test_cathetus_always_leq_hypot(h, a):
     assume(h >= a)

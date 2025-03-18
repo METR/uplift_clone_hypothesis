@@ -34,9 +34,7 @@ from tests.common.strategies import intervals
 SOME_LABEL = calc_label_from_name("some label")
 
 
-TEST_SETTINGS = settings(
-    max_examples=5000, database=None, suppress_health_check=list(HealthCheck)
-)
+TEST_SETTINGS = settings(max_examples=5000, database=None, suppress_health_check=list(HealthCheck))
 
 
 def interesting_origin(n: Optional[int] = None) -> InterestingOrigin:
@@ -95,9 +93,7 @@ def shrinking_from(start):
             runner.cached_test_function(start)
             assert runner.interesting_examples
             (last_data,) = runner.interesting_examples.values()
-            return runner.new_shrinker(
-                last_data, lambda d: d.status == Status.INTERESTING
-            )
+            return runner.new_shrinker(last_data, lambda d: d.status == Status.INTERESTING)
 
     return accept
 
@@ -108,10 +104,7 @@ def fresh_data(*, random=None, observer=None) -> ConjectureData:
             context = current_build_context()
         except InvalidArgument:
             # ensure usage of fresh_data() is not flaky outside of property tests.
-            raise ValueError(
-                "must pass a seeded Random instance to fresh_data() when "
-                "outside of a build context"
-            ) from None
+            raise ValueError("must pass a seeded Random instance to fresh_data() when outside of a build context") from None
 
         # within property tests, ensure fresh_data uses a controlled source of
         # randomness.
@@ -183,9 +176,7 @@ def integer_kwargs(
         use_max_value = draw(st.booleans())
     use_shrink_towards = draw(st.booleans())
     if use_weights is None:
-        use_weights = (
-            draw(st.booleans()) if (use_min_value and use_max_value) else False
-        )
+        use_weights = draw(st.booleans()) if (use_min_value and use_max_value) else False
 
     # Invariants:
     # (1) min_value <= forced <= max_value
@@ -242,16 +233,10 @@ def _collection_kwargs(draw, *, forced, use_min_size=None, use_max_size=None):
         use_max_size = draw(st.booleans())
 
     if use_min_size:
-        min_size = draw(
-            st.integers(0, min(len(forced), cap) if forced is not None else cap)
-        )
+        min_size = draw(st.integers(0, min(len(forced), cap) if forced is not None else cap))
 
     if use_max_size:
-        max_size = draw(
-            st.integers(
-                min_value=min_size if forced is None else max(min_size, len(forced))
-            )
-        )
+        max_size = draw(st.integers(min_value=min_size if forced is None else max(min_size, len(forced))))
         # cap to some reasonable max size to avoid overruns.
         max_size = min(max_size, min_size + 100)
 
@@ -261,14 +246,8 @@ def _collection_kwargs(draw, *, forced, use_min_size=None, use_max_size=None):
 @st.composite
 def string_kwargs(draw, *, use_min_size=None, use_max_size=None, use_forced=False):
     interval_set = draw(intervals())
-    forced = (
-        draw(TextStrategy(OneCharStringStrategy(interval_set))) if use_forced else None
-    )
-    kwargs = draw(
-        _collection_kwargs(
-            forced=forced, use_min_size=use_min_size, use_max_size=use_max_size
-        )
-    )
+    forced = draw(TextStrategy(OneCharStringStrategy(interval_set))) if use_forced else None
+    kwargs = draw(_collection_kwargs(forced=forced, use_min_size=use_min_size, use_max_size=use_max_size))
     # if the intervalset is empty, then the min size must be zero, because the
     # only valid value is the empty string.
     if len(interval_set) == 0:
@@ -281,11 +260,7 @@ def string_kwargs(draw, *, use_min_size=None, use_max_size=None, use_forced=Fals
 def bytes_kwargs(draw, *, use_min_size=None, use_max_size=None, use_forced=False):
     forced = draw(st.binary()) if use_forced else None
 
-    kwargs = draw(
-        _collection_kwargs(
-            forced=forced, use_min_size=use_min_size, use_max_size=use_max_size
-        )
-    )
+    kwargs = draw(_collection_kwargs(forced=forced, use_min_size=use_min_size, use_max_size=use_max_size))
     return {"forced": forced, **kwargs}
 
 
@@ -365,10 +340,7 @@ def kwargs_strategy(choice_type, strategy_kwargs=None, *, use_forced=False):
 def choice_types_kwargs(strategy_kwargs=None, *, use_forced=False):
     options = ["boolean", "integer", "float", "bytes", "string"]
     return st.one_of(
-        st.tuples(
-            st.just(name), kwargs_strategy(name, strategy_kwargs, use_forced=use_forced)
-        )
-        for name in options
+        st.tuples(st.just(name), kwargs_strategy(name, strategy_kwargs, use_forced=use_forced)) for name in options
     )
 
 
@@ -389,9 +361,7 @@ def nodes(draw, *, was_forced=None, choice_types=None):
     value = draw_value(choice_type, kwargs)
     was_forced = draw(st.booleans()) if was_forced is None else was_forced
 
-    return ChoiceNode(
-        type=choice_type, value=value, kwargs=kwargs, was_forced=was_forced
-    )
+    return ChoiceNode(type=choice_type, value=value, kwargs=kwargs, was_forced=was_forced)
 
 
 def ir(*values: list[ChoiceT]) -> list[ChoiceNode]:

@@ -65,9 +65,7 @@ def test_observability():
     for t in testcases:
         if t["status"] != "gave_up":
             assert t["timing"]
-            assert ("interactive" in t["arguments"]) == (
-                "generate:interactive" in t["timing"]
-            )
+            assert ("interactive" in t["arguments"]) == ("generate:interactive" in t["timing"])
 
 
 def test_capture_unnamed_arguments():

@@ -73,10 +73,7 @@ def get_trimmed_traceback(
         tb is None
         or os.environ.get("HYPOTHESIS_NO_TRACEBACK_TRIM")
         or hypothesis.settings.default.verbosity >= hypothesis.Verbosity.debug
-        or (
-            is_hypothesis_file(traceback.extract_tb(tb)[-1][0])
-            and not isinstance(exception, _Trimmable)
-        )
+        or (is_hypothesis_file(traceback.extract_tb(tb)[-1][0]) and not isinstance(exception, _Trimmable))
     ):
         return tb
     while tb.tb_next is not None and (
@@ -114,9 +111,7 @@ class InterestingOrigin(NamedTuple):
         return f"{self.exc_type.__name__} at {self.filename}:{self.lineno}{ctx}{group}"
 
     @classmethod
-    def from_exception(
-        cls, exception: BaseException, /, seen: tuple[BaseException, ...] = ()
-    ) -> "InterestingOrigin":
+    def from_exception(cls, exception: BaseException, /, seen: tuple[BaseException, ...] = ()) -> "InterestingOrigin":
         filename, lineno = None, None
         if tb := get_trimmed_traceback(exception):
             filename, lineno, *_ = traceback.extract_tb(tb)[-1]

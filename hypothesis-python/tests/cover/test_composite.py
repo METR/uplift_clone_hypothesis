@@ -113,9 +113,7 @@ def test_can_shrink_matrices_with_length_param():
     def matrix(draw):
         rows = draw(st.integers(1, 10))
         columns = draw(st.integers(1, 10))
-        return [
-            [draw(st.integers(0, 10000)) for _ in range(columns)] for _ in range(rows)
-        ]
+        return [[draw(st.integers(0, 10000)) for _ in range(columns)] for _ in range(rows)]
 
     def transpose(m):
         return [[row[i] for row in m] for i in range(len(m[0]))]

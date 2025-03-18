@@ -64,9 +64,7 @@ def test_handles_context():
 
 
 def test_handles_groups():
-    origin = esc.InterestingOrigin.from_exception(
-        BaseExceptionGroup("message", [ValueError("msg2")])
-    )
+    origin = esc.InterestingOrigin.from_exception(BaseExceptionGroup("message", [ValueError("msg2")]))
     assert "ExceptionGroup at " in str(origin)
     assert "child exception" in str(origin)
     assert "ValueError at " in str(origin)

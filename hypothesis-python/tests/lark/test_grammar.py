@@ -98,9 +98,7 @@ def test_cannot_convert_EBNF_to_strategy_directly():
         check_can_generate_examples(from_lark(EBNF_GRAMMAR, start="value"))
     with pytest.raises(InvalidArgument):
         # Wrong type for explicit_strategies
-        check_can_generate_examples(
-            from_lark(Lark(LIST_GRAMMAR, start="list"), explicit=[])
-        )
+        check_can_generate_examples(from_lark(Lark(LIST_GRAMMAR, start="list"), explicit=[]))
 
 
 def test_required_undefined_terminals_require_explicit_strategies():
@@ -111,30 +109,20 @@ def test_required_undefined_terminals_require_explicit_strategies():
     with pytest.raises(InvalidArgument, match=r"%declare"):
         check_can_generate_examples(from_lark(Lark(elem_grammar, start="list")))
     strategy = {"ELEMENT": just("200")}
-    check_can_generate_examples(
-        from_lark(Lark(elem_grammar, start="list"), explicit=strategy)
-    )
+    check_can_generate_examples(from_lark(Lark(elem_grammar, start="list"), explicit=strategy))
 
 
 def test_cannot_use_explicit_strategies_for_unknown_terminals():
     with pytest.raises(InvalidArgument):
-        check_can_generate_examples(
-            from_lark(
-                Lark(LIST_GRAMMAR, start="list"), explicit={"unused_name": just("")}
-            )
-        )
+        check_can_generate_examples(from_lark(Lark(LIST_GRAMMAR, start="list"), explicit={"unused_name": just("")}))
 
 
 def test_non_string_explicit_strategies_are_invalid():
     with pytest.raises(InvalidArgument):
-        check_can_generate_examples(
-            from_lark(Lark(LIST_GRAMMAR, start="list"), explicit={"NUMBER": just(0)})
-        )
+        check_can_generate_examples(from_lark(Lark(LIST_GRAMMAR, start="list"), explicit={"NUMBER": just(0)}))
 
 
-@given(
-    string=from_lark(Lark(LIST_GRAMMAR, start="list"), explicit={"NUMBER": just("0")})
-)
+@given(string=from_lark(Lark(LIST_GRAMMAR, start="list"), explicit={"NUMBER": just("0")}))
 def test_can_override_defined_terminal(string):
     assert sum(json.loads(string)) == 0
 
@@ -160,9 +148,5 @@ def test_can_generate_from_limited_alphabet_no_comma_json(string):
 
 
 def test_error_if_alphabet_bans_all_start_rules():
-    with pytest.raises(
-        InvalidArgument, match=r"No start rule .+ is allowed by alphabet="
-    ):
-        check_can_generate_examples(
-            from_lark(Lark(LIST_GRAMMAR, start="list"), alphabet="abc")
-        )
+    with pytest.raises(InvalidArgument, match=r"No start rule .+ is allowed by alphabet="):
+        check_can_generate_examples(from_lark(Lark(LIST_GRAMMAR, start="list"), alphabet="abc"))

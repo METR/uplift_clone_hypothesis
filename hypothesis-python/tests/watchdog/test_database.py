@@ -35,16 +35,12 @@ def test_database_listener_directory():
         flush=lambda _db: time_sleep(0.2),
         supports_value_delete=False,
         # expensive flush makes shrinking take forever
-        parent_settings=settings(
-            max_examples=5, stateful_step_count=10, phases=set(Phase) - {Phase.shrink}
-        ),
+        parent_settings=settings(max_examples=5, stateful_step_count=10, phases=set(Phase) - {Phase.shrink}),
     )
 
 
 def test_database_listener_multiplexed(tmp_path):
-    db = MultiplexedDatabase(
-        InMemoryExampleDatabase(), DirectoryBasedExampleDatabase(tmp_path)
-    )
+    db = MultiplexedDatabase(InMemoryExampleDatabase(), DirectoryBasedExampleDatabase(tmp_path))
     events = []
 
     def listener(event):
@@ -84,10 +80,7 @@ def wait_for(condition, *, timeout=1, interval=0.01):
         if condition():
             return
         time_sleep(interval)
-    raise Exception(
-        f"timing out after waiting {timeout}s for condition "
-        f"{get_pretty_function_description(condition)}"
-    )
+    raise Exception(f"timing out after waiting {timeout}s for condition {get_pretty_function_description(condition)}")
 
 
 def test_database_listener_directory_explicit(tmp_path):

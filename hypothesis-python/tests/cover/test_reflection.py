@@ -160,10 +160,7 @@ def test_positional_errors_if_given_duplicate_kwargs():
 
 
 def test_names_of_functions_are_pretty():
-    assert (
-        get_pretty_function_description(test_names_of_functions_are_pretty)
-        == "test_names_of_functions_are_pretty"
-    )
+    assert get_pretty_function_description(test_names_of_functions_are_pretty) == "test_names_of_functions_are_pretty"
 
 
 class Foo:
@@ -204,15 +201,11 @@ def test_does_not_error_on_confused_sources():
 
 
 def test_digests_are_reasonably_unique():
-    assert function_digest(test_simple_conversion) != function_digest(
-        test_does_not_error_on_confused_sources
-    )
+    assert function_digest(test_simple_conversion) != function_digest(test_does_not_error_on_confused_sources)
 
 
 def test_digest_returns_the_same_value_for_two_calls():
-    assert function_digest(test_simple_conversion) == function_digest(
-        test_simple_conversion
-    )
+    assert function_digest(test_simple_conversion) == function_digest(test_simple_conversion)
 
 
 def test_can_digest_a_built_in_function():
@@ -237,20 +230,14 @@ def test_arg_string_is_in_order():
         pass
 
     assert repr_call(foo, (1, 2, 3, 4, 5), {}) == "foo(c=1, a=2, b=3, f=4, a1=5)"
-    assert (
-        repr_call(foo, (1, 2), {"b": 3, "f": 4, "a1": 5})
-        == "foo(c=1, a=2, b=3, f=4, a1=5)"
-    )
+    assert repr_call(foo, (1, 2), {"b": 3, "f": 4, "a1": 5}) == "foo(c=1, a=2, b=3, f=4, a1=5)"
 
 
 def test_varkwargs_are_sorted_and_after_real_kwargs():
     def foo(d, e, f, **kwargs):
         pass
 
-    assert (
-        repr_call(foo, (), {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6})
-        == "foo(d=4, e=5, f=6, a=1, b=2, c=3)"
-    )
+    assert repr_call(foo, (), {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}) == "foo(d=4, e=5, f=6, a=1, b=2, c=3)"
 
 
 def test_varargs_come_without_equals():
@@ -318,30 +305,22 @@ def test_name_does_not_clash_with_function_names():
 
 
 def test_copying_sets_name():
-    f = define_function_signature(
-        "hello_world", "A docstring for hello_world", signature(has_two_args)
-    )(universal_acceptor)
+    f = define_function_signature("hello_world", "A docstring for hello_world", signature(has_two_args))(universal_acceptor)
     assert f.__name__ == "hello_world"
 
 
 def test_copying_sets_docstring():
-    f = define_function_signature(
-        "foo", "A docstring for foo", signature(has_two_args)
-    )(universal_acceptor)
+    f = define_function_signature("foo", "A docstring for foo", signature(has_two_args))(universal_acceptor)
     assert f.__doc__ == "A docstring for foo"
 
 
 def test_uses_defaults():
-    f = define_function_signature(
-        "foo", "A docstring for foo", signature(has_a_default)
-    )(universal_acceptor)
+    f = define_function_signature("foo", "A docstring for foo", signature(has_a_default))(universal_acceptor)
     assert f(3, 2) == ((3, 2, 1), {})
 
 
 def test_uses_varargs():
-    f = define_function_signature("foo", "A docstring for foo", signature(has_varargs))(
-        universal_acceptor
-    )
+    f = define_function_signature("foo", "A docstring for foo", signature(has_varargs))(universal_acceptor)
     assert f(1, 2) == ((1, 2), {})
 
 
@@ -357,9 +336,7 @@ def test_exec_as_module_execs():
 
 
 def test_exec_as_module_caches():
-    assert source_exec_as_module(DEFINE_FOO_FUNCTION) is source_exec_as_module(
-        DEFINE_FOO_FUNCTION
-    )
+    assert source_exec_as_module(DEFINE_FOO_FUNCTION) is source_exec_as_module(DEFINE_FOO_FUNCTION)
 
 
 def test_exec_leaves_sys_path_unchanged():
@@ -659,9 +636,7 @@ def test_param_called_within_defaults_on_error():
 
 def _prep_source(*pairs):
     return [
-        pytest.param(
-            dedent(x).strip(), dedent(y).strip().encode(), id=f"case-{i}", marks=marks
-        )
+        pytest.param(dedent(x).strip(), dedent(y).strip().encode(), id=f"case-{i}", marks=marks)
         for i, (x, y, *marks) in enumerate(pairs)
     ]
 

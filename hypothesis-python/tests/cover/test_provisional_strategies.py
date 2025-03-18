@@ -34,34 +34,25 @@ def test_is_URL(url):
     domain_path = components[0]
     path = domain_path.split("/", 1)[1] if "/" in domain_path else ""
     assert all(c in allowed_chars for c in path)
-    assert all(
-        re.match("^[0-9A-Fa-f]{2}", after_perc) for after_perc in path.split("%")[1:]
-    )
+    assert all(re.match("^[0-9A-Fa-f]{2}", after_perc) for after_perc in path.split("%")[1:])
 
     fragment = components[1] if "#" in url_schemeless else ""
     fragment_allowed_chars = allowed_chars | {"?"}
     assert all(c in fragment_allowed_chars for c in fragment)
-    assert all(
-        re.match("^[0-9A-Fa-f]{2}", after_perc)
-        for after_perc in fragment.split("%")[1:]
-    )
+    assert all(re.match("^[0-9A-Fa-f]{2}", after_perc) for after_perc in fragment.split("%")[1:])
 
 
 @pytest.mark.parametrize("max_length", [-1, 0, 3, 4.0, 256])
 @pytest.mark.parametrize("max_element_length", [-1, 0, 4.0, 64, 128])
 def test_invalid_domain_arguments(max_length, max_element_length):
     with pytest.raises(InvalidArgument):
-        check_can_generate_examples(
-            domains(max_length=max_length, max_element_length=max_element_length)
-        )
+        check_can_generate_examples(domains(max_length=max_length, max_element_length=max_element_length))
 
 
 @pytest.mark.parametrize("max_length", [None, 4, 8, 255])
 @pytest.mark.parametrize("max_element_length", [None, 1, 2, 4, 8, 63])
 def test_valid_domains_arguments(max_length, max_element_length):
-    check_can_generate_examples(
-        domains(max_length=max_length, max_element_length=max_element_length)
-    )
+    check_can_generate_examples(domains(max_length=max_length, max_element_length=max_element_length))
 
 
 @pytest.mark.parametrize("strategy", [domains(), urls()])

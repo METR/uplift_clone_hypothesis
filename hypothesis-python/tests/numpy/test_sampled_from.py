@@ -16,9 +16,7 @@ from hypothesis.strategies import data, sampled_from
 from tests.common.utils import fails_with
 
 
-@given(
-    data(), npst.arrays(dtype=npst.scalar_dtypes(), shape=npst.array_shapes(max_dims=1))
-)
+@given(data(), npst.arrays(dtype=npst.scalar_dtypes(), shape=npst.array_shapes(max_dims=1)))
 def test_can_sample_1D_numpy_array_without_warning(data, arr):
     data.draw(sampled_from(arr))
 
@@ -26,9 +24,7 @@ def test_can_sample_1D_numpy_array_without_warning(data, arr):
 @fails_with(InvalidArgument)
 @given(
     data(),
-    npst.arrays(
-        dtype=npst.scalar_dtypes(), shape=npst.array_shapes(min_dims=2, max_dims=5)
-    ),
+    npst.arrays(dtype=npst.scalar_dtypes(), shape=npst.array_shapes(min_dims=2, max_dims=5)),
 )
 def test_sampling_multi_dimensional_arrays_is_deprecated(data, arr):
     data.draw(sampled_from(arr))

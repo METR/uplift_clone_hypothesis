@@ -61,9 +61,7 @@ def test_output_emitting_unicode(testdir, monkeypatch):
     monkeypatch.setenv("LC_ALL", "C")
     monkeypatch.setenv("LANG", "C")
     script = testdir.makepyfile(UNICODE_EMITTING)
-    result = getattr(testdir, "runpytest_subprocess", testdir.runpytest)(
-        script, "--verbose", "--capture=no"
-    )
+    result = getattr(testdir, "runpytest_subprocess", testdir.runpytest)(script, "--verbose", "--capture=no")
     out = "\n".join(result.stdout.lines)
     assert "test_emits_unicode" in out
     assert chr(1001) in out or escape_unicode_characters(chr(1001)) in out
@@ -78,9 +76,7 @@ def get_line_num(token, result, skip_n=0):
                 return i
             else:
                 skipped += 1
-    raise AssertionError(
-        f"Token {token!r} not found (skipped {skipped} of planned {skip_n} skips)"
-    )
+    raise AssertionError(f"Token {token!r} not found (skipped {skipped} of planned {skip_n} skips)")
 
 
 TRACEBACKHIDE_HEALTHCHECK = """

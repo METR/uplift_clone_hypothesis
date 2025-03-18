@@ -112,12 +112,8 @@ else:
                         "Check spelling and your Python import path, or use the Python API?"
                     ) from err
 
-        def describe_close_matches(
-            module_or_class: types.ModuleType, objname: str
-        ) -> str:
-            public_names = [
-                name for name in vars(module_or_class) if not name.startswith("_")
-            ]
+        def describe_close_matches(module_or_class: types.ModuleType, objname: str) -> str:
+            public_names = [name for name in vars(module_or_class) if not name.startswith("_")]
             matches = get_close_matches(objname, public_names)
             if matches:
                 return f"  Closest matches: {matches!r}"
@@ -136,8 +132,7 @@ else:
                     ) from None
                 raise click.UsageError(
                     f"Found the {modulename!r} module, but it doesn't have a "
-                    f"{funcname!r} attribute."
-                    + describe_close_matches(module, funcname)
+                    f"{funcname!r} attribute." + describe_close_matches(module, funcname)
                 ) from err
         else:
             try:
@@ -156,8 +151,7 @@ else:
                     func_class_is = "attribute"
                 raise click.UsageError(
                     f"Found the {modulename!r} module and {classname!r} {func_class_is}, "
-                    f"but it doesn't have a {funcname!r} attribute."
-                    + describe_close_matches(func_class, funcname)
+                    f"but it doesn't have a {funcname!r} attribute." + describe_close_matches(func_class, funcname)
                 ) from err
 
     def _refactor(func, fname):
@@ -212,9 +206,7 @@ else:
         # Special case for stdin/stdout usage
         if "-" in path:
             if len(path) > 1:
-                raise Exception(
-                    "Cannot specify multiple paths when reading from stdin!"
-                )
+                raise Exception("Cannot specify multiple paths when reading from stdin!")
             print("Codemodding from stdin", file=sys.stderr)
             print(codemods.refactor(sys.stdin.read()))
             return 0
@@ -226,9 +218,7 @@ else:
             errors.add(_refactor(codemods.refactor, *files))
         else:
             with Pool() as pool:
-                for msg in pool.imap_unordered(
-                    partial(_refactor, codemods.refactor), files
-                ):
+                for msg in pool.imap_unordered(partial(_refactor, codemods.refactor), files):
                     errors.add(msg)
         errors.discard(None)
         for msg in errors:
@@ -286,8 +276,7 @@ else:
     @click.option(
         "--annotate/--no-annotate",
         default=None,
-        help="force ghostwritten tests to be type-annotated (or not).  "
-        "By default, match the code to test.",
+        help="force ghostwritten tests to be type-annotated (or not).  By default, match the code to test.",
     )
     def write(func, writer, except_, style, annotate):  # \b disables autowrap
         """`hypothesis write` writes property-based tests for you!

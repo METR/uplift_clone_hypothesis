@@ -94,9 +94,7 @@ def test_floats_order_worse_than_their_integral_part(n, g):
     assert flt.float_to_lex(float(g)) < i
 
 
-integral_floats = st.floats(allow_infinity=False, allow_nan=False, min_value=0.0).map(
-    lambda x: abs(float(int(x)))
-)
+integral_floats = st.floats(allow_infinity=False, allow_nan=False, min_value=0.0).map(lambda x: abs(float(int(x))))
 
 
 @given(integral_floats, integral_floats)
@@ -149,20 +147,13 @@ INTERESTING_FLOATS = [0.0, 1.0, 2.0, sys.float_info.max, float("inf"), float("na
 
 @pytest.mark.parametrize(
     ("start", "end"),
-    [
-        (a, b)
-        for a in INTERESTING_FLOATS
-        for b in INTERESTING_FLOATS
-        if flt.float_to_lex(a) > flt.float_to_lex(b)
-    ],
+    [(a, b) for a in INTERESTING_FLOATS for b in INTERESTING_FLOATS if flt.float_to_lex(a) > flt.float_to_lex(b)],
 )
 def test_can_shrink_downwards(start, end):
     assert minimal_from(start, lambda x: not (x < end)) == end
 
 
-@pytest.mark.parametrize(
-    "f", [1, 2, 4, 8, 10, 16, 32, 64, 100, 128, 256, 500, 512, 1000, 1024]
-)
+@pytest.mark.parametrize("f", [1, 2, 4, 8, 10, 16, 32, 64, 100, 128, 256, 500, 512, 1000, 1024])
 @pytest.mark.parametrize("mul", [1.1, 1.5, 9.99, 10])
 def test_shrinks_downwards_to_integers(f, mul):
     g = minimal_from(f * mul, lambda x: x >= f)

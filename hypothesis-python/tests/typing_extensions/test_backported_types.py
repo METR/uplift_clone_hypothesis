@@ -42,9 +42,7 @@ from tests.common.debug import (
 
 @pytest.mark.parametrize("value", ["dog", b"goldfish", 42, 63.4, -80.5, False])
 def test_typing_extensions_Literal(value):
-    assert_simple_property(
-        from_type(typing_extensions.Literal[value]), lambda v: v == value
-    )
+    assert_simple_property(from_type(typing_extensions.Literal[value]), lambda v: v == value)
 
 
 @given(st.data())
@@ -107,17 +105,13 @@ def test_defaultdict(ex):
 @pytest.mark.parametrize("non_runtime_type", NON_RUNTIME_TYPES)
 def test_non_runtime_type_cannot_be_resolved(non_runtime_type):
     strategy = st.from_type(non_runtime_type)
-    with pytest.raises(
-        InvalidArgument, match="there is no such thing as a runtime instance"
-    ):
+    with pytest.raises(InvalidArgument, match="there is no such thing as a runtime instance"):
         check_can_generate_examples(strategy)
 
 
 @pytest.mark.parametrize("non_runtime_type", NON_RUNTIME_TYPES)
 def test_non_runtime_type_cannot_be_registered(non_runtime_type):
-    with pytest.raises(
-        InvalidArgument, match="there is no such thing as a runtime instance"
-    ):
+    with pytest.raises(InvalidArgument, match="there is no such thing as a runtime instance"):
         st.register_type_strategy(non_runtime_type, st.none())
 
 
@@ -154,8 +148,7 @@ def test_callable_return_typegard_type(typ):
     strategy = st.from_type(Callable[[], typ[int]])
     with pytest.raises(
         InvalidArgument,
-        match="Hypothesis cannot yet construct a strategy for callables "
-        "which are PEP-647 TypeGuards or PEP-742 TypeIs",
+        match="Hypothesis cannot yet construct a strategy for callables which are PEP-647 TypeGuards or PEP-742 TypeIs",
     ):
         check_can_generate_examples(strategy)
 
@@ -220,21 +213,11 @@ class Novel(Book):
             lambda novel: "author" in novel,
             id="author-is-required",
         ),
-        pytest.param(
-            assert_all_examples, lambda novel: "genre" in novel, id="genre-is-required"
-        ),
-        pytest.param(
-            find_any, lambda novel: "pages" in novel, id="pages-may-be-present"
-        ),
-        pytest.param(
-            find_any, lambda novel: "pages" not in novel, id="pages-may-be-absent"
-        ),
-        pytest.param(
-            find_any, lambda novel: "rating" in novel, id="rating-may-be-present"
-        ),
-        pytest.param(
-            find_any, lambda novel: "rating" not in novel, id="rating-may-be-absent"
-        ),
+        pytest.param(assert_all_examples, lambda novel: "genre" in novel, id="genre-is-required"),
+        pytest.param(find_any, lambda novel: "pages" in novel, id="pages-may-be-present"),
+        pytest.param(find_any, lambda novel: "pages" not in novel, id="pages-may-be-absent"),
+        pytest.param(find_any, lambda novel: "rating" in novel, id="rating-may-be-present"),
+        pytest.param(find_any, lambda novel: "rating" not in novel, id="rating-may-be-absent"),
     ],
 )
 def test_required_and_not_required_keys(check, condition):

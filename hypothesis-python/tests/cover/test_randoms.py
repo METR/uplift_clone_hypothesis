@@ -62,12 +62,8 @@ define_method_strategy("getrandbits", n=st.integers(1, 128))
 define_method_strategy("gauss", mu=st.floats(-1000, 1000), sigma=beta_param)
 define_method_strategy("normalvariate", mu=st.floats(-1000, 1000), sigma=beta_param)
 # the standard library lognormalvariate is weirdly bad at handling large floats
-define_method_strategy(
-    "lognormvariate", mu=st.floats(0.1, 10), sigma=st.floats(0.1, 10)
-)
-define_method_strategy(
-    "vonmisesvariate", mu=st.floats(0, math.pi * 2), kappa=beta_param
-)
+define_method_strategy("lognormvariate", mu=st.floats(0.1, 10), sigma=st.floats(0.1, 10))
+define_method_strategy("vonmisesvariate", mu=st.floats(0, math.pi * 2), kappa=beta_param)
 # Small alpha may raise ZeroDivisionError, see https://bugs.python.org/issue41421
 define_method_strategy("paretovariate", alpha=st.floats(min_value=1.0))
 define_method_strategy("shuffle", x=st.lists(st.integers()))
@@ -391,9 +387,7 @@ def test_random_includes_zero_excludes_one():
 def test_betavariate_includes_zero_and_one():
     # https://github.com/HypothesisWorks/hypothesis/issues/4297#issuecomment-2720144709
     strat = st.randoms(use_true_random=False).flatmap(
-        lambda r: st.builds(
-            r.betavariate, alpha=st.just(1.0) | beta_param, beta=beta_param
-        )
+        lambda r: st.builds(r.betavariate, alpha=st.just(1.0) | beta_param, beta=beta_param)
     )
     assert_all_examples(strat, lambda x: 0 <= x <= 1)
     find_any(strat, lambda x: x == 0)

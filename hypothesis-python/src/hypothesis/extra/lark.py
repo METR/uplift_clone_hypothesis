@@ -43,9 +43,7 @@ from hypothesis.strategies._internal.utils import cacheable, defines_strategy
 __all__ = ["from_lark"]
 
 
-def get_terminal_names(
-    terminals: list[TerminalDef], rules: list[Rule], ignore_names: list[str]
-) -> set[str]:
+def get_terminal_names(terminals: list[TerminalDef], rules: list[Rule], ignore_names: list[str]) -> set[str]:
     """Get names of all terminals in the grammar.
 
     The arguments are the results of calling ``Lark.grammar.compile()``,
@@ -113,9 +111,7 @@ class LarkStrategy(st.SearchStrategy):
                 "The following arguments were passed as explicit_strategies, but "
                 f"there is no {unknown_explicit} terminal production in this grammar."
             )
-        if missing_declared := sorted(
-            all_terminals - {t.name for t in terminals} - set(explicit)
-        ):
+        if missing_declared := sorted(all_terminals - {t.name for t in terminals} - set(explicit)):
             raise InvalidArgument(
                 f"Undefined terminal{'s' * (len(missing_declared) > 1)} "
                 f"{sorted(missing_declared)!r}. Generation does not currently "
@@ -130,9 +126,7 @@ class LarkStrategy(st.SearchStrategy):
 
         for rule in rules:
             if disallowed.isdisjoint(r.name for r in rule.expansion):
-                nonterminals.setdefault(rule.origin.name, []).append(
-                    tuple(rule.expansion)
-                )
+                nonterminals.setdefault(rule.origin.name, []).append(tuple(rule.expansion))
 
         allowed_rules = {*self.terminal_strategies, *nonterminals}
         while dict(nonterminals) != (
@@ -145,16 +139,10 @@ class LarkStrategy(st.SearchStrategy):
             allowed_rules = {*self.terminal_strategies, *nonterminals}
 
         if set(start).isdisjoint(allowed_rules):
-            raise InvalidArgument(
-                f"No start rule {tuple(start)} is allowed by {alphabet=}"
-            )
-        self.start = st.sampled_from(
-            [self.names_to_symbols[s] for s in start if s in allowed_rules]
-        )
+            raise InvalidArgument(f"No start rule {tuple(start)} is allowed by {alphabet=}")
+        self.start = st.sampled_from([self.names_to_symbols[s] for s in start if s in allowed_rules])
 
-        self.nonterminal_strategies = {
-            k: st.sampled_from(sorted(v, key=len)) for k, v in nonterminals.items()
-        }
+        self.nonterminal_strategies = {k: st.sampled_from(sorted(v, key=len)) for k, v in nonterminals.items()}
 
         self.__rule_labels: dict[str, int] = {}
 
@@ -168,9 +156,7 @@ class LarkStrategy(st.SearchStrategy):
         try:
             return self.__rule_labels[name]
         except KeyError:
-            return self.__rule_labels.setdefault(
-                name, calc_label_from_name(f"LARK:{name}")
-            )
+            return self.__rule_labels.setdefault(name, calc_label_from_name(f"LARK:{name}"))
 
     def draw_symbol(
         self,
@@ -244,8 +230,5 @@ def from_lark(
         explicit = {}
     else:
         check_type(dict, explicit, "explicit")
-        explicit = {
-            k: v.map(check_explicit(f"explicit[{k!r}]={v!r}"))
-            for k, v in explicit.items()
-        }
+        explicit = {k: v.map(check_explicit(f"explicit[{k!r}]={v!r}")) for k, v in explicit.items()}
     return LarkStrategy(grammar, start, explicit, alphabet)

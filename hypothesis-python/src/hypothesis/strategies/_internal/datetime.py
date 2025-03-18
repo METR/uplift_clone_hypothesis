@@ -75,10 +75,7 @@ def datetime_does_not_exist(value):
         # 9999, so it should be a very small fraction of possible values.
         return True
 
-    if (
-        value.tzinfo is not roundtrip.tzinfo
-        and value.utcoffset() != roundtrip.utcoffset()
-    ):
+    if value.tzinfo is not roundtrip.tzinfo and value.utcoffset() != roundtrip.utcoffset():
         # This only ever occurs during imaginary (i.e. nonexistent) datetimes,
         # and only for pytz timezones which do not follow PEP-495 semantics.
         # (may exclude a few other edge cases, but you should use zoneinfo anyway)
@@ -88,9 +85,7 @@ def datetime_does_not_exist(value):
     return value != roundtrip
 
 
-def draw_capped_multipart(
-    data, min_value, max_value, duration_names=DATENAMES + TIMENAMES
-):
+def draw_capped_multipart(data, min_value, max_value, duration_names=DATENAMES + TIMENAMES):
     assert isinstance(min_value, (dt.date, dt.time, dt.datetime))
     assert type(min_value) == type(max_value)
     assert min_value <= max_value
@@ -211,8 +206,7 @@ def datetimes(
     check_valid_interval(min_value, max_value, "min_value", "max_value")
     if not isinstance(timezones, SearchStrategy):
         raise InvalidArgument(
-            f"{timezones=} must be a SearchStrategy that can "
-            "provide tzinfo for datetimes (either None or dt.tzinfo objects)"
+            f"{timezones=} must be a SearchStrategy that can provide tzinfo for datetimes (either None or dt.tzinfo objects)"
         )
     return DatetimeStrategy(min_value, max_value, timezones, allow_imaginary)
 
@@ -264,9 +258,7 @@ class DateStrategy(SearchStrategy):
         self.max_value = max_value
 
     def do_draw(self, data):
-        return dt.date(
-            **draw_capped_multipart(data, self.min_value, self.max_value, DATENAMES)
-        )
+        return dt.date(**draw_capped_multipart(data, self.min_value, self.max_value, DATENAMES))
 
     def filter(self, condition):
         if (
@@ -301,9 +293,7 @@ class DateStrategy(SearchStrategy):
 
 
 @defines_strategy(force_reusable_values=True)
-def dates(
-    min_value: dt.date = dt.date.min, max_value: dt.date = dt.date.max
-) -> SearchStrategy[dt.date]:
+def dates(min_value: dt.date = dt.date.min, max_value: dt.date = dt.date.max) -> SearchStrategy[dt.date]:
     """dates(min_value=datetime.date.min, max_value=datetime.date.max)
 
     A strategy for dates between ``min_value`` and ``max_value``.
@@ -458,6 +448,4 @@ def timezones(*, no_cache: bool = False) -> SearchStrategy["zoneinfo.ZoneInfo"]:
         ``pip install hypothesis[zoneinfo]`` installs it, if and only if needed.
     """
     check_type(bool, no_cache, "no_cache")
-    return timezone_keys().map(
-        zoneinfo.ZoneInfo.no_cache if no_cache else zoneinfo.ZoneInfo
-    )
+    return timezone_keys().map(zoneinfo.ZoneInfo.no_cache if no_cache else zoneinfo.ZoneInfo)

@@ -356,15 +356,11 @@ class LStar:
 
             ex = string[n + 1 :]
 
-            assert self.member(labels_wrong_destination + ex) != self.member(
-                labels_correct_destination + ex
-            )
+            assert self.member(labels_wrong_destination + ex) != self.member(labels_correct_destination + ex)
 
             # Adding this experiment causes us to distinguish the wrong
             # destination from the correct one.
-            self.__states[wrong_destination].experiments[ex] = self.member(
-                labels_wrong_destination + ex
-            )
+            self.__states[wrong_destination].experiments[ex] = self.member(labels_wrong_destination + ex)
 
             # We now clear the cached details that caused us to make this error
             # so that when we recalculate this transition we get to a

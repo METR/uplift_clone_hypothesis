@@ -112,10 +112,7 @@ def test_minimize_sets_sampled_from():
 
 
 def test_can_simplify_flatmap_with_bounded_left_hand_size():
-    assert (
-        minimal(booleans().flatmap(lambda x: lists(just(x))), lambda x: len(x) >= 10)
-        == [False] * 10
-    )
+    assert minimal(booleans().flatmap(lambda x: lists(just(x))), lambda x: len(x) >= 10) == [False] * 10
 
 
 def test_can_simplify_across_flatmap_of_just():
@@ -128,17 +125,11 @@ def test_can_simplify_on_right_hand_strategy_of_flatmap():
 
 @flaky(min_passes=5, max_runs=5)
 def test_can_ignore_left_hand_side_of_flatmap():
-    assert (
-        minimal(integers().flatmap(lambda x: lists(integers())), lambda x: len(x) >= 10)
-        == [0] * 10
-    )
+    assert minimal(integers().flatmap(lambda x: lists(integers())), lambda x: len(x) >= 10) == [0] * 10
 
 
 def test_can_simplify_on_both_sides_of_flatmap():
-    assert (
-        minimal(integers().flatmap(lambda x: lists(just(x))), lambda x: len(x) >= 10)
-        == [0] * 10
-    )
+    assert minimal(integers().flatmap(lambda x: lists(just(x))), lambda x: len(x) >= 10) == [0] * 10
 
 
 def test_flatmap_rectangles():
@@ -158,10 +149,7 @@ def test_flatmap_rectangles():
 @flaky(min_passes=5, max_runs=5)
 @pytest.mark.parametrize("dict_class", [dict, OrderedDict])
 def test_dictionary(dict_class):
-    assert (
-        minimal(dictionaries(keys=integers(), values=text(), dict_class=dict_class))
-        == dict_class()
-    )
+    assert minimal(dictionaries(keys=integers(), values=text(), dict_class=dict_class)) == dict_class()
 
     x = minimal(
         dictionaries(keys=integers(), values=text(), dict_class=dict_class),
@@ -218,9 +206,7 @@ def test_find_large_union_list():
 
 
 @pytest.mark.parametrize("n", [0, 1, 10, 100, 1000])
-@pytest.mark.parametrize(
-    "seed", [13878544811291720918, 15832355027548327468, 12901656430307478246]
-)
+@pytest.mark.parametrize("seed", [13878544811291720918, 15832355027548327468, 12901656430307478246])
 def test_containment(n, seed):
     iv = minimal(
         tuples(lists(integers()), integers()),
@@ -245,9 +231,7 @@ def test_reordering_bytes(seed):
 
 
 def test_minimize_long_list():
-    assert (
-        minimal(lists(booleans(), min_size=50), lambda x: len(x) >= 70) == [False] * 70
-    )
+    assert minimal(lists(booleans(), min_size=50), lambda x: len(x) >= 70) == [False] * 70
 
 
 def test_minimize_list_of_longish_lists():
@@ -296,15 +280,11 @@ def test_minimize_dict():
 
 
 def test_minimize_list_of_sets():
-    assert minimal(
-        lists(sets(booleans())), lambda x: len(list(filter(None, x))) >= 3
-    ) == ([{False}] * 3)
+    assert minimal(lists(sets(booleans())), lambda x: len(list(filter(None, x))) >= 3) == ([{False}] * 3)
 
 
 def test_minimize_list_of_lists():
-    assert minimal(
-        lists(lists(integers())), lambda x: len(list(filter(None, x))) >= 3
-    ) == ([[0]] * 3)
+    assert minimal(lists(lists(integers())), lambda x: len(list(filter(None, x))) >= 3) == ([[0]] * 3)
 
 
 def test_minimize_list_of_tuples():
@@ -313,9 +293,7 @@ def test_minimize_list_of_tuples():
 
 
 def test_minimize_multi_key_dicts():
-    assert minimal(dictionaries(keys=booleans(), values=booleans()), bool) == {
-        False: False
-    }
+    assert minimal(dictionaries(keys=booleans(), values=booleans()), bool) == {False: False}
 
 
 def test_multiple_empty_lists_are_independent():
@@ -326,9 +304,7 @@ def test_multiple_empty_lists_are_independent():
 
 def test_can_find_sets_unique_by_incomplete_data():
     size = 5
-    ls = minimal(
-        lists(tuples(integers(), integers()), unique_by=max), lambda x: len(x) >= size
-    )
+    ls = minimal(lists(tuples(integers(), integers()), unique_by=max), lambda x: len(x) >= size)
     assert len(ls) == size
     values = sorted(map(max, ls))
     assert values[-1] - values[0] == size - 1
@@ -338,31 +314,21 @@ def test_can_find_sets_unique_by_incomplete_data():
 
 @pytest.mark.parametrize("n", range(10))
 def test_lists_forced_near_top(n):
-    assert minimal(
-        lists(integers(), min_size=n, max_size=n + 2), lambda t: len(t) == n + 2
-    ) == [0] * (n + 2)
+    assert minimal(lists(integers(), min_size=n, max_size=n + 2), lambda t: len(t) == n + 2) == [0] * (n + 2)
 
 
 def test_sum_of_pair_int():
-    assert minimal(
-        tuples(integers(0, 1000), integers(0, 1000)), lambda x: sum(x) > 1000
-    ) == (1, 1000)
+    assert minimal(tuples(integers(0, 1000), integers(0, 1000)), lambda x: sum(x) > 1000) == (1, 1000)
 
 
 def test_sum_of_pair_float():
-    assert minimal(
-        tuples(st.floats(0, 1000), st.floats(0, 1000)), lambda x: sum(x) > 1000
-    ) == (1.0, 1000.0)
+    assert minimal(tuples(st.floats(0, 1000), st.floats(0, 1000)), lambda x: sum(x) > 1000) == (1.0, 1000.0)
 
 
 def test_sum_of_pair_mixed():
     # check both orderings
-    assert minimal(
-        tuples(st.floats(0, 1000), st.integers(0, 1000)), lambda x: sum(x) > 1000
-    ) == (1.0, 1000)
-    assert minimal(
-        tuples(st.integers(0, 1000), st.floats(0, 1000)), lambda x: sum(x) > 1000
-    ) == (1, 1000.0)
+    assert minimal(tuples(st.floats(0, 1000), st.integers(0, 1000)), lambda x: sum(x) > 1000) == (1.0, 1000)
+    assert minimal(tuples(st.integers(0, 1000), st.floats(0, 1000)), lambda x: sum(x) > 1000) == (1, 1000.0)
 
 
 def test_sum_of_pair_separated_int():
@@ -530,7 +496,4 @@ def test_minimize_duplicated_characters_within_a_choice():
 
 def test_nasty_string_shrinks():
     # failures found via NASTY_STRINGS should shrink like normal
-    assert (
-        minimal(st.text(), lambda s: "𝕿𝖍𝖊" in s, settings=settings(max_examples=10000))
-        == "𝕿𝖍𝖊"
-    )
+    assert minimal(st.text(), lambda s: "𝕿𝖍𝖊" in s, settings=settings(max_examples=10000)) == "𝕿𝖍𝖊"

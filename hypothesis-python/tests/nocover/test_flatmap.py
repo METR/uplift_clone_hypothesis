@@ -99,16 +99,12 @@ def test_mixed_list_flatmap():
 
 @pytest.mark.parametrize("n", range(1, 10))
 def test_can_shrink_through_a_binding(n):
-    bool_lists = integers(0, 100).flatmap(
-        lambda k: lists(booleans(), min_size=k, max_size=k)
-    )
+    bool_lists = integers(0, 100).flatmap(lambda k: lists(booleans(), min_size=k, max_size=k))
     assert minimal(bool_lists, lambda x: x.count(True) >= n) == [True] * n
 
 
 @pytest.mark.parametrize("n", range(1, 10))
 def test_can_delete_in_middle_of_a_binding(n):
-    bool_lists = integers(1, 100).flatmap(
-        lambda k: lists(booleans(), min_size=k, max_size=k)
-    )
+    bool_lists = integers(1, 100).flatmap(lambda k: lists(booleans(), min_size=k, max_size=k))
     result = minimal(bool_lists, lambda x: x[0] and x[-1] and x.count(False) >= n)
     assert result == [True] + [False] * n + [True]

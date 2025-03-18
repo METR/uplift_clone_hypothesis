@@ -114,9 +114,7 @@ class GenericCache(Generic[K, V]):
             if len(self.data) >= self.max_size:
                 evicted = self.data[0]
                 if evicted.pins > 0:
-                    raise ValueError(
-                        "Cannot increase size of cache where all keys have been pinned."
-                    ) from None
+                    raise ValueError("Cannot increase size of cache where all keys have been pinned.") from None
                 del self.keys_to_indices[evicted.key]
                 i = 0
                 self.data[0] = entry

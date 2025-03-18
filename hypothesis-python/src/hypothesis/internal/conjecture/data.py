@@ -76,9 +76,7 @@ def __getattr__(name: str) -> Any:
         )
         return AVAILABLE_PROVIDERS
 
-    raise AttributeError(
-        f"Module 'hypothesis.internal.conjecture.data' has no attribute {name}"
-    )
+    raise AttributeError(f"Module 'hypothesis.internal.conjecture.data' has no attribute {name}")
 
 
 T = TypeVar("T")
@@ -433,9 +431,7 @@ class Spans:
     def __init__(self, record: SpanRecord) -> None:
         self.trail = record.trail
         self.labels = record.labels
-        self.__length = self.trail.count(
-            TrailType.STOP_SPAN_DISCARD
-        ) + record.trail.count(TrailType.STOP_SPAN_NO_DISCARD)
+        self.__length = self.trail.count(TrailType.STOP_SPAN_DISCARD) + record.trail.count(TrailType.STOP_SPAN_NO_DISCARD)
         self.__children: Optional[list[Sequence[int]]] = None
 
     @cached_property
@@ -537,29 +533,19 @@ class DataObserver:
     def kill_branch(self) -> None:
         """Mark this part of the tree as not worth re-exploring."""
 
-    def draw_integer(
-        self, value: int, *, kwargs: IntegerKWargs, was_forced: bool
-    ) -> None:
+    def draw_integer(self, value: int, *, kwargs: IntegerKWargs, was_forced: bool) -> None:
         pass
 
-    def draw_float(
-        self, value: float, *, kwargs: FloatKWargs, was_forced: bool
-    ) -> None:
+    def draw_float(self, value: float, *, kwargs: FloatKWargs, was_forced: bool) -> None:
         pass
 
-    def draw_string(
-        self, value: str, *, kwargs: StringKWargs, was_forced: bool
-    ) -> None:
+    def draw_string(self, value: str, *, kwargs: StringKWargs, was_forced: bool) -> None:
         pass
 
-    def draw_bytes(
-        self, value: bytes, *, kwargs: BytesKWargs, was_forced: bool
-    ) -> None:
+    def draw_bytes(self, value: bytes, *, kwargs: BytesKWargs, was_forced: bool) -> None:
         pass
 
-    def draw_boolean(
-        self, value: bool, *, kwargs: BooleanKWargs, was_forced: bool
-    ) -> None:
+    def draw_boolean(self, value: bool, *, kwargs: BooleanKWargs, was_forced: bool) -> None:
         pass
 
 
@@ -631,8 +617,7 @@ class ConjectureData:
             provider_kw = {}
         elif not isinstance(provider, type):
             raise InvalidArgument(
-                f"Expected {provider=} to be a class since {provider_kw=} was "
-                "passed, but got an instance instead."
+                f"Expected {provider=} to be a class since {provider_kw=} was passed, but got an instance instead."
             )
 
         assert isinstance(observer, DataObserver)
@@ -660,9 +645,7 @@ class ConjectureData:
         self.max_depth = 0
         self.has_discards = False
 
-        self.provider: PrimitiveProvider = (
-            provider(self, **provider_kw) if isinstance(provider, type) else provider
-        )
+        self.provider: PrimitiveProvider = provider(self, **provider_kw) if isinstance(provider, type) else provider
         assert isinstance(self.provider, PrimitiveProvider)
 
         self.__result: Optional[ConjectureResult] = None
@@ -691,12 +674,8 @@ class ConjectureData:
         self.arg_slices: set[tuple[int, int]] = set()
         self.slice_comments: dict[tuple[int, int], str] = {}
         self._observability_args: dict[str, Any] = {}
-        self._observability_predicates: defaultdict = defaultdict(
-            lambda: {"satisfied": 0, "unsatisfied": 0}
-        )
-        self._sampled_from_all_strategies_elements_message: Optional[
-            tuple[str, object]
-        ] = None
+        self._observability_predicates: defaultdict = defaultdict(lambda: {"satisfied": 0, "unsatisfied": 0})
+        self._sampled_from_all_strategies_elements_message: Optional[tuple[str, object]] = None
 
         self.expected_exception: Optional[BaseException] = None
         self.expected_traceback: Optional[str] = None
@@ -770,14 +749,10 @@ class ConjectureData:
 
         if observe:
             was_forced = forced is not None
-            getattr(self.observer, f"draw_{choice_type}")(
-                value, kwargs=kwargs, was_forced=was_forced
-            )
+            getattr(self.observer, f"draw_{choice_type}")(value, kwargs=kwargs, was_forced=was_forced)
             size = 0 if self.provider.avoid_realization else choices_size([value])
             if self.length + size > self.max_length:
-                debug_report(
-                    f"overrun because {self.length=} + {size=} > {self.max_length=}"
-                )
+                debug_report(f"overrun because {self.length=} + {size=} > {self.max_length=}")
                 self.mark_overrun()
 
             node = ChoiceNode(
@@ -852,9 +827,7 @@ class ConjectureData:
 
         if forced is not None:
             assert allow_nan or not math.isnan(forced)
-            assert math.isnan(forced) or (
-                sign_aware_lte(min_value, forced) and sign_aware_lte(forced, max_value)
-            )
+            assert math.isnan(forced) or (sign_aware_lte(min_value, forced) and sign_aware_lte(forced, max_value))
 
         kwargs: FloatKWargs = self._pooled_kwargs(
             "float",
@@ -902,9 +875,7 @@ class ConjectureData:
         assert forced is None or min_size <= len(forced) <= max_size
         assert min_size >= 0
 
-        kwargs: BytesKWargs = self._pooled_kwargs(
-            "bytes", {"min_size": min_size, "max_size": max_size}
-        )
+        kwargs: BytesKWargs = self._pooled_kwargs("bytes", {"min_size": min_size, "max_size": max_size})
         return self._draw("bytes", kwargs, observe=observe, forced=forced)
 
     def draw_boolean(
@@ -1041,11 +1012,7 @@ class ConjectureData:
                 output=self.output,
                 expected_traceback=self.expected_traceback,
                 expected_exception=self.expected_exception,
-                extra_information=(
-                    self.extra_information
-                    if self.extra_information.has_information()
-                    else None
-                ),
+                extra_information=(self.extra_information if self.extra_information.has_information() else None),
                 has_discards=self.has_discards,
                 target_observations=self.target_observations,
                 tags=frozenset(self.tags),
@@ -1238,9 +1205,7 @@ class ConjectureData:
         self.freeze()
         raise StopTest(self.testcounter)
 
-    def mark_interesting(
-        self, interesting_origin: Optional[InterestingOrigin] = None
-    ) -> NoReturn:
+    def mark_interesting(self, interesting_origin: Optional[InterestingOrigin] = None) -> NoReturn:
         self.conclude_test(Status.INTERESTING, interesting_origin)
 
     def mark_invalid(self, why: Optional[str] = None) -> NoReturn:

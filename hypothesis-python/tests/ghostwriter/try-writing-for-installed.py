@@ -36,11 +36,7 @@ def getmodules():
     for top, _, files in os.walk(std_lib):
         for nm in files:
             if nm.endswith(".py") and nm not in ("__init__.py", "__main__.py"):
-                modname = (
-                    os.path.join(top, nm)[len(std_lib) + 1 : -3]
-                    .replace(os.sep, ".")
-                    .replace("site-packages.", "")
-                )
+                modname = os.path.join(top, nm)[len(std_lib) + 1 : -3].replace(os.sep, ".").replace("site-packages.", "")
                 if not any(bad in modname for bad in skip):
                     yield modname
 
@@ -57,10 +53,7 @@ def write_for(mod):
         )
     except subprocess.SubprocessError as e:
         # Only report the error if we could load _but not process_ the module
-        if (
-            "Error: Found the '" not in e.stderr
-            and "Error: Failed to import" not in e.stderr
-        ):
+        if "Error: Found the '" not in e.stderr and "Error: Failed to import" not in e.stderr:
             return mod
 
 

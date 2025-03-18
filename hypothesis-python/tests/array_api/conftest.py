@@ -59,9 +59,7 @@ with warnings.catch_warnings():
         xp_and_xps_pairs = [(mock_xp, mock_xps)]
     elif test_xp_option == "all":
         if len(name_to_entry_point) == 0:
-            raise ValueError(
-                "HYPOTHESIS_TEST_ARRAY_API='all', but no entry points where found"
-            )
+            raise ValueError("HYPOTHESIS_TEST_ARRAY_API='all', but no entry points where found")
         xp_and_xps_pairs = [(mock_xp, mock_xps)]
         for ep in name_to_entry_point.values():
             xp = ep.load()
@@ -95,9 +93,7 @@ def pytest_generate_tests(metafunc):
     xp_and_xps_params = []
     for xp, xps in xp_and_xps_pairs:
         xp_params.append(pytest.param(xp, id=xp.__name__))
-        xp_and_xps_params.append(
-            pytest.param(xp, xps, id=f"{xp.__name__}-{xps.api_version}")
-        )
+        xp_and_xps_params.append(pytest.param(xp, xps, id=f"{xp.__name__}-{xps.api_version}"))
     if "xp" in metafunc.fixturenames:
         if "xps" in metafunc.fixturenames:
             metafunc.parametrize("xp, xps", xp_and_xps_params)
@@ -114,6 +110,4 @@ def pytest_collection_modifyitems(config, items):
                 min_version: NominalVersion = markers[0].args[0]
                 xps_version: NominalVersion = item.callspec.params["xps"].api_version
                 if xps_version < min_version:
-                    item.add_marker(
-                        pytest.mark.skip(reason=f"requires api_version=>{min_version}")
-                    )
+                    item.add_marker(pytest.mark.skip(reason=f"requires api_version=>{min_version}"))

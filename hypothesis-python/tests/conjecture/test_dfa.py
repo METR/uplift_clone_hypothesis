@@ -39,9 +39,7 @@ def test_enumeration_of_very_long_strings():
     forever to run because it would run in time roughly 256 ** 50.
     """
     size = 50
-    dfa = ConcreteDFA(
-        [{c: n + 1 for c in range(256)} for n in range(100)] + [{}], {size}
-    )
+    dfa = ConcreteDFA([{c: n + 1 for c in range(256)} for n in range(100)] + [{}], {size})
 
     for i, s in enumerate(dfa.all_matching_strings()):
         assert len(s) == size
@@ -116,9 +114,7 @@ def test_canonicalised_matches_same_strings(dfa, via_repr):
 
     assert minimal == next(canon.all_matching_strings())
 
-    assert dfa.count_strings(dfa.start, len(minimal)) == canon.count_strings(
-        canon.start, len(minimal)
-    )
+    assert dfa.count_strings(dfa.start, len(minimal)) == canon.count_strings(canon.start, len(minimal))
 
 
 # filters about 80% of examples. should potentially improve at some point.
@@ -133,9 +129,7 @@ def test_has_string_of_max_length(dfa):
 
 
 def test_converts_long_tables_to_dicts():
-    dfa = ConcreteDFA(
-        [[(0, 0), (1, 1), (2, 2), (3, 1), (4, 0), (7, 10, 1)], [(0, 0)], []], {2}
-    )
+    dfa = ConcreteDFA([[(0, 0), (1, 1), (2, 2), (3, 1), (4, 0), (7, 10, 1)], [(0, 0)], []], {2})
     assert dfa.transition(0, 2) == 2
     assert dfa.transition(1, 0) == 0
 

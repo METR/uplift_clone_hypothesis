@@ -100,17 +100,13 @@ class LazyStrategy(SearchStrategy):
             check_sideeffect_during_initialization("lazy evaluation of {!r}", self)
 
             unwrapped_args = tuple(unwrap_strategies(s) for s in self.__args)
-            unwrapped_kwargs = {
-                k: unwrap_strategies(v) for k, v in self.__kwargs.items()
-            }
+            unwrapped_kwargs = {k: unwrap_strategies(v) for k, v in self.__kwargs.items()}
 
             base = self.function(*self.__args, **self.__kwargs)
             if unwrapped_args == self.__args and unwrapped_kwargs == self.__kwargs:
                 self.__wrapped_strategy = base
             else:
-                self.__wrapped_strategy = self.function(
-                    *unwrapped_args, **unwrapped_kwargs
-                )
+                self.__wrapped_strategy = self.function(*unwrapped_args, **unwrapped_kwargs)
             for method, fn in self._transformations:
                 self.__wrapped_strategy = getattr(self.__wrapped_strategy, method)(fn)
         return self.__wrapped_strategy
@@ -143,23 +139,14 @@ class LazyStrategy(SearchStrategy):
             sig = signature(self.function)
             pos = [p for p in sig.parameters.values() if "POSITIONAL" in p.kind.name]
             if len(pos) > 1 or any(p.default is not sig.empty for p in pos):
-                _args, _kwargs = convert_positional_arguments(
-                    self.function, self.__args, self.__kwargs
-                )
+                _args, _kwargs = convert_positional_arguments(self.function, self.__args, self.__kwargs)
             else:
-                _args, _kwargs = convert_keyword_arguments(
-                    self.function, self.__args, self.__kwargs
-                )
+                _args, _kwargs = convert_keyword_arguments(self.function, self.__args, self.__kwargs)
             kwargs_for_repr = {
-                k: v
-                for k, v in _kwargs.items()
-                if k not in sig.parameters or v is not sig.parameters[k].default
+                k: v for k, v in _kwargs.items() if k not in sig.parameters or v is not sig.parameters[k].default
             }
-            self.__representation = repr_call(
-                self.function, _args, kwargs_for_repr, reorder=False
-            ) + "".join(
-                f".{method}({get_pretty_function_description(fn)})"
-                for method, fn in self._transformations
+            self.__representation = repr_call(self.function, _args, kwargs_for_repr, reorder=False) + "".join(
+                f".{method}({get_pretty_function_description(fn)})" for method, fn in self._transformations
             )
         return self.__representation
 

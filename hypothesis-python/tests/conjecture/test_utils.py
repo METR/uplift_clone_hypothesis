@@ -136,9 +136,7 @@ def test_choice():
 
 
 def test_fixed_size_draw_many():
-    many = cu.many(
-        ConjectureData.for_choices([]), min_size=3, max_size=3, average_size=3
-    )
+    many = cu.many(ConjectureData.for_choices([]), min_size=3, max_size=3, average_size=3)
     assert many.more()
     assert many.more()
     assert many.more()
@@ -193,9 +191,7 @@ def test_many_with_min_size():
 
 
 def test_many_with_max_size():
-    many = cu.many(
-        ConjectureData.for_choices((True,) * 5), min_size=0, average_size=1, max_size=2
-    )
+    many = cu.many(ConjectureData.for_choices((True,) * 5), min_size=0, average_size=1, max_size=2)
     assert many.more()
     assert many.more()
     assert not many.more()

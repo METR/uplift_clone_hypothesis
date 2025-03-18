@@ -15,27 +15,17 @@ from pathlib import Path
 
 
 def current_branch():
-    return (
-        subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-        .decode("ascii")
-        .strip()
-    )
+    return subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("ascii").strip()
 
 
 def tags():
-    result = [
-        t.decode("ascii") for t in subprocess.check_output(["git", "tag"]).split(b"\n")
-    ]
+    result = [t.decode("ascii") for t in subprocess.check_output(["git", "tag"]).split(b"\n")]
     assert len(set(result)) == len(result)
     return set(result)
 
 
 ROOT = Path(
-    subprocess.check_output(
-        ["git", "-C", os.path.dirname(__file__), "rev-parse", "--show-toplevel"]
-    )
-    .decode("ascii")
-    .strip()
+    subprocess.check_output(["git", "-C", os.path.dirname(__file__), "rev-parse", "--show-toplevel"]).decode("ascii").strip()
 )
 REPO_TESTS = ROOT / "whole_repo_tests"
 
@@ -134,13 +124,7 @@ def modified_files():
 
 
 def all_files():
-    return [
-        f
-        for f in subprocess.check_output(["git", "ls-files"])
-        .decode("ascii")
-        .splitlines()
-        if os.path.exists(f)
-    ]
+    return [f for f in subprocess.check_output(["git", "ls-files"]).decode("ascii").splitlines() if os.path.exists(f)]
 
 
 def changed_files_from_master():

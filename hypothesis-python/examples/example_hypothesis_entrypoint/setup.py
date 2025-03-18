@@ -21,7 +21,5 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=["hypothesis"],
     python_requires=">=3.7",
-    entry_points={
-        "hypothesis": ["_ = example_hypothesis_entrypoint:_hypothesis_setup_hook"]
-    },
+    entry_points={"hypothesis": ["_ = example_hypothesis_entrypoint:_hypothesis_setup_hook"]},
 )

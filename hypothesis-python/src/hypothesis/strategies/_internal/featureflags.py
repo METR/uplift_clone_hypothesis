@@ -89,11 +89,7 @@ class FeatureFlags:
         oneof = self.__at_least_one_of
         is_disabled = self.__data.draw_boolean(
             self.__p_disabled,
-            forced=(
-                False
-                if len(oneof) == 1 and name in oneof
-                else self.__is_disabled.get(name)
-            ),
+            forced=(False if len(oneof) == 1 and name in oneof else self.__is_disabled.get(name)),
         )
         self.__is_disabled[name] = is_disabled
         if name in oneof and not is_disabled:

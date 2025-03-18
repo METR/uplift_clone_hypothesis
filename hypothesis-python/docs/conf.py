@@ -18,9 +18,7 @@ root = Path(__file__).parent.parent
 sys.path.append(str(root / "src"))
 sys.path.append(str(Path(__file__).parent / "_ext"))
 
-needs_sphinx = re.search(
-    r"sphinx==([0-9\.]+)", root.joinpath("../requirements/tools.txt").read_text()
-).group(1)
+needs_sphinx = re.search(r"sphinx==([0-9\.]+)", root.joinpath("../requirements/tools.txt").read_text()).group(1)
 default_role = "py:obj"
 nitpicky = True
 
@@ -81,9 +79,7 @@ def setup(app):
     )
 
     mod = types.ModuleType("xps")
-    mod.__dict__.update(
-        make_strategies_namespace(mock_xp, api_version=RELEASED_VERSIONS[-1]).__dict__
-    )
+    mod.__dict__.update(make_strategies_namespace(mock_xp, api_version=RELEASED_VERSIONS[-1]).__dict__)
     assert "xps" not in sys.modules
     sys.modules["xps"] = mod
 
@@ -175,9 +171,7 @@ html_logo = "../../brand/dragonfly-rainbow-150w.svg"
 
 latex_elements = {}
 
-latex_documents = [
-    (master_doc, "Hypothesis.tex", "Hypothesis Documentation", author, "manual")
-]
+latex_documents = [(master_doc, "Hypothesis.tex", "Hypothesis Documentation", author, "manual")]
 
 man_pages = [(master_doc, "hypothesis", "Hypothesis Documentation", [author], 1)]
 

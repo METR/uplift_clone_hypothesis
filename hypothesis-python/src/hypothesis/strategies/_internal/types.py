@@ -290,12 +290,7 @@ def is_a_union(thing: object) -> bool:
 
 def is_a_type(thing: object) -> bool:
     """Return True if thing is a type or a generic type like thing."""
-    return (
-        isinstance(thing, type)
-        or is_generic_type(thing)
-        or is_a_new_type(thing)
-        or is_a_type_alias_type(thing)
-    )
+    return isinstance(thing, type) or is_generic_type(thing) or is_a_new_type(thing) or is_a_type_alias_type(thing)
 
 
 def is_typing_literal(thing: object) -> bool:
@@ -306,10 +301,7 @@ def is_typing_literal(thing: object) -> bool:
 
 
 def is_annotated_type(thing: object) -> bool:
-    return (
-        isinstance(thing, _AnnotatedAlias)
-        and getattr(thing, "__args__", None) is not None
-    )
+    return isinstance(thing, _AnnotatedAlias) and getattr(thing, "__args__", None) is not None
 
 
 def get_constraints_filter_map():
@@ -344,11 +336,7 @@ def _get_constraints(args: tuple[Any, ...]) -> Iterator["at.BaseMetadata"]:
 
 def _flat_annotated_repr_parts(annotated_type):
     # Helper to get a good error message in find_annotated_strategy() below.
-    type_reps = [
-        get_pretty_function_description(a)
-        for a in annotated_type.__args__
-        if not isinstance(a, typing.TypeVar)
-    ]
+    type_reps = [get_pretty_function_description(a) for a in annotated_type.__args__ if not isinstance(a, typing.TypeVar)]
     metadata_reps = []
     for m in getattr(annotated_type, "__metadata__", ()):
         if is_annotated_type(m):
@@ -420,8 +408,7 @@ def is_generic_type(type_):
     # We check for `MyClass[T]` and `MyClass[int]` with the first condition,
     # while the second condition is for `MyClass`.
     return isinstance(type_, (*typing_root_type, GenericAlias)) or (
-        isinstance(type_, type)
-        and (typing.Generic in type_.__mro__ or hasattr(type_, "__class_getitem__"))
+        isinstance(type_, type) and (typing.Generic in type_.__mro__ or hasattr(type_, "__class_getitem__"))
     )
 
 
@@ -477,20 +464,13 @@ def from_typing_type(thing):
     # Some "generic" classes are not generic *in* anything - for example both
     # Hashable and Sized have `__args__ == ()`
     origin = get_origin(thing) or thing
-    if (
-        origin in vars(collections.abc).values()
-        and len(getattr(thing, "__args__", None) or []) == 0
-    ):
+    if origin in vars(collections.abc).values() and len(getattr(thing, "__args__", None) or []) == 0:
         return st.from_type(origin)
 
     # Parametrised generic types have their __origin__ attribute set to the
     # un-parametrised version, which we need to use in the subclass checks.
     # i.e.:     typing.List[int].__origin__ == list
-    mapping = {
-        k: v
-        for k, v in _global_type_lookup.items()
-        if is_generic_type(k) and try_issubclass(k, thing)
-    }
+    mapping = {k: v for k, v in _global_type_lookup.items() if is_generic_type(k) and try_issubclass(k, thing)}
 
     # Discard any type which is not it's own origin, where the origin is also in the
     # mapping.  On old Python versions this could be due to redefinition of types
@@ -506,11 +486,7 @@ def from_typing_type(thing):
     if len(mapping) > 1:
         _Environ = getattr(os, "_Environ", None)
         mapping.pop(_Environ, None)
-    tuple_types = [
-        t
-        for t in mapping
-        if (isinstance(t, type) and issubclass(t, tuple)) or get_origin(t) is tuple
-    ]
+    tuple_types = [t for t in mapping if (isinstance(t, type) and issubclass(t, tuple)) or get_origin(t) is tuple]
     if len(mapping) > len(tuple_types):
         for tuple_type in tuple_types:
             mapping.pop(tuple_type)
@@ -549,11 +525,7 @@ def from_typing_type(thing):
             mapping.pop(bytes, None)
             if sys.version_info[:2] <= (3, 13):
                 mapping.pop(collections.abc.ByteString, None)
-    elif (
-        (not mapping)
-        and isinstance(thing, typing.ForwardRef)
-        and thing.__forward_arg__ in vars(builtins)
-    ):
+    elif (not mapping) and isinstance(thing, typing.ForwardRef) and thing.__forward_arg__ in vars(builtins):
         return st.from_type(getattr(builtins, thing.__forward_arg__))
     # Sort strategies according to our type-sorting heuristic for stable output
     strategies = [
@@ -567,10 +539,7 @@ def from_typing_type(thing):
     ]
     empty = ", ".join(repr(s) for s in strategies if s.is_empty)
     if empty or not strategies:
-        raise ResolutionFailed(
-            f"Could not resolve {empty or thing} to a strategy; "
-            "consider using register_type_strategy"
-        )
+        raise ResolutionFailed(f"Could not resolve {empty or thing} to a strategy; consider using register_type_strategy")
     return st.one_of(strategies)
 
 
@@ -587,9 +556,7 @@ def _networks(bits):
     return st.tuples(st.integers(0, 2**bits - 1), st.integers(-bits, 0).map(abs))
 
 
-utc_offsets = st.builds(
-    datetime.timedelta, minutes=st.integers(0, 59), hours=st.integers(-23, 23)
-)
+utc_offsets = st.builds(datetime.timedelta, minutes=st.integers(0, 59), hours=st.integers(-23, 23))
 
 # These builtin and standard-library types have Hypothesis strategies,
 # seem likely to appear in type annotations, or are otherwise notable.
@@ -609,9 +576,7 @@ utc_offsets = st.builds(
 # exposed for it, and NotImplemented itself is typed as Any so that it can be
 # returned without being listed in a function signature:
 # https://github.com/python/mypy/issues/6710#issuecomment-485580032
-_global_type_lookup: dict[
-    type, typing.Union[st.SearchStrategy, typing.Callable[[type], st.SearchStrategy]]
-] = {
+_global_type_lookup: dict[type, typing.Union[st.SearchStrategy, typing.Callable[[type], st.SearchStrategy]]] = {
     type(None): st.none(),
     bool: st.booleans(),
     int: st.integers(),
@@ -684,9 +649,7 @@ _global_type_lookup: dict[
         st.just(0),
         st.just("reason"),
     ),
-    UnicodeTranslateError: st.builds(
-        UnicodeTranslateError, st.text(), st.just(0), st.just(0), st.just("reason")
-    ),
+    UnicodeTranslateError: st.builds(UnicodeTranslateError, st.text(), st.just(0), st.just(0), st.just("reason")),
     BaseExceptionGroup: st.builds(
         BaseExceptionGroup,
         st.text(),
@@ -716,9 +679,7 @@ if PYPY:
     _global_type_lookup[builtins.sequenceiterator] = st.builds(iter, st.tuples())  # type: ignore
 
 
-_fallback_type_strategy = st.sampled_from(
-    sorted(_global_type_lookup, key=type_sorting_key)
-)
+_fallback_type_strategy = st.sampled_from(sorted(_global_type_lookup, key=type_sorting_key))
 # subclass of MutableMapping, and so we resolve to a union which
 # includes this... but we don't actually ever want to build one.
 _global_type_lookup[os._Environ] = st.just(os.environ)
@@ -743,9 +704,7 @@ _global_type_lookup.update(
             st.decimals(),
             st.timedeltas(),
         ),
-        typing.SupportsRound: st.one_of(
-            st.booleans(), st.integers(), st.floats(), st.decimals(), st.fractions()
-        ),
+        typing.SupportsRound: st.one_of(st.booleans(), st.integers(), st.floats(), st.decimals(), st.fractions()),
         typing.SupportsComplex: st.one_of(
             st.booleans(),
             st.integers(),
@@ -800,9 +759,7 @@ def _from_numpy_type(thing: type) -> typing.Optional[st.SearchStrategy]:
     return _from_type(thing)
 
 
-_global_extra_lookup: dict[
-    str, typing.Callable[[type], typing.Optional[st.SearchStrategy]]
-] = {
+_global_extra_lookup: dict[str, typing.Callable[[type], typing.Optional[st.SearchStrategy]]] = {
     "numpy": _from_numpy_type,
 }
 
@@ -932,16 +889,12 @@ def resolve_ItemsView(thing):
 
 @register(typing.KeysView, st.builds(dict).map(dict.keys))
 def resolve_KeysView(thing):
-    return st.dictionaries(_from_hashable_type(thing.__args__[0]), st.none()).map(
-        dict.keys
-    )
+    return st.dictionaries(_from_hashable_type(thing.__args__[0]), st.none()).map(dict.keys)
 
 
 @register(typing.ValuesView, st.builds(dict).map(dict.values))
 def resolve_ValuesView(thing):
-    return st.dictionaries(st.integers(), st.from_type(thing.__args__[0])).map(
-        dict.values
-    )
+    return st.dictionaries(st.integers(), st.from_type(thing.__args__[0])).map(dict.values)
 
 
 @register(typing.Iterator, st.iterables(st.nothing()))
@@ -987,11 +940,7 @@ def resolve_Pattern(thing):
 )
 def resolve_Match(thing):
     if thing.__args__[0] == bytes:
-        return (
-            st.binary(min_size=1)
-            .map(lambda c: re.match(b".", c, flags=re.DOTALL))
-            .filter(bool)
-        )
+        return st.binary(min_size=1).map(lambda c: re.match(b".", c, flags=re.DOTALL)).filter(bool)
     return st.text().map(lambda c: re.match(".", c, flags=re.DOTALL)).filter(bool)
 
 
@@ -1090,16 +1039,13 @@ def resolve_TypeVar(thing):
         # This incantation runs a sampled_from over the strategies inferred for
         # each part of the union, wraps that in shared so that we only generate
         # from one type per testcase, and flatmaps that back to instances.
-        return st.shared(
-            st.sampled_from(original_strategies), key=type_var_key
-        ).flatmap(lambda s: s)
+        return st.shared(st.sampled_from(original_strategies), key=type_var_key).flatmap(lambda s: s)
 
     builtin_scalar_types = [type(None), bool, int, float, str, bytes]
     return st.shared(
         st.sampled_from(
             # Constraints may be None or () on various Python versions.
-            getattr(thing, "__constraints__", None)
-            or builtin_scalar_types,
+            getattr(thing, "__constraints__", None) or builtin_scalar_types,
         ),
         key=type_var_key,
     ).flatmap(st.from_type)

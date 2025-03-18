@@ -84,11 +84,7 @@ def test_can_reduce_poison_from_any_subtree(size, seed):
     assert len(ConjectureData.for_choices(data.choices).draw(strat)) == size
 
     # find the nodes corresponding to n1 and n2
-    nodes = [
-        node
-        for node in data.nodes
-        if node.type == "integer" and node.kwargs["max_value"] == 2**16 - 1
-    ]
+    nodes = [node for node in data.nodes if node.type == "integer" and node.kwargs["max_value"] == 2**16 - 1]
     assert len(nodes) % 2 == 0
 
     marker = bytes([1, 2, 3, 4])
@@ -105,15 +101,10 @@ def test_can_reduce_poison_from_any_subtree(size, seed):
             if POISON in v and m == marker:
                 data.mark_interesting()
 
-        runner = ConjectureRunner(
-            test_function_with_poison, random=random, settings=TEST_SETTINGS
-        )
+        runner = ConjectureRunner(test_function_with_poison, random=random, settings=TEST_SETTINGS)
         # replace n1 and n2 with 2**16 - 1 to insert a poison value here
         runner.cached_test_function(
-            data.choices[: node.index]
-            + (2**16 - 1, 2**16 - 1)
-            + (data.choices[node.index + 2 :])
-            + (marker,)
+            data.choices[: node.index] + (2**16 - 1, 2**16 - 1) + (data.choices[node.index + 2 :]) + (marker,)
         )
         assert runner.interesting_examples
 

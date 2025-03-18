@@ -73,9 +73,7 @@ CategoriesTuple: "TypeAlias" = tuple[CategoryName, ...]
 
 
 def charmap_file(fname: str = "charmap") -> Path:
-    return storage_directory(
-        "unicode_data", unicodedata.unidata_version, f"{fname}.json.gz"
-    )
+    return storage_directory("unicode_data", unicodedata.unidata_version, f"{fname}.json.gz")
 
 
 _charmap = None
@@ -129,9 +127,7 @@ def charmap() -> dict[CategoryName, IntervalsT]:
                 pass
 
         # convert between lists and tuples
-        _charmap = {
-            k: tuple(tuple(pair) for pair in pairs) for k, pairs in tmp_charmap.items()
-        }
+        _charmap = {k: tuple(tuple(pair) for pair in pairs) for k, pairs in tmp_charmap.items()}
         # each value is a tuple of 2-tuples (that is, tuples of length 2)
         # and that both elements of that tuple are integers.
         for vs in _charmap.values():
@@ -225,9 +221,7 @@ def as_general_categories(cats: Categories, name: str = "cats") -> CategoriesTup
             out.discard(c)
             out.update(x for x in cs if x.startswith(c))
         elif c not in cs:
-            raise InvalidArgument(
-                f"In {name}={cats!r}, {c!r} is not a valid Unicode category."
-            )
+            raise InvalidArgument(f"In {name}={cats!r}, {c!r} is not a valid Unicode category.")
     return tuple(c for c in cs if c in out)
 
 
@@ -274,18 +268,14 @@ def _query_for_key(key: Categories) -> IntervalsT:
     if set(key) == set(categories()):
         result = IntervalSet([(0, sys.maxunicode)])
     else:
-        result = IntervalSet(_query_for_key(key[:-1])).union(
-            IntervalSet(charmap()[key[-1]])
-        )
+        result = IntervalSet(_query_for_key(key[:-1])).union(IntervalSet(charmap()[key[-1]]))
     assert isinstance(result, IntervalSet)
     if context is None or not context.data.provider.avoid_realization:
         category_index_cache[cache_key] = result.intervals
     return result.intervals
 
 
-limited_category_index_cache: dict[
-    tuple[CategoriesTuple, int, int, IntervalsT, IntervalsT], IntervalSet
-] = {}
+limited_category_index_cache: dict[tuple[CategoriesTuple, int, int, IntervalsT, IntervalsT], IntervalSet] = {}
 
 
 def query(

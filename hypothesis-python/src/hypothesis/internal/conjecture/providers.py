@@ -264,9 +264,7 @@ class PrimitiveProvider(abc.ABC):
         """
         return {}
 
-    def observe_information_messages(
-        self, *, lifetime: _Lifetime
-    ) -> Iterable[_BackendInfoMsg]:
+    def observe_information_messages(self, *, lifetime: _Lifetime) -> Iterable[_BackendInfoMsg]:
         """Called at the end of each test case and again at end of the test function.
 
         Return an iterable of `{type: info/alert/error, title: str, content: str|dict}`
@@ -398,9 +396,7 @@ class HypothesisProvider(PrimitiveProvider):
             # We assert that sum(p) is strictly less than 1 because it simplifies
             # handling forced values when we can force into the unmapped probability
             # mass. We should eventually remove this restriction.
-            sampler = Sampler(
-                [1 - sum(weights.values()), *weights.values()], observe=False
-            )
+            sampler = Sampler([1 - sum(weights.values()), *weights.values()], observe=False)
             # if we're forcing, it's easiest to force into the unmapped probability
             # mass and then force the drawn value after.
             idx = sampler.sample(self._cd)
@@ -462,9 +458,7 @@ class HypothesisProvider(PrimitiveProvider):
                     clamped = result  # pragma: no cover
                 else:
                     clamped = clamper(result)
-                if float_to_int(clamped) != float_to_int(result) and not (
-                    math.isnan(result) and allow_nan
-                ):
+                if float_to_int(clamped) != float_to_int(result) and not (math.isnan(result) and allow_nan):
                     result = clamped
             else:
                 result = nasty_floats[i - 1]
@@ -693,11 +687,7 @@ class HypothesisProvider(PrimitiveProvider):
             return STRING_SAMPLER_CACHE[key]
 
         nasty_strings = [s for s in NASTY_STRINGS if choice_permitted(s, kwargs)]
-        sampler = (
-            Sampler([1 / len(nasty_strings)] * len(nasty_strings), observe=False)
-            if nasty_strings
-            else None
-        )
+        sampler = Sampler([1 / len(nasty_strings)] * len(nasty_strings), observe=False) if nasty_strings else None
         result = (sampler, nasty_strings)
         STRING_SAMPLER_CACHE[key] = result
         return result
@@ -706,9 +696,7 @@ class HypothesisProvider(PrimitiveProvider):
 class BytestringProvider(PrimitiveProvider):
     lifetime = "test_case"
 
-    def __init__(
-        self, conjecturedata: Optional["ConjectureData"], /, *, bytestring: bytes
-    ):
+    def __init__(self, conjecturedata: Optional["ConjectureData"], /, *, bytestring: bytes):
         super().__init__(conjecturedata)
         self.bytestring = bytestring
         self.index = 0

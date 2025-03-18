@@ -30,14 +30,54 @@ FTZCulprits: "TypeAlias" = tuple[Optional[bool], set[str]]
 KNOWN_EVER_CULPRITS = (
     # https://moyix.blogspot.com/2022/09/someones-been-messing-with-my-subnormals.html
     # fmt: off
-    "archive-pdf-tools", "bgfx-python", "bicleaner-ai-glove", "BTrees", "cadbiom",
-    "ctranslate2", "dyNET", "dyNET38", "gevent", "glove-python-binary", "higra",
-    "hybridq", "ikomia", "ioh", "jij-cimod", "lavavu", "lavavu-osmesa", "MulticoreTSNE",
-    "neural-compressor", "nwhy", "openjij", "openturns", "perfmetrics", "pHashPy",
-    "pyace-lite", "pyapr", "pycompadre", "pycompadre-serial", "PyKEP", "pykep",
-    "pylimer-tools", "pyqubo", "pyscf", "PyTAT", "python-prtree", "qiskit-aer",
-    "qiskit-aer-gpu", "RelStorage", "sail-ml", "segmentation", "sente", "sinr",
-    "snapml", "superman", "symengine", "systran-align", "texture-tool", "tsne-mp",
+    "archive-pdf-tools",
+    "bgfx-python",
+    "bicleaner-ai-glove",
+    "BTrees",
+    "cadbiom",
+    "ctranslate2",
+    "dyNET",
+    "dyNET38",
+    "gevent",
+    "glove-python-binary",
+    "higra",
+    "hybridq",
+    "ikomia",
+    "ioh",
+    "jij-cimod",
+    "lavavu",
+    "lavavu-osmesa",
+    "MulticoreTSNE",
+    "neural-compressor",
+    "nwhy",
+    "openjij",
+    "openturns",
+    "perfmetrics",
+    "pHashPy",
+    "pyace-lite",
+    "pyapr",
+    "pycompadre",
+    "pycompadre-serial",
+    "PyKEP",
+    "pykep",
+    "pylimer-tools",
+    "pyqubo",
+    "pyscf",
+    "PyTAT",
+    "python-prtree",
+    "qiskit-aer",
+    "qiskit-aer-gpu",
+    "RelStorage",
+    "sail-ml",
+    "segmentation",
+    "sente",
+    "sinr",
+    "snapml",
+    "superman",
+    "symengine",
+    "systran-align",
+    "texture-tool",
+    "tsne-mp",
     "xcsf",
     # fmt: on
 )
@@ -60,9 +100,7 @@ def run_in_process(fn: Callable[..., FTZCulprits], *args: object) -> FTZCulprits
     return retval
 
 
-def target(
-    q: "Queue[FTZCulprits]", fn: Callable[..., FTZCulprits], *args: object
-) -> None:
+def target(q: "Queue[FTZCulprits]", fn: Callable[..., FTZCulprits], *args: object) -> None:
     q.put(fn(*args))
 
 

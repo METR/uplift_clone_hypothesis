@@ -29,7 +29,6 @@ def using_tool_id(tool_id, tool_name):
 
 @pytest.mark.skipif(sys.version_info[:2] < (3, 12), reason="new namespace")
 def test_monitoring_warns_on_registered_tool_id(warns_or_raises):
-
     # scrutineer can't run if something has already registered its tool id.
     with using_tool_id(MONITORING_TOOL_ID, "rogue"):
         with warns_or_raises(HypothesisWarning, match=r"already taken by tool rogue"):

@@ -210,10 +210,7 @@ def test_example_argument_validation():
 
     with pytest.raises(
         InvalidArgument,
-        match=re.escape(
-            "Inconsistent args: @given() got strategies for 'y', "
-            "but @example() got arguments for 'x'"
-        ),
+        match=re.escape("Inconsistent args: @given() got strategies for 'y', but @example() got arguments for 'x'"),
     ):
         example(x=None)(has_posonly_args)(1)
 

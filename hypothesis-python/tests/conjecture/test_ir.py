@@ -187,9 +187,7 @@ def test_draw_string_single_interval_with_equal_bounds(s, n):
         {"min_size": 0, "max_size": 0, "intervals": IntervalSet.from_string("abc")},
     )
 )
-@example(
-    ("string", {"min_size": 0, "max_size": 3, "intervals": IntervalSet.from_string("")})
-)
+@example(("string", {"min_size": 0, "max_size": 3, "intervals": IntervalSet.from_string("")}))
 @example(
     (
         "string",
@@ -246,9 +244,7 @@ def test_nodes(random):
 
     data.freeze()
     expected_tree_nodes = (
-        ChoiceNode(
-            type="float", value=5.0, kwargs=float_kw(-10.0, 10.0), was_forced=True
-        ),
+        ChoiceNode(type="float", value=5.0, kwargs=float_kw(-10.0, 10.0), was_forced=True),
         ChoiceNode(
             type="boolean",
             value=True,
@@ -271,9 +267,7 @@ def test_nodes(random):
             kwargs={"min_size": 8, "max_size": 8},
             was_forced=True,
         ),
-        ChoiceNode(
-            type="integer", value=50, kwargs=integer_kw(0, 100), was_forced=True
-        ),
+        ChoiceNode(type="integer", value=50, kwargs=integer_kw(0, 100), was_forced=True),
     )
     assert data.nodes == expected_tree_nodes
 
@@ -285,9 +279,7 @@ def test_copy_choice_node(node):
     assume(not node.was_forced)
     new_value = draw_value(node.type, node.kwargs)
     # if we drew the same value as before, the node should still be equal
-    assert (node.copy(with_value=new_value) == node) is (
-        choice_equal(new_value, node.value)
-    )
+    assert (node.copy(with_value=new_value) == node) is (choice_equal(new_value, node.value))
 
 
 @given(nodes())
@@ -340,9 +332,7 @@ def test_data_with_changed_forced_value(node):
         was_forced=True,
     )
 )
-@example(
-    ChoiceNode(type="integer", value=50, kwargs=integer_kw(50, 100), was_forced=True)
-)
+@example(ChoiceNode(type="integer", value=50, kwargs=integer_kw(50, 100), was_forced=True))
 @example(
     ChoiceNode(
         type="string",
@@ -460,12 +450,8 @@ def test_forced_nodes_are_trivial(node):
 @pytest.mark.parametrize(
     "node",
     [
-        ChoiceNode(
-            type="float", value=5.0, kwargs=float_kw(5.0, 10.0), was_forced=False
-        ),
-        ChoiceNode(
-            type="float", value=0.0, kwargs=float_kw(-5.0, 5.0), was_forced=False
-        ),
+        ChoiceNode(type="float", value=5.0, kwargs=float_kw(5.0, 10.0), was_forced=False),
+        ChoiceNode(type="float", value=0.0, kwargs=float_kw(-5.0, 5.0), was_forced=False),
         ChoiceNode(type="float", value=0.0, kwargs=float_kw(), was_forced=False),
         ChoiceNode(type="boolean", value=False, kwargs={"p": 0.5}, was_forced=False),
         ChoiceNode(type="boolean", value=True, kwargs={"p": 1.0}, was_forced=False),
@@ -502,12 +488,8 @@ def test_forced_nodes_are_trivial(node):
             kwargs={"min_size": 2, "max_size": COLLECTION_DEFAULT_MAX_SIZE},
             was_forced=False,
         ),
-        ChoiceNode(
-            type="integer", value=50, kwargs=integer_kw(50, 100), was_forced=False
-        ),
-        ChoiceNode(
-            type="integer", value=0, kwargs=integer_kw(-10, 10), was_forced=False
-        ),
+        ChoiceNode(type="integer", value=50, kwargs=integer_kw(50, 100), was_forced=False),
+        ChoiceNode(type="integer", value=0, kwargs=integer_kw(-10, 10), was_forced=False),
         ChoiceNode(
             type="integer",
             value=2,
@@ -567,12 +549,8 @@ def test_trivial_nodes(node):
 @pytest.mark.parametrize(
     "node",
     [
-        ChoiceNode(
-            type="float", value=6.0, kwargs=float_kw(5.0, 10.0), was_forced=False
-        ),
-        ChoiceNode(
-            type="float", value=-5.0, kwargs=float_kw(-5.0, 5.0), was_forced=False
-        ),
+        ChoiceNode(type="float", value=6.0, kwargs=float_kw(5.0, 10.0), was_forced=False),
+        ChoiceNode(type="float", value=-5.0, kwargs=float_kw(-5.0, 5.0), was_forced=False),
         ChoiceNode(type="float", value=1.0, kwargs=float_kw(), was_forced=False),
         ChoiceNode(type="boolean", value=True, kwargs={"p": 0.5}, was_forced=False),
         ChoiceNode(type="boolean", value=True, kwargs={"p": 0.99}, was_forced=False),
@@ -604,9 +582,7 @@ def test_trivial_nodes(node):
             kwargs={"min_size": 1, "max_size": 10},
             was_forced=False,
         ),
-        ChoiceNode(
-            type="integer", value=-10, kwargs=integer_kw(-10, 10), was_forced=False
-        ),
+        ChoiceNode(type="integer", value=-10, kwargs=integer_kw(-10, 10), was_forced=False),
         ChoiceNode(type="integer", value=42, kwargs=integer_kw(), was_forced=False),
     ],
 )
@@ -850,31 +826,13 @@ def test_draw_directly_explicit():
     # this is a much weaker and more explicit variant of the property-based test
     # directly above, but this is such an important thing to ensure that we have
     # correct that it's worth some duplication in case we ever screw up our pbt test.
-    assert (
-        ConjectureData.for_choices(["a"]).draw_string(
-            IntervalSet([(0, 127)]), min_size=1
-        )
-        == "a"
-    )
+    assert ConjectureData.for_choices(["a"]).draw_string(IntervalSet([(0, 127)]), min_size=1) == "a"
     assert ConjectureData.for_choices([b"a"]).draw_bytes() == b"a"
-    assert (
-        ConjectureData.for_choices([1.0]).draw_float(
-            0.0, 2.0, allow_nan=False, smallest_nonzero_magnitude=0.5
-        )
-        == 1.0
-    )
+    assert ConjectureData.for_choices([1.0]).draw_float(0.0, 2.0, allow_nan=False, smallest_nonzero_magnitude=0.5) == 1.0
     assert ConjectureData.for_choices([True]).draw_boolean(0.3)
     assert ConjectureData.for_choices([42]).draw_integer() == 42
-    assert (
-        ConjectureData.for_choices([-42]).draw_integer(min_value=-50, max_value=0)
-        == -42
-    )
-    assert (
-        ConjectureData.for_choices([10]).draw_integer(
-            min_value=10, max_value=11, weights={10: 0.1, 11: 0.3}
-        )
-        == 10
-    )
+    assert ConjectureData.for_choices([-42]).draw_integer(min_value=-50, max_value=0) == -42
+    assert ConjectureData.for_choices([10]).draw_integer(min_value=10, max_value=11, weights={10: 0.1, 11: 0.3}) == 10
 
 
 @pytest.mark.parametrize(

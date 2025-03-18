@@ -24,9 +24,7 @@ def test_utc_is_minimal():
 
 
 def test_can_generate_non_utc():
-    find_any(
-        st.datetimes(timezones=st.timezones()).filter(lambda d: d.tzinfo.key != "UTC")
-    )
+    find_any(st.datetimes(timezones=st.timezones()).filter(lambda d: d.tzinfo.key != "UTC"))
 
 
 @given(st.data(), st.datetimes(), st.datetimes())

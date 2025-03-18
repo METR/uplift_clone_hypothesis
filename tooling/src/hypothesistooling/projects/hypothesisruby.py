@@ -105,9 +105,7 @@ def current_version():
     """Returns the current version as specified by the gemspec."""
     ensure_bundler()
     return (
-        subprocess.check_output(
-            [install.BUNDLER_EXECUTABLE, "exec", "ruby", "-e", RUBY_TO_PRINT_VERSION]
-        )
+        subprocess.check_output([install.BUNDLER_EXECUTABLE, "exec", "ruby", "-e", RUBY_TO_PRINT_VERSION])
         .decode("ascii")
         .strip()
     )
@@ -144,9 +142,7 @@ RUBY_TO_PRINT_VERSION = f"""
 require 'rubygems'
 spec = Gem::Specification::load({GEMSPEC_FILE!r})
 puts spec.version
-""".strip().replace(
-    "\n", "; "
-)
+""".strip().replace("\n", "; ")
 
 
 RUBYGEMS_CREDENTIALS = os.path.expanduser("~/.gem/credentials")
@@ -157,6 +153,4 @@ def upload_distribution():
     tools.assert_can_release()
     # Credentials are supplied by the GEM_HOST_API_KEY envvar, which in turn
     # is set from the repository secrets by GitHub Actions.
-    subprocess.check_call(
-        [install.GEM_EXECUTABLE, "push", *glob("hypothesis-specs-*.gem")]
-    )
+    subprocess.check_call([install.GEM_EXECUTABLE, "push", *glob("hypothesis-specs-*.gem")])

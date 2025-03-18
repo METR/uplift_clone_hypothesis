@@ -35,8 +35,7 @@ CASES = (
     Cases.mth,
     ('mth(\n    n=100,\n    label="a long label which forces a newline",\n)', FAIL_MSG),
     indent(
-        '@example(n=100, label="a long label which forces a newline")'
-        '.via(\n    "discovered failure"\n)',
+        '@example(n=100, label="a long label which forces a newline").via(\n    "discovered failure"\n)',
         prefix="+    ",
     ),
 )
@@ -146,9 +145,7 @@ UNDEF_NAME_PATCH_BODY = f"""\
         pytest.param(*SIMPLE, SIMPLE_PATCH_BODY, (), id="simple"),
         pytest.param(*CASES, CASES_PATCH_BODY, (), id="cases"),
         pytest.param(*TOPLEVEL, TOPLEVEL_PATCH_BODY, (), id="toplevel"),
-        pytest.param(
-            *COVERING, COVERING_PATCH_BODY, ("covering example",), id="covering"
-        ),
+        pytest.param(*COVERING, COVERING_PATCH_BODY, ("covering example",), id="covering"),
         pytest.param(*UNDEF_NAME, UNDEF_NAME_PATCH_BODY, (), id="undef_name"),
     ],
 )

@@ -79,9 +79,7 @@ def test_unsat_filtered_sampling_in_rejection_stage(x):
 
 
 def test_easy_filtered_sampling():
-    assert_simple_property(
-        sampled_from(range(100)).filter(lambda x: x == 0), lambda x: x == 0
-    )
+    assert_simple_property(sampled_from(range(100)).filter(lambda x: x == 0), lambda x: x == 0)
 
 
 @given(sampled_from(range(100)).filter(lambda x: x == 99))
@@ -117,10 +115,7 @@ def test_does_not_include_duplicates_even_when_duplicated_in_collection(ls):
 
 @given(
     st.sets(
-        st.sampled_from(range(50))
-        .map(lambda x: x * 2)
-        .filter(lambda x: x % 3)
-        .map(lambda x: x // 2),
+        st.sampled_from(range(50)).map(lambda x: x * 2).filter(lambda x: x % 3).map(lambda x: x // 2),
         min_size=33,
     )
 )
@@ -298,9 +293,7 @@ class TestErrorNoteBehavior3819:
             ]
         ],
     )
-    def test_error_appropriate_error_note_3819(
-        self, func_to_call, exp_err_cls, should_exp_msg
-    ):
+    def test_error_appropriate_error_note_3819(self, func_to_call, exp_err_cls, should_exp_msg):
         if exp_err_cls is None:
             # Here we only care that no exception was raised, so nothing to assert.
             func_to_call()
@@ -311,7 +304,6 @@ class TestErrorNoteBehavior3819:
             matching_messages = [
                 n
                 for n in notes
-                if n.startswith("sample_from was given a collection of strategies")
-                and n.endswith("Was one_of intended?")
+                if n.startswith("sample_from was given a collection of strategies") and n.endswith("Was one_of intended?")
             ]
             assert len(matching_messages) == (1 if should_exp_msg else 0)

@@ -27,8 +27,7 @@ def test_allowed_inputs_to_target(observation, label):
 
 
 @given(
-    observation=st.integers(min_value=1)
-    | st.floats(min_value=1, allow_nan=False, allow_infinity=False),
+    observation=st.integers(min_value=1) | st.floats(min_value=1, allow_nan=False, allow_infinity=False),
     label=st.sampled_from(["a", "few", "labels"]),
 )
 def test_allowed_inputs_to_target_fewer_labels(observation, label):
@@ -52,9 +51,7 @@ def test_multiple_target_calls(args):
         target(observation, label=label)
 
 
-@given(
-    st.lists(st.floats(allow_nan=False, allow_infinity=False), min_size=11, max_size=20)
-)
+@given(st.lists(st.floats(allow_nan=False, allow_infinity=False), min_size=11, max_size=20))
 def test_respects_max_pool_size(observations):
     """Using many examples of several labels like this stresses the
     pool-size logic and internal assertions in TargetSelector.
@@ -68,11 +65,7 @@ def everything_except(type_):
     # tests to check that invalid inputs are rejected, but for `target()`
     # we need to use `@given` (to validate arguments instead of context)
     # so we might as well apply this neat recipe.
-    return (
-        st.from_type(type)
-        .flatmap(st.from_type)
-        .filter(lambda x: not isinstance(x, type_))
-    )
+    return st.from_type(type).flatmap(st.from_type).filter(lambda x: not isinstance(x, type_))
 
 
 @example(float("nan"), "")

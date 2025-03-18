@@ -53,11 +53,7 @@ class Ordering(Shrinker):
             prefix = list(self.current[:i])
             k = find_integer(
                 lambda k: i + k <= len(self.current)
-                and self.consider(
-                    prefix
-                    + sorted(self.current[i : i + k], key=self.key)
-                    + list(self.current[i + k :])
-                )
+                and self.consider(prefix + sorted(self.current[i : i + k], key=self.key) + list(self.current[i + k :]))
             )
             i += k
 
@@ -83,11 +79,7 @@ class Ordering(Shrinker):
                 split = i - a
                 values = sorted(self.current[a:i] + self.current[i + 1 : b])
                 return self.consider(
-                    list(self.current[:a])
-                    + values[:split]
-                    + [self.current[i]]
-                    + values[split:]
-                    + list(self.current[b:])
+                    list(self.current[:a]) + values[:split] + [self.current[i]] + values[split:] + list(self.current[b:])
                 )
 
             left = i

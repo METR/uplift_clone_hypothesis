@@ -185,11 +185,7 @@ class DFA:
                 # All of j's successors have a known max_length or are dead,
                 # so we can now compute a max_length for j itself.
                 cache[j] = max(
-                    (
-                        1 + cache[k]
-                        for k in self.successor_states(j)
-                        if not self.is_dead(k)
-                    ),
+                    (1 + cache[k] for k in self.successor_states(j) if not self.is_dead(k)),
                     default=0,
                 )
 
@@ -230,9 +226,7 @@ class DFA:
             if n == 0:
                 cache[s, n] = self.is_accepting(s)
             else:
-                cache[s, n] = any(
-                    cache.get((t, n - 1)) for t in self.successor_states(s)
-                )
+                cache[s, n] = any(cache.get((t, n - 1)) for t in self.successor_states(s))
 
         return cache[state, length]
 
@@ -266,9 +260,7 @@ class DFA:
             if n == 0:
                 cache[s, n] = int(self.is_accepting(s))
             else:
-                cache[s, n] = sum(
-                    cache[t, n - 1] * k for t, k in self.transition_counts(s)
-                )
+                cache[s, n] = sum(cache[t, n - 1] * k for t, k in self.transition_counts(s))
 
         return cache[state, length]
 
@@ -479,9 +471,7 @@ class DFA:
                 seen.add(j)
                 queue.append(j)
 
-        transitions = [
-            {c: state_map[s] for c, s in self.transitions(t)} for t in reverse_state_map
-        ]
+        transitions = [{c: state_map[s] for c, s in self.transitions(t)} for t in reverse_state_map]
 
         result = ConcreteDFA(transitions, accepting)
         assert self.equivalent(result)
@@ -565,9 +555,7 @@ class DFA:
             # And also queue any logical consequences of merging those
             # two states for merging.
             for c in alphabet:
-                queue.append(
-                    (self.transition(self_state, c), other.transition(other_state, c))
-                )
+                queue.append((self.transition(self_state, c), other.transition(other_state, c)))
         return True
 
 

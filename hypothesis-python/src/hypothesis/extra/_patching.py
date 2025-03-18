@@ -89,8 +89,7 @@ class AddExamplesCodemod(VisitorBasedCodemodCommand):
 
         # Codemod the failing examples to Call nodes usable as decorators
         self.fn_examples = {
-            k: tuple(d for x in nodes if (d := self.__call_node_to_example_dec(*x)))
-            for k, nodes in fn_examples.items()
+            k: tuple(d for x in nodes if (d := self.__call_node_to_example_dec(*x))) for k, nodes in fn_examples.items()
         }
 
     def __call_node_to_example_dec(self, node, via):
@@ -99,13 +98,7 @@ class AddExamplesCodemod(VisitorBasedCodemodCommand):
             func=self.decorator_func,
             args=(
                 [
-                    a.with_changes(
-                        comma=(
-                            a.comma
-                            if m.findall(a.comma, m.Comment())
-                            else cst.MaybeSentinel.DEFAULT
-                        )
-                    )
+                    a.with_changes(comma=(a.comma if m.findall(a.comma, m.Comment()) else cst.MaybeSentinel.DEFAULT))
                     for a in node.args
                 ]
                 if black
@@ -150,11 +143,7 @@ def get_patch_for(func, failing_examples, *, strip_via=()):
         return None
 
     modules_in_test_scope = sorted(
-        (
-            (k, v)
-            for (k, v) in module.__dict__.items()
-            if isinstance(v, types.ModuleType)
-        ),
+        ((k, v) for (k, v) in module.__dict__.items() if isinstance(v, types.ModuleType)),
         key=lambda kv: len(kv[1].__name__),
     )
 
@@ -193,9 +182,7 @@ def get_patch_for(func, failing_examples, *, strip_via=()):
             # we'll still want to support older versions.
             with suppress(Exception):
                 wrapper = cst.metadata.MetadataWrapper(node)
-                kwarg_names = {
-                    a.keyword for a in m.findall(wrapper, m.Arg(keyword=m.Name()))
-                }
+                kwarg_names = {a.keyword for a in m.findall(wrapper, m.Arg(keyword=m.Name()))}
                 node = m.replace(
                     wrapper,
                     m.Name(value=m.MatchIfTrue(names.__contains__))
@@ -272,8 +259,6 @@ def save_patch(patch: str, *, slug: str = "") -> Path:  # pragma: no cover
 
 def gc_patches(slug: str = "") -> None:  # pragma: no cover
     cutoff = date.today() - timedelta(days=7)
-    for fname in Path(storage_directory("patches")).glob(
-        f"????-??-??--{slug}????????.patch"
-    ):
+    for fname in Path(storage_directory("patches")).glob(f"????-??-??--{slug}????????.patch"):
         if date.fromisoformat(fname.stem.split("--")[0]) < cutoff:
             fname.unlink()

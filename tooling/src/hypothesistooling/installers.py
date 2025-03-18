@@ -48,9 +48,7 @@ def ensure_python(version):
 
 STACK = os.path.join(HOME, ".local", "bin", "stack")
 GHC = os.path.join(HOME, ".local", "bin", "ghc")
-SHELLCHECK = shutil.which("shellcheck") or os.path.join(
-    HOME, ".local", "bin", "shellcheck"
-)
+SHELLCHECK = shutil.which("shellcheck") or os.path.join(HOME, ".local", "bin", "shellcheck")
 
 
 def ensure_stack():

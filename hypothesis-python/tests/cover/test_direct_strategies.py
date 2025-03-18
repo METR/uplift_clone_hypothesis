@@ -34,10 +34,7 @@ def fn_test(*fnkwargs):
     return pytest.mark.parametrize(
         ("fn", "args"),
         fnkwargs,
-        ids=[
-            "{}({})".format(fn.__name__, ", ".join(map(pretty, args)))
-            for fn, args in fnkwargs
-        ],
+        ids=["{}({})".format(fn.__name__, ", ".join(map(pretty, args))) for fn, args in fnkwargs],
     )
 
 
@@ -344,9 +341,7 @@ def test_produces_valid_examples_from_args(fn, args):
 
 def test_build_class_with_target_kwarg():
     NamedTupleWithTargetField = collections.namedtuple("Something", ["target"])
-    check_can_generate_examples(
-        st.builds(NamedTupleWithTargetField, target=st.integers())
-    )
+    check_can_generate_examples(st.builds(NamedTupleWithTargetField, target=st.integers()))
 
 
 def test_builds_raises_with_no_target():

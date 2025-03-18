@@ -138,12 +138,8 @@ class UUIDFieldForm(ReprForm):
 
 
 class ChoiceFieldForm(ReprForm):
-    _choice = forms.ChoiceField(
-        choices=(("cola", "Cola"), ("tea", "Tea"), ("water", "Water"))
-    )
-    _multiple = forms.MultipleChoiceField(
-        choices=(("cola", "Cola"), ("tea", "Tea"), ("water", "Water"))
-    )
+    _choice = forms.ChoiceField(choices=(("cola", "Cola"), ("tea", "Tea"), ("water", "Water")))
+    _multiple = forms.MultipleChoiceField(choices=(("cola", "Cola"), ("tea", "Tea"), ("water", "Water")))
     _typed = forms.TypedChoiceField(
         choices=(("1", "one"), ("2", "two"), ("3", "three"), ("4", "four")),
         coerce=int,
@@ -234,6 +230,4 @@ class StoreForm(ReprModelForm):
 
 
 class MultipleCompaniesForm(ReprForm):
-    companies = forms.ModelMultipleChoiceField(
-        queryset=Company.objects.order_by("name")
-    )
+    companies = forms.ModelMultipleChoiceField(queryset=Company.objects.order_by("name"))

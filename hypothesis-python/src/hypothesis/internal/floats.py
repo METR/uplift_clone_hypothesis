@@ -59,9 +59,7 @@ def is_negative(x: SupportsFloat) -> bool:
     try:
         return math.copysign(1.0, x) < 0
     except TypeError:
-        raise TypeError(
-            f"Expected float but got {x!r} of type {type(x).__name__}"
-        ) from None
+        raise TypeError(f"Expected float but got {x!r} of type {type(x).__name__}") from None
 
 
 def count_between_floats(x: float, y: float, width: int = 64) -> int:
@@ -70,9 +68,7 @@ def count_between_floats(x: float, y: float, width: int = 64) -> int:
         if is_negative(y):
             return float_to_int(x, width) - float_to_int(y, width) + 1
         else:
-            return count_between_floats(x, -0.0, width) + count_between_floats(
-                0.0, y, width
-            )
+            return count_between_floats(x, -0.0, width) + count_between_floats(0.0, y, width)
     else:
         assert not is_negative(y)
         return float_to_int(y, width) - float_to_int(x, width) + 1

@@ -47,18 +47,12 @@ def get_test_function(source_code, settings_decorator=lambda fn: fn):
     except Exception:
         print(f"************\n{source_code}\n************")
         raise
-    tests = [
-        v
-        for k, v in namespace.items()
-        if k.startswith(("test_", "Test")) and not isinstance(v, ModuleType)
-    ]
+    tests = [v for k, v in namespace.items() if k.startswith(("test_", "Test")) and not isinstance(v, ModuleType)]
     assert len(tests) == 1, tests
     return settings_decorator(tests[0])
 
 
-@pytest.mark.parametrize(
-    "badness", ["not an exception", BaseException, [ValueError], (Exception, "bad")]
-)
+@pytest.mark.parametrize("badness", ["not an exception", BaseException, [ValueError], (Exception, "bad")])
 def test_invalid_exceptions(badness):
     with pytest.raises(InvalidArgument):
         ghostwriter._check_except(badness)
@@ -204,9 +198,7 @@ def test_binary_op_also_handles_frozensets():
 
 
 @varied_excepts
-@pytest.mark.parametrize(
-    "func", [re.compile, json.loads, json.dump, timsort, ast.literal_eval]
-)
+@pytest.mark.parametrize("func", [re.compile, json.loads, json.dump, timsort, ast.literal_eval])
 def test_ghostwriter_unittest_style(func, ex):
     source_code = ghostwriter.fuzz(func, except_=ex, style="unittest")
     assert issubclass(get_test_function(source_code), unittest.TestCase)
@@ -338,9 +330,7 @@ def test_run_ghostwriter_roundtrip():
         pass
 
     # Finally, restricting ourselves to finite floats makes the test pass!
-    source_code = source_code.replace(
-        "st.floats()", "st.floats(allow_nan=False, allow_infinity=False)"
-    )
+    source_code = source_code.replace("st.floats()", "st.floats(allow_nan=False, allow_infinity=False)")
     get_test_function(source_code, settings_decorator=s)()
 
 
@@ -484,21 +474,15 @@ def test_obj_name(temp_script_file, temp_script_file_with_py_function):
     # Module paths (strings including a "/") should raise a meaningful UsageError
     with pytest.raises(click.exceptions.UsageError) as e:
         cli.obj_name("mydirectory/myscript.py")
-    assert e.match(
-        "Remember that the ghostwriter should be passed the name of a module, not a path."
-    )
+    assert e.match("Remember that the ghostwriter should be passed the name of a module, not a path.")
     # Windows paths (strings including a "\") should also raise a meaningful UsageError
     with pytest.raises(click.exceptions.UsageError) as e:
         cli.obj_name(R"mydirectory\myscript.py")
-    assert e.match(
-        "Remember that the ghostwriter should be passed the name of a module, not a path."
-    )
+    assert e.match("Remember that the ghostwriter should be passed the name of a module, not a path.")
     # File names of modules (strings ending in ".py") should raise a meaningful UsageError
     with pytest.raises(click.exceptions.UsageError) as e:
         cli.obj_name("myscript.py")
-    assert e.match(
-        "Remember that the ghostwriter should be passed the name of a module, not a file."
-    )
+    assert e.match("Remember that the ghostwriter should be passed the name of a module, not a file.")
     # File names of modules (strings ending in ".py") that exist should get a suggestion
     with pytest.raises(click.exceptions.UsageError) as e:
         cli.obj_name(str(temp_script_file))
@@ -507,9 +491,7 @@ def test_obj_name(temp_script_file, temp_script_file_with_py_function):
         f"\n\tTry: hypothesis write {temp_script_file.stem}"
     )
     # File names of modules (strings ending in ".py") that define a py function should succeed
-    assert isinstance(
-        cli.obj_name(str(temp_script_file_with_py_function)), FunctionType
-    )
+    assert isinstance(cli.obj_name(str(temp_script_file_with_py_function)), FunctionType)
 
 
 def test_gets_public_location_not_impl_location():

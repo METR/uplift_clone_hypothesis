@@ -73,9 +73,7 @@ def _clean_source(src: str) -> bytes:
     # Remove blank lines and use the tokenize module to strip out comments,
     # so that those can be changed without changing the database key.
     try:
-        src = untokenize(
-            t for t in generate_tokens(StringIO(src).readline) if t.type != COMMENT
-        )
+        src = untokenize(t for t in generate_tokens(StringIO(src).readline) if t.type != COMMENT)
     except Exception:
         pass
     # Finally, remove any trailing whitespace and empty lines as a last cleanup.
@@ -130,17 +128,13 @@ def check_signature(sig: inspect.Signature) -> None:
             )
 
 
-def get_signature(
-    target: Any, *, follow_wrapped: bool = True, eval_str: bool = False
-) -> inspect.Signature:
+def get_signature(target: Any, *, follow_wrapped: bool = True, eval_str: bool = False) -> inspect.Signature:
     # Special case for use of `@unittest.mock.patch` decorator, mimicking the
     # behaviour of getfullargspec instead of reporting unusable arguments.
     patches = getattr(target, "patchings", None)
     if isinstance(patches, list) and all(isinstance(p, PatchType) for p in patches):
         P = inspect.Parameter
-        return inspect.Signature(
-            [P("args", P.VAR_POSITIONAL), P("keywargs", P.VAR_KEYWORD)]
-        )
+        return inspect.Signature([P("args", P.VAR_POSITIONAL), P("keywargs", P.VAR_KEYWORD)])
 
     if isinstance(getattr(target, "__signature__", None), inspect.Signature):
         # This special case covers unusual codegen like Pydantic models
@@ -155,19 +149,13 @@ def get_signature(
                 and selfy.default is inspect.Parameter.empty
                 and selfy.kind.name.startswith("POSITIONAL_")
             ):
-                return sig.replace(
-                    parameters=[v for k, v in sig.parameters.items() if k != "self"]
-                )
+                return sig.replace(parameters=[v for k, v in sig.parameters.items() if k != "self"])
         return sig
     # eval_str is only supported by Python 3.10 and newer
     if sys.version_info[:2] >= (3, 10):
-        sig = inspect.signature(
-            target, follow_wrapped=follow_wrapped, eval_str=eval_str
-        )
+        sig = inspect.signature(target, follow_wrapped=follow_wrapped, eval_str=eval_str)
     else:
-        sig = inspect.signature(
-            target, follow_wrapped=follow_wrapped
-        )  # pragma: no cover
+        sig = inspect.signature(target, follow_wrapped=follow_wrapped)  # pragma: no cover
     check_signature(sig)
     return sig
 
@@ -198,9 +186,7 @@ def required_args(target, args=(), kwargs=()):
     except (ValueError, TypeError):
         return set()
     return {
-        name
-        for name, param in list(sig.parameters.items())[len(args) :]
-        if arg_is_required(param) and name not in kwargs
+        name for name, param in list(sig.parameters.items())[len(args) :] if arg_is_required(param) and name not in kwargs
     }
 
 
@@ -262,12 +248,7 @@ def is_first_param_referenced_in_function(f):
     except Exception:
         return True  # Assume it's OK unless we know otherwise
     name = next(iter(get_signature(f).parameters))
-    return any(
-        isinstance(node, ast.Name)
-        and node.id == name
-        and isinstance(node.ctx, ast.Load)
-        for node in ast.walk(tree)
-    )
+    return any(isinstance(node, ast.Name) and node.id == name and isinstance(node.ctx, ast.Load) for node in ast.walk(tree))
 
 
 def extract_all_lambdas(tree, matching_signature):
@@ -490,7 +471,7 @@ def repr_call(f, args, kwargs, *, reorder=True):
     if repr_len > 30000:
         warnings.warn(
             "Generating overly large repr. This is an expensive operation, and with "
-            f"a length of {repr_len//1000} kB is unlikely to be useful. Use -Wignore "
+            f"a length of {repr_len // 1000} kB is unlikely to be useful. Use -Wignore "
             "to ignore the warning, or -Werror to get a traceback.",
             HypothesisWarning,
             stacklevel=2,
@@ -551,19 +532,12 @@ def define_function_signature(name, docstring, signature):
     newsig = signature.replace(
         parameters=[
             p if p.default is signature.empty else p.replace(default=not_set)
-            for p in (
-                p.replace(annotation=signature.empty)
-                for p in signature.parameters.values()
-            )
+            for p in (p.replace(annotation=signature.empty) for p in signature.parameters.values())
         ],
         return_annotation=signature.empty,
     )
 
-    pos_args = [
-        p
-        for p in signature.parameters.values()
-        if p.kind.name.startswith("POSITIONAL_")
-    ]
+    pos_args = [p for p in signature.parameters.values() if p.kind.name.startswith("POSITIONAL_")]
 
     def accept(f):
         fsig = inspect.signature(f, follow_wrapped=False)
@@ -611,11 +585,7 @@ def define_function_signature(name, docstring, signature):
         }
         if kwdefaults:
             result.__kwdefaults__ = kwdefaults
-        annotations = {
-            p.name: p.annotation
-            for p in signature.parameters.values()
-            if p.annotation is not signature.empty
-        }
+        annotations = {p.name: p.annotation for p in signature.parameters.values() if p.annotation is not signature.empty}
         if signature.return_annotation is not signature.empty:
             annotations["return"] = signature.return_annotation
         if annotations:

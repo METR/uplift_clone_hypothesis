@@ -58,11 +58,7 @@ def get_reports(file_contents, *, testdir):
     if crash in pytest_stdout:
         pytest.xfail(reason="upstream error in Black")
 
-    explanations = {
-        i: {(test_file, i)}
-        for i, line in enumerate(file_contents.splitlines())
-        if line.endswith(BUG_MARKER)
-    }
+    explanations = {i: {(test_file, i)} for i, line in enumerate(file_contents.splitlines()) if line.endswith(BUG_MARKER)}
     expected = [
         ("\n".join(r), "\n    | ".join(r))  # single, ExceptionGroup
         for r in make_report(explanations).values()

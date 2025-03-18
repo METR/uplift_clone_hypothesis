@@ -37,8 +37,7 @@ def run_length_encode(seq):
             # If you uncomment this line this branch will be skipped and we'll
             # always append a new run of length 1. Note which tests fail.
             # False and
-            s
-            == result[-1][0]
+            s == result[-1][0]
             # Try uncommenting this line and see what problems occur:
             # and result[-1][-1] < 2
         ):

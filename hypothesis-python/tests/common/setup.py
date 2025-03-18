@@ -29,10 +29,7 @@ def run():
     # See https://github.com/HypothesisWorks/hypothesis/issues/1674
     filterwarnings(
         "ignore",
-        message=(
-            "The virtualenv distutils package at .+ appears to be in the "
-            "same location as the system distutils?"
-        ),
+        message=("The virtualenv distutils package at .+ appears to be in the same location as the system distutils?"),
         category=UserWarning,
     )
 
@@ -45,9 +42,9 @@ def run():
         v = getattr(x, s.name)
         # Check if it has a dynamically defined default and if so skip comparison.
         if getattr(settings, s.name).show_default:
-            assert v == s.default or (
-                is_in_ci() and v == getattr(CI, s.name)
-            ), f"({v!r} == x.{s.name}) != (s.{s.name} == {s.default!r})"
+            assert v == s.default or (is_in_ci() and v == getattr(CI, s.name)), (
+                f"({v!r} == x.{s.name}) != (s.{s.name} == {s.default!r})"
+            )
 
     settings.register_profile(
         "default",

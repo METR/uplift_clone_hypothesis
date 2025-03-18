@@ -38,9 +38,7 @@ def test_strategy_priority_over_constraints():
 def test_invalid_annotated_type():
     msg = re.escape("Did you mean `Annotated[str | int, 'dummy']`?")
     with pytest.raises(ResolutionFailed, match=f".*{msg}$"):
-        check_can_generate_examples(
-            st.from_type(Annotated[str, "dummy", Annotated[int, "dummy"]])
-        )
+        check_can_generate_examples(st.from_type(Annotated[str, "dummy", Annotated[int, "dummy"]]))
 
 
 @pytest.mark.parametrize(

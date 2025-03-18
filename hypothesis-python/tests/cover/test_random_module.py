@@ -64,9 +64,7 @@ def test_cannot_register_non_Random():
         register_random("not a Random instance")
 
 
-@pytest.mark.filterwarnings(
-    "ignore:It looks like `register_random` was passed an object that could be garbage collected"
-)
+@pytest.mark.filterwarnings("ignore:It looks like `register_random` was passed an object that could be garbage collected")
 def test_registering_a_Random_is_idempotent():
     gc_collect()
     n_registered = len(entropy.RANDOMS_TO_MANAGE)
@@ -157,9 +155,7 @@ def test_find_does_not_pollute_state():
         assert state_a2 != state_b2
 
 
-@pytest.mark.filterwarnings(
-    "ignore:It looks like `register_random` was passed an object that could be garbage collected"
-)
+@pytest.mark.filterwarnings("ignore:It looks like `register_random` was passed an object that could be garbage collected")
 def test_evil_prng_registration_nonsense():
     # my guess is that other tests may register randoms that are then marked for
     # deletion (but not actually gc'd yet). Therefore, depending on the order tests
@@ -200,17 +196,13 @@ def test_evil_prng_registration_nonsense():
     assert r3.getstate() == s4, "retained state when registered within the context"
 
 
-@pytest.mark.skipif(
-    PYPY, reason="We can't guard against bad no-reference patterns in pypy."
-)
+@pytest.mark.skipif(PYPY, reason="We can't guard against bad no-reference patterns in pypy.")
 def test_passing_unreferenced_instance_raises():
     with pytest.raises(ReferenceError):
         register_random(random.Random(0))
 
 
-@pytest.mark.skipif(
-    PYPY, reason="We can't guard against bad no-reference patterns in pypy."
-)
+@pytest.mark.skipif(PYPY, reason="We can't guard against bad no-reference patterns in pypy.")
 def test_passing_unreferenced_instance_within_function_scope_raises():
     def f():
         register_random(random.Random(0))
@@ -219,9 +211,7 @@ def test_passing_unreferenced_instance_within_function_scope_raises():
         f()
 
 
-@pytest.mark.skipif(
-    PYPY, reason="We can't guard against bad no-reference patterns in pypy."
-)
+@pytest.mark.skipif(PYPY, reason="We can't guard against bad no-reference patterns in pypy.")
 def test_passing_referenced_instance_within_function_scope_warns():
     def f():
         r = random.Random(0)
@@ -229,18 +219,13 @@ def test_passing_referenced_instance_within_function_scope_warns():
 
     with pytest.warns(
         HypothesisWarning,
-        match="It looks like `register_random` was passed an object that could be"
-        " garbage collected",
+        match="It looks like `register_random` was passed an object that could be garbage collected",
     ):
         f()
 
 
-@pytest.mark.filterwarnings(
-    "ignore:It looks like `register_random` was passed an object that could be garbage collected"
-)
-@pytest.mark.skipif(
-    PYPY, reason="We can't guard against bad no-reference patterns in pypy."
-)
+@pytest.mark.filterwarnings("ignore:It looks like `register_random` was passed an object that could be garbage collected")
+@pytest.mark.skipif(PYPY, reason="We can't guard against bad no-reference patterns in pypy.")
 def test_register_random_within_nested_function_scope():
     n_registered = len(entropy.RANDOMS_TO_MANAGE)
 

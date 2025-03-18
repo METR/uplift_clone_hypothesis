@@ -24,9 +24,7 @@ def test_contains_the_test_function_name_in_the_exception_string():
     def this_has_a_totally_unique_name(x):
         reject()
 
-    with pytest.raises(
-        Unsatisfiable, match=re.escape(this_has_a_totally_unique_name.__name__)
-    ):
+    with pytest.raises(Unsatisfiable, match=re.escape(this_has_a_totally_unique_name.__name__)):
         this_has_a_totally_unique_name()
 
     class Foo:

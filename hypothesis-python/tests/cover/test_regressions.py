@@ -127,9 +127,7 @@ def test_prng_state_unpolluted_by_given_issue_1266():
 
 exc_instances = [
     errors.NoSuchExample("foobar", extra="baz"),
-    errors.DeadlineExceeded(
-        runtime=timedelta(seconds=1.5), deadline=timedelta(seconds=1.0)
-    ),
+    errors.DeadlineExceeded(runtime=timedelta(seconds=1.5), deadline=timedelta(seconds=1.0)),
     errors.RewindRecursive(int),
     errors.UnsatisfiedAssumption("reason for unsatisfied"),
     errors.FlakyReplay(

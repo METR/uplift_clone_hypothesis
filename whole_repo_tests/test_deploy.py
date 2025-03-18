@@ -16,9 +16,7 @@ import hypothesistooling as tools
 from hypothesistooling import __main__ as main, releasemanagement as rm
 
 
-@pytest.mark.parametrize(
-    "project", [p for p in tools.all_projects() if p.has_release()]
-)
+@pytest.mark.parametrize("project", [p for p in tools.all_projects() if p.has_release()])
 def test_release_file_exists_and_is_valid(project, monkeypatch):
     if not tools.has_uncommitted_changes(project.BASE_DIR):
         pytest.xfail("Cannot run release process with uncommitted changes")

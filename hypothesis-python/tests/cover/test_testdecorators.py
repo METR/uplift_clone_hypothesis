@@ -309,9 +309,7 @@ def test_can_find_string_with_duplicates(s):
 def test_has_ascii(x):
     if not x:
         return
-    ascii_characters = (
-        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ \t\n"
-    )
+    ascii_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ \t\n"
     assert any(c in ascii_characters for c in x)
 
 

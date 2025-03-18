@@ -55,11 +55,7 @@ from tests.common.debug import (
 from tests.common.utils import fails_with, temp_registered
 
 sentinel = object()
-BUILTIN_TYPES = tuple(
-    v
-    for v in vars(builtins).values()
-    if isinstance(v, type) and v.__name__ != "BuiltinImporter"
-)
+BUILTIN_TYPES = tuple(v for v in vars(builtins).values() if isinstance(v, type) and v.__name__ != "BuiltinImporter")
 generics = sorted(
     (
         t
@@ -67,10 +63,7 @@ generics = sorted(
         # We ignore TypeVar, because it is not a Generic type:
         if isinstance(t, types.typing_root_type)
         and t != typing.TypeVar
-        and (
-            sys.version_info[:2] <= (3, 11)
-            or t != getattr(typing, "ByteString", object())
-        )
+        and (sys.version_info[:2] <= (3, 11) or t != getattr(typing, "ByteString", object()))
     ),
     key=str,
 )
@@ -116,9 +109,7 @@ def test_typing_Type_int():
         assert_simple_property(from_type(t), lambda x: x is int)
 
 
-@given(
-    from_type(type[typing.Union[str, list]]) | from_type(_Type[typing.Union[str, list]])
-)
+@given(from_type(type[typing.Union[str, list]]) | from_type(_Type[typing.Union[str, list]]))
 def test_typing_Type_Union(ex):
     assert ex in (str, list)
 
@@ -275,9 +266,7 @@ def test_register_generic_typing_strats():
     ):
         # We register sets for the abstract sequence type, which masks subtypes
         # from supertype resolution but not direct resolution
-        assert_all_examples(
-            from_type(typing.Sequence[int]), lambda ex: isinstance(ex, set)
-        )
+        assert_all_examples(from_type(typing.Sequence[int]), lambda ex: isinstance(ex, set))
         assert_all_examples(
             from_type(typing.Container[int]),
             lambda ex: not isinstance(ex, typing.Sequence),
@@ -484,9 +473,7 @@ def test_raises_for_arg_with_unresolvable_annotation():
     with pytest.raises(ResolutionFailed):
         check_can_generate_examples(st.builds(unknown_annotated_func))
     with pytest.raises(ResolutionFailed):
-        check_can_generate_examples(
-            st.builds(unknown_annotated_func, a=st.none(), c=...)
-        )
+        check_can_generate_examples(st.builds(unknown_annotated_func, a=st.none(), c=...))
 
 
 @given(a=..., b=...)
@@ -577,11 +564,7 @@ class AnnotatedTarget:
 )
 def test_required_args(target, args, kwargs):
     # Mostly checking that `self` (and only self) is correctly excluded
-    check_can_generate_examples(
-        st.builds(
-            target, *map(st.just, args), **{k: st.just(v) for k, v in kwargs.items()}
-        )
-    )
+    check_can_generate_examples(st.builds(target, *map(st.just, args), **{k: st.just(v) for k, v in kwargs.items()}))
 
 
 class AnnotatedNamedTuple(typing.NamedTuple):
@@ -736,9 +719,7 @@ class SomeClass:
 
 
 def test_resolving_recursive_type_with_registered_constraint():
-    with temp_registered(
-        SomeClass, st.builds(SomeClass, value=st.integers(min_value=1))
-    ):
+    with temp_registered(SomeClass, st.builds(SomeClass, value=st.integers(min_value=1))):
 
         @given(s=st.from_type(SomeClass))
         def test(s):
@@ -748,9 +729,7 @@ def test_resolving_recursive_type_with_registered_constraint():
 
 
 def test_resolving_recursive_type_with_registered_constraint_not_none():
-    with temp_registered(
-        SomeClass, st.builds(SomeClass, value=st.integers(min_value=1))
-    ):
+    with temp_registered(SomeClass, st.builds(SomeClass, value=st.integers(min_value=1))):
         s = st.from_type(SomeClass)
         print(s, s.wrapped_strategy)
         find_any(s, lambda s: s.next_node is not None)
@@ -854,9 +833,7 @@ def test_bytestring_not_treated_as_generic_sequence(val):
 
 
 @pytest.mark.skipif(sys.version_info[:2] >= (3, 14), reason="FIXME-py314")
-@pytest.mark.parametrize(
-    "type_", [int, Real, object, typing.Union[int, str], typing.Union[Real, str]]
-)
+@pytest.mark.parametrize("type_", [int, Real, object, typing.Union[int, str], typing.Union[Real, str]])
 def test_bytestring_is_valid_sequence_of_int_and_parent_classes(type_):
     find_any(
         st.from_type(typing.Sequence[type_]),
@@ -896,32 +873,22 @@ def test_generic_aliases_can_be_conditionally_resolved_by_registered_function(
     def get_custom_container_strategy(thing):
         if restrict_custom_strategy and typing.get_origin(thing) != CustomContainer:
             return NotImplemented
-        return st.builds(
-            CustomContainer, content=st.from_type(typing.get_args(thing)[0])
-        )
+        return st.builds(CustomContainer, content=st.from_type(typing.get_args(thing)[0]))
 
     with temp_registered(CustomContainer, get_custom_container_strategy):
 
         def is_custom_container_with_str(example):
-            return isinstance(example, CustomContainer) and isinstance(
-                example.content, str
-            )
+            return isinstance(example, CustomContainer) and isinstance(example.content, str)
 
         def is_non_custom_container(example):
-            return isinstance(example, typing.Container) and not isinstance(
-                example, CustomContainer
-            )
+            return isinstance(example, typing.Container) and not isinstance(example, CustomContainer)
 
-        assert_all_examples(
-            st.from_type(CustomContainer[str]), is_custom_container_with_str
-        )
+        assert_all_examples(st.from_type(CustomContainer[str]), is_custom_container_with_str)
         # If the strategy function is restricting, it doesn't return a strategy
         # for requests for Container[...], so it's never generated. When not
         # restricting, it is generated.
         if restrict_custom_strategy:
-            assert_all_examples(
-                st.from_type(typing.Container[str]), is_non_custom_container
-            )
+            assert_all_examples(st.from_type(typing.Container[str]), is_non_custom_container)
         else:
             find_any(st.from_type(typing.Container[str]), is_custom_container_with_str)
             find_any(st.from_type(typing.Container[str]), is_non_custom_container)
@@ -1152,10 +1119,7 @@ def test_resolves_type_of_builtin_types(t):
     assert_simple_property(st.from_type(type[t.__name__]), lambda v: v is t)
 
 
-@given(
-    st.from_type(type[typing.Union["str", "int"]])
-    | st.from_type(_Type[typing.Union["str", "int"]])
-)
+@given(st.from_type(type[typing.Union["str", "int"]]) | st.from_type(_Type[typing.Union["str", "int"]]))
 def test_resolves_type_of_union_of_forwardrefs_to_builtins(x):
     assert x in (str, int)
 
@@ -1166,9 +1130,7 @@ def test_resolves_type_of_union_of_forwardrefs_to_builtins(x):
     [getattr(typing, "List", None)[int], typing.Optional[int]],
 )
 def test_builds_suggests_from_type(type_):
-    with pytest.raises(
-        InvalidArgument, match=re.escape(f"try using from_type({type_!r})")
-    ):
+    with pytest.raises(InvalidArgument, match=re.escape(f"try using from_type({type_!r})")):
         check_can_generate_examples(st.builds(type_))
     try:
         check_can_generate_examples(st.builds(type_, st.just("has an argument")))

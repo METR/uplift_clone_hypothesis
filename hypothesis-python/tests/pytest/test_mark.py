@@ -26,9 +26,7 @@ def test_bar():
 
 def test_can_select_mark(testdir):
     script = testdir.makepyfile(TESTSUITE)
-    result = testdir.runpytest(
-        script, "--verbose", "--strict-markers", "-m", "hypothesis"
-    )
+    result = testdir.runpytest(script, "--verbose", "--strict-markers", "-m", "hypothesis")
     out = "\n".join(result.stdout.lines)
     assert "1 passed, 1 deselected" in out
 
@@ -50,8 +48,6 @@ class TestStuff(TestCase):
 
 def test_can_select_mark_on_unittest(testdir):
     script = testdir.makepyfile(UNITTEST_TESTSUITE)
-    result = testdir.runpytest(
-        script, "--verbose", "--strict-markers", "-m", "hypothesis"
-    )
+    result = testdir.runpytest(script, "--verbose", "--strict-markers", "-m", "hypothesis")
     out = "\n".join(result.stdout.lines)
     assert "1 passed, 1 deselected" in out
